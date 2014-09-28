@@ -7,9 +7,8 @@ from flickrdownloader import get_image_urls
 from sift import process
 from PIL import Image
 from pylab import arange, cos, sin, plot, figure, gray, imshow, axis, show, pi
-
-#import scipy.io
-#mat = scipy.io.loadmat('rands.mat')
+import scipy.io
+from descriptor import test
 
 def plot_features(image, locations, circle=False):
     """ Show image with features. input: image (image as array), 
@@ -53,6 +52,8 @@ for image_url in image_urls[:2]:
 # get a list of all downloaded images    
 image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(image_dir,f))]
 
+descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
+
 # extract descriptors for all images
 for image_file in image_files:
     
@@ -63,5 +64,7 @@ for image_file in image_files:
         image = image.convert('L')
         
     locations, descriptors = process.process_image(image)
+    
+    test(descriptors, descriptor_data.get('cbest'), descriptor_data.get('idxbest'))
     
     plot_features(image, locations, True)
