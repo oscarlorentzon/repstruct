@@ -1,11 +1,15 @@
 import urllib
 import os.path
+from numpy import shape, array
 from os import listdir
 from os.path import isfile, join
 from flickrdownloader import get_image_urls
 from sift import process
 from PIL import Image
 from pylab import arange, cos, sin, plot, figure, gray, imshow, axis, show, pi
+
+#import scipy.io
+#mat = scipy.io.loadmat('rands.mat')
 
 def plot_features(image, locations, circle=False):
     """ Show image with features. input: image (image as array), 
@@ -52,8 +56,12 @@ image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(imag
 # extract descriptors for all images
 for image_file in image_files:
     
-    image = Image.open(image_file).convert('L')
-    gray_image = image.convert('L')
-    locations, descriptors = process.process_image(gray_image)
+    image = Image.open(image_file)
+    shape = array(image).shape
+    
+    if len(shape) == 3:
+        image = image.convert('L')
+        
+    locations, descriptors = process.process_image(image)
     
     plot_features(image, locations, True)
