@@ -1,6 +1,6 @@
 import urllib
 import os.path
-from numpy import shape, array
+from numpy import shape, array, histogram
 from os import listdir
 from os.path import isfile, join
 from flickrdownloader import get_image_urls
@@ -8,7 +8,7 @@ from sift import extract
 from PIL import Image
 from pylab import arange, cos, sin, plot, figure, gray, imshow, axis, show, pi
 import scipy.io
-from descriptor import test
+from descriptor import classify_descriptors, normalize_descriptor_histogram
 
 def plot_features(image, locations, circle=False):
     """ Show image with features. input: image (image as array), 
@@ -68,7 +68,11 @@ for image_file in image_files:
         
     locations, descriptors = extract.extract_feature_vectors(image)
     
-    #descriptor_data.get('idxbest')
-    test(descriptors, descriptor_data.get('cbest'))
+    descriptor_histogram = classify_descriptors(descriptors, descriptor_data.get('cbest'))
+    
+    #histnormering = hist(idxbest,1:a);
+    descriptor_histogram_norm, bins = histogram(descriptor_data.get('idxbest'), range(1,1002))
+    
+    normalized_descriptor_histogram = normalize_descriptor_histogram(descriptor_histogram, descriptor_histogram_norm)
     
     plot_features(image, locations, True)
