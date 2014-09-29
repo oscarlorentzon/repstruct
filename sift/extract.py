@@ -1,7 +1,7 @@
 from numpy import loadtxt
 import os
 
-def process_image(image,params="--edge-thresh 10 --peak-thresh 5"):
+def extract_feature_vectors(image,params="--edge-thresh 10 --peak-thresh 5"):
     """ Process an image and save the results in a file. """
     
     tmp_dir = os.path.dirname(os.path.abspath(__file__)) + "/tmp/"

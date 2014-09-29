@@ -4,7 +4,7 @@ from numpy import shape, array
 from os import listdir
 from os.path import isfile, join
 from flickrdownloader import get_image_urls
-from sift import process
+from sift import extract
 from PIL import Image
 from pylab import arange, cos, sin, plot, figure, gray, imshow, axis, show, pi
 import scipy.io
@@ -31,23 +31,26 @@ def plot_features(image, locations, circle=False):
     axis('off')
     show()
 
+download = False
 api_key = '5145b16c5f46c546da37da57f7dd9bd3'
 tag = 'goldengatebridge'
 
-# Get image urls from flickr api
-image_urls = get_image_urls(api_key, tag)
-
 image_dir = os.path.dirname(os.path.abspath(__file__)) + "/images/" + tag
-if not os.path.exists(image_dir):
-    os.makedirs(image_dir)
 
-# download images from flickr
-i = 1
-for image_url in image_urls[:2]:
+if download:
+    # Get image urls from flickr api
+    image_urls = get_image_urls(api_key, tag)
     
-    image_path = image_dir + "/" + tag + str(i) + ".jpg"
-    urllib.urlretrieve(image_url, image_path)
-    i += 1
+    if not os.path.exists(image_dir):
+        os.makedirs(image_dir)
+
+    # download images from flickr
+    i = 1
+    for image_url in image_urls[:2]:
+        
+        image_path = image_dir + "/" + tag + str(i) + ".jpg"
+        urllib.urlretrieve(image_url, image_path)
+        i += 1
 
 # get a list of all downloaded images    
 image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(image_dir,f))]
@@ -63,8 +66,9 @@ for image_file in image_files:
     if len(shape) == 3:
         image = image.convert('L')
         
-    locations, descriptors = process.process_image(image)
+    locations, descriptors = extract.extract_feature_vectors(image)
     
-    test(descriptors, descriptor_data.get('cbest'), descriptor_data.get('idxbest'))
+    #descriptor_data.get('idxbest')
+    test(descriptors, descriptor_data.get('cbest'))
     
     plot_features(image, locations, True)

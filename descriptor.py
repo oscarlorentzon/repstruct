@@ -1,42 +1,22 @@
-from numpy import multiply, sqrt, sum
+import numpy as np
 
-
-def test(descriptors, cluster_center_locations, cluster_center_indeces):
+def get_descriptor_histogram(descriptors, cluster_center_locations):
     
-    a = multiply(cluster_center_locations, cluster_center_locations)
     
-    cluster_center_norm =  sqrt(sum(multiply(cluster_center_locations, cluster_center_locations), 1))
+    cluster_center_norm =  np.sqrt(np.sum(np.multiply(cluster_center_locations, cluster_center_locations), 1))
     
-    a = 1
+    normalized_cluster_center_locations = np.divide(cluster_center_locations, np.tile(cluster_center_norm, [128,1]).transpose())
 
-
-
-
-
-#% Clustering descriptors and creating a histogramvector for each image
-#    cnorm = sqrt(sum(cbest.*cbest,2));
-#    cbest = cbest./cnorm(:,ones(128,1));
-#    k = length(descriptors);
-#    a = size(cbest,1);
-#    xd = zeros(k,a);
-#    hixindic = zeros(1,k);
-#    histnormering = hist(idxbest,1:a);
-#    for i = 1:k
-#        indexes = klustra(descriptors{i},cbest);
-#        hists = hist(indexes,1:a);
-#        % Eliminate images with less than 100 descriptors
-#        if sum(hists) >= 100
-#            xd(i,:) = hists;
-#            hixindic(i) = 1;
-#        end
-#    end
-#    histindexes = find(hixindic);
-#    xd = xd(histindexes,:);
+    indices = get_closest_cluster_center_indices(descriptors, normalized_cluster_center_locations)
     
+    # TODO: 1000 is length of cluster center locations
+    descriptor_histogram = np.histogram(indices, range(1,1001))
+    
+    return descriptor_histogram
 
 
-#function idX = klustra(X,c)
-#% Clusters descriptors into classes with centroids 
-#% on the unit sphere using cosine similarity
-#    [duh,idX] = max(X*c',[],2);
-#end
+def get_closest_cluster_center_indices(descriptors, normalized_cluster_center_locations):
+    
+    return np.argmax(np.dot(descriptors, normalized_cluster_center_locations.transpose()), 1)
+
+
