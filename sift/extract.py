@@ -1,7 +1,7 @@
 from numpy import loadtxt
 import os
 
-def extract_feature_vectors(image,params="--edge-thresh 10 --peak-thresh 5"):
+def extract_feature_vectors(image,params="--edge-thresh 10 --peak-thresh 1"):
     """ Process an image and save the results in a file. """
     
     tmp_dir = os.path.dirname(os.path.abspath(__file__)) + "/tmp/"
@@ -16,7 +16,7 @@ def extract_feature_vectors(image,params="--edge-thresh 10 --peak-thresh 5"):
     cmmd = str("sift " + tmp_pgm + " --output=" + tmp_key + " " + params)
     os.system(cmmd)
 
-    print "processed", "to", tmp_key
+    # print "processed", "to", tmp_key
     
     result = loadtxt(tmp_key)
     return result[:,:4], result[:,4:]

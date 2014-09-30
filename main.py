@@ -1,38 +1,24 @@
 import urllib
 import os.path
-from numpy import shape, array, histogram
+import numpy as np
 from os import listdir
 from os.path import isfile, join
 from flickrdownloader import get_image_urls
 from sift import extract
 from PIL import Image
-from pylab import arange, cos, sin, plot, figure, gray, imshow, axis, show, pi
 import scipy.io
 from descriptor import classify_descriptors, normalize_descriptor_histogram
-
-def plot_features(image, locations, circle=False):
-    """ Show image with features. input: image (image as array), 
-        locations (row, col, scale, orientation of each feature). """
-
-    def draw_circle(center, radius):
-        t = arange(0,1.01,.01) * 2 * pi
-        x = radius * cos(t) + center[0]
-        y = radius * sin(t) + center[1]
-        plot(x, y, 'b', linewidth=2)
-
-    figure()
-    gray()
-    imshow(image)
-    if circle:
-        for location in locations:
-            draw_circle(location[:2], location[2]) 
-    else:
-        plot(locations[:,0], locations[:,1], 'ob')
-    axis('off')
-    show()
+import feat_vec
+from matplotlib.pyplot import plot, figure, show, axhline, axvline
+from matplotlib.figure import Figure
 
 download = False
-api_key = '5145b16c5f46c546da37da57f7dd9bd3'
+extract_features = False
+load = True
+
+with open ("flickr_key.txt", "r") as myfile:
+    api_key=myfile.read()
+
 tag = 'goldengatebridge'
 
 image_dir = os.path.dirname(os.path.abspath(__file__)) + "/images/" + tag
@@ -46,33 +32,61 @@ if download:
 
     # download images from flickr
     i = 1
-    for image_url in image_urls[:2]:
+    for image_url in image_urls:
         
         image_path = image_dir + "/" + tag + str(i) + ".jpg"
         urllib.urlretrieve(image_url, image_path)
         i += 1
-
-# get a list of all downloaded images    
-image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(image_dir,f))]
-
-descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
-
-# extract descriptors for all images
-for image_file in image_files:
     
-    image = Image.open(image_file)
-    shape = array(image).shape
+    print "images downloaded"
+
+a = np.array([]).reshape(0, 1000)
+
+if extract_features:
+    # get a list of all downloaded images    
+    image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(image_dir,f))]
     
-    if len(shape) == 3:
-        image = image.convert('L')
+    descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
+    
+    # extract descriptors for all images
+    for image_file in image_files:
         
-    locations, descriptors = extract.extract_feature_vectors(image)
+        image = Image.open(image_file)
+        shape = np.array(image).shape
+        
+        if len(shape) == 3:
+            image = image.convert('L')
+            
+        locations, descriptors = extract.extract_feature_vectors(image)
+        
+        descriptor_norm = np.sqrt(np.sum(np.multiply(descriptors, descriptors)))
+        
+        descriptors = descriptors / descriptor_norm
+        
+        descriptor_histogram = classify_descriptors(descriptors, descriptor_data.get('cbest'))
+        
+        print "Number of descriptors", (sum(descriptor_histogram))
+        
+        descriptor_histogram_norm, bins = np.histogram(descriptor_data.get('idxbest'), range(1,1002))
+        
+        normalized_descriptor_histogram = normalize_descriptor_histogram(descriptor_histogram, descriptor_histogram_norm)
+        
+        a = np.vstack((a, normalized_descriptor_histogram))
     
-    descriptor_histogram = classify_descriptors(descriptors, descriptor_data.get('cbest'))
+    np.savetxt("deschists.txt", a)
     
-    #histnormering = hist(idxbest,1:a);
-    descriptor_histogram_norm, bins = histogram(descriptor_data.get('idxbest'), range(1,1002))
+    print "descriptor histograms created"
     
-    normalized_descriptor_histogram = normalize_descriptor_histogram(descriptor_histogram, descriptor_histogram_norm)
-    
-    plot_features(image, locations, True)
+if load:
+    a = np.loadtxt("deschists.txt", float)
+
+y, V = feat_vec.generate_feature_vectors(a)
+
+figure()
+plot(y[:,1], y[:,2], '*')
+axhline(0)
+axvline(0)
+show()
+
+for value in y[:,2]:
+    print value

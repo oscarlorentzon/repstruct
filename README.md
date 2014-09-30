@@ -1,11 +1,13 @@
-## About repstruct
+# About repstruct
 
-repstruct is a python library for finding representative structures in large image collections. It is a port of the Matlab code written for the Master's thesis [Finding reprensentative structures in large image collections](http://www2.maths.lth.se/vision/education/pages/OscarNils09/) by Oscar Lorentzon and Nils Lundahl.
+Repstruct is a python library for finding representative structures in large image collections. It is implemented according to the theory of the Master's thesis [Finding reprensentative structures in large image collections](http://www2.maths.lth.se/vision/education/pages/OscarNils09/) by Oscar Lorentzon and Nils Lundahl.
 
-### Dependencies
+## Running
+To be able to download images from flickr.com an API key is required. An API key can be obtained from flickr.com. The API key should be provided by adding a text file called flickr_key.txt with the API key in the root of the project.
+
+## Dependencies
 You need to have Python 2.7+ and the following python libraries:
 
-* [PCV](https://github.com/jesolem/PCV)
 * [NumPy](http://numpy.scipy.org/)
 * [SciPy](http://scipy.org/)
 * [Matplotlib](http://matplotlib.sourceforge.net/)

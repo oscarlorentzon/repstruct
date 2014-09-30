@@ -1,3 +1,6 @@
 *.pyc
+flickr_key.txt
+
+*.*~
 images/*
 sift/tmp/*
