@@ -1,5 +1,7 @@
 *.pyc
+
 flickr_key.txt
+deschists.txt
 
 *.*~
 images/*
