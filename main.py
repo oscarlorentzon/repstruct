@@ -9,17 +9,17 @@ from PIL import Image
 import scipy.io
 from descriptor import classify_descriptors, normalize_descriptor_histogram
 import feat_vec
-from matplotlib.pyplot import plot, figure, show, axhline, axvline
-from matplotlib.figure import Figure
+from matplotlib.pyplot import plot, figure, show, axhline, axvline, imshow
+import kclosest as kc
 
-download = False
-extract_features = False
+download = True
+extract_features = True
 load = True
 
 with open ("flickr_key.txt", "r") as myfile:
-    api_key=myfile.read()
+    api_key=myfile.readline().rstrip()
 
-tag = 'goldengatebridge'
+tag = 'steppyramid'
 
 image_dir = os.path.dirname(os.path.abspath(__file__)) + "/images/" + tag
 
@@ -42,6 +42,8 @@ if download:
 
 a = np.array([]).reshape(0, 1000)
 
+image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(image_dir,f))]
+
 if extract_features:
     # get a list of all downloaded images    
     image_files = [join(image_dir,f) for f in listdir(image_dir) if isfile(join(image_dir,f))]
@@ -51,7 +53,7 @@ if extract_features:
     # extract descriptors for all images
     for image_file in image_files:
         
-        image = Image.open(image_file)
+        image = Image.open(image_file)        
         shape = np.array(image).shape
         
         if len(shape) == 3:
@@ -73,14 +75,53 @@ if extract_features:
         
         a = np.vstack((a, normalized_descriptor_histogram))
     
-    np.savetxt("deschists.txt", a)
+    np.savetxt("deschists_" + tag + ".txt", a)
     
     print "descriptor histograms created"
     
 if load:
-    a = np.loadtxt("deschists.txt", float)
+    a = np.loadtxt("deschists_" + tag + ".txt", float)
 
 y, V = feat_vec.generate_feature_vectors(a)
+
+closest30 = kc.test(30, y[:,:30])
+
+ixs = kc.test(5, y[closest30,:])
+
+closest5 = closest30[ixs]
+
+iiii = 1
+fig = figure()
+for c in closest30:
+    image_file = image_files[c]
+    image = Image.open(image_file)   
+    
+    sub = fig.add_subplot(3,10,iiii)
+    sub.imshow(image)
+    
+    iiii += 1
+
+show()
+
+iii = 1
+fig = figure()
+for c in closest5:
+    image_file = image_files[c]
+    image = Image.open(image_file)   
+    
+    sub = fig.add_subplot(2,3,iii)
+    sub.imshow(image)
+    
+    iii += 1
+
+show()
+
+a = 1
+
+#%# Determining the five closest images
+#    D2 = pdist(y(IXS,:),'cosine');
+#    ixs = kclosest(5,D2);
+#    finalfive = IXS(ixs);
 
 figure()
 plot(y[:,1], y[:,2], '*')
