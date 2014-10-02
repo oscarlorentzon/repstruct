@@ -3,7 +3,7 @@ from PIL import Image
 import numpy as np
 
 import sift as sift
-import descriptor as descriptor
+import features.descriptor as desc
 
 class Extractor:
     
@@ -13,13 +13,16 @@ class Extractor:
     def extract(self):
         descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
         
-        descriptor_cluster_centers = descriptor_data.get('cbest')
-        descriptor_cluster_center_indexes = descriptor_data.get('idxbest')
+        # Descriptor training data cluster centers
+        desc_cc = descriptor_data.get('cbest')
+
+        # Gets the training data descriptor cluster center indexes and create histogram
+        desc_cc_norm, bins = np.histogram(descriptor_data.get('idxbest'), range(1,1002))
         
         # Create empty histogram array
         H = np.array([]).reshape(0, 1000)
         
-        # extract descriptors for all images
+        # extract descs for all images
         for image_file in self.image_files:
             
             image = Image.open(image_file)        
@@ -28,20 +31,16 @@ class Extractor:
             if len(shape) == 3:
                 image = image.convert('L')
                 
-            locations, descriptors = sift.extract_feature_vectors(image)
+            locs, descs = sift.extract_feature_vectors(image)
             
-            descriptor_norm = np.sqrt(np.sum(np.multiply(descriptors, descriptors)))
+            descs = desc.normalize(descs)
+            desc_cc = desc.normalize(desc_cc)
+            desc_hist = desc.classify(descs, desc_cc)
             
-            descriptors = descriptors / descriptor_norm
+            norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
+
+            H = np.vstack((H, norm_desc_hist))
             
-            descriptor_histogram = descriptor.classify_descriptors(descriptors, descriptor_cluster_centers)
+            print "Number of descs", descs.shape[0] #(sum(desc_hist))
             
-            print "Number of descriptors", (sum(descriptor_histogram))
-            
-            descriptor_histogram_norm, bins = np.histogram(descriptor_cluster_center_indexes, range(1,1002))
-            
-            normalized_descriptor_histogram = descriptor.normalize_descriptor_histogram(descriptor_histogram, descriptor_histogram_norm)
-            
-            H = np.vstack((H, normalized_descriptor_histogram))
-        
         return H
