@@ -5,4 +5,4 @@ deschists_*.txt
 
 *.*~
 images/*
-sift/tmp/*
+features/tmp/*

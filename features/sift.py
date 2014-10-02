@@ -20,6 +20,3 @@ def extract_feature_vectors(image,params="--edge-thresh 10 --peak-thresh 1"):
     
     result = loadtxt(tmp_key)
     return result[:,:4], result[:,4:]
-    
-    
-
