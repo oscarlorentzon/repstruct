@@ -8,6 +8,7 @@ To be able to download images from flickr.com an API key is required. An API key
 ## Dependencies
 You need to have Python 2.7+ and the following python libraries:
 
+* [PIL](http://www.pythonware.com/products/pil/)
 * [NumPy](http://numpy.scipy.org/)
 * [SciPy](http://scipy.org/)
 * [Matplotlib](http://matplotlib.sourceforge.net/)
