@@ -10,7 +10,7 @@ from analysis import pca, kclosest
 
 # Steps to run
 download = False
-extract_features = True
+extract_features = False
 
 # Parameters
 with open ("flickr_key.txt", "r") as myfile:
