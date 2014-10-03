@@ -11,6 +11,8 @@ def k_closest(k, V, metric='cosine'):
         k : The number of elements in the result set.
         V : A 2-D array with vectors in rows for which to find the 
             closest set of k vectors.
+        metric : The metric for which to perform the distance measure.
+            Possible values are the ones defined for scipy.spatial.distance.pdist.
     
         Returns
         -------

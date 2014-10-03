@@ -1,6 +1,6 @@
 import numpy as np
 
-def neutral_sub_pca(X, neut_factor = 0.8):
+def neutral_sub_pca(X, neut_factor=0.8):
     
     x_shape = X.shape
     row_count = x_shape[0]

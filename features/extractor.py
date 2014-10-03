@@ -17,7 +17,7 @@ class Extractor:
         desc_cc = descriptor_data.get('cbest')
 
         # Gets the training data descriptor cluster center indexes and create histogram
-        desc_cc_norm, bins = np.histogram(descriptor_data.get('idxbest'), range(1,1002))
+        desc_cc_norm, bins = np.histogram(descriptor_data.get('idxbest'), range(1, 1002))
         
         # Create empty histogram array
         H = np.array([]).reshape(0, 1000)
