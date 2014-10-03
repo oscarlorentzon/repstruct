@@ -20,7 +20,6 @@ def classify(X, C):
     """ Classifies the row vectors of X on the cluster center
         row vectors of C using cosine similarity.
         
-            
         Parameters
         ----------
         X : A 2-D array.
@@ -50,8 +49,7 @@ def classify(X, C):
 def normalize_by_division(v, n):
     """ Divides each element of the vector v with the corresponding 
         element of the normalization vector n.
-        
-            
+         
         Parameters
         ----------
         v : A 1-D array.

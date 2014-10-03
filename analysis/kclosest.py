@@ -2,9 +2,19 @@ import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
 def k_closest(k, V, metric='cosine'):
-    """ Returns an approximate solution to the problem of
-        finding the closest group of k elements in a set
-        where the internal distances are given by Dv.
+    """ Performs an approximate solution to the problem of
+        finding the closest group of k elements in a set of 
+        vectors.
+        
+        Parameters
+        ----------
+        k : The number of elements in the result set.
+        V : A 2-D array with vectors in rows for which to find the 
+            closest set of k vectors.
+    
+        Returns
+        -------
+        An array of row indices for the k closest row vectors.
     """
     
     d = pdist(V, metric)
@@ -12,30 +22,30 @@ def k_closest(k, V, metric='cosine'):
     D = squareform(d)
     N = D.shape[0]
     
-    distsum = np.zeros(N)
-    distsum2 = np.zeros(k)
-    ix = np.zeros((N, k), dtype=np.int)
+    total_dist = np.zeros(N)
+    neighbours = np.zeros((N, k), dtype=np.int)
 
     # For each element, calculate the sum of distances 
-    # to itself (=0) and its k-1 nearest neighbours
+    # to itself (=0) and its k-1 nearest neighbors.
     for i in range(0, N):
-        indices = np.argsort(D[i,:])
+        row = D[i,:]
         
-        vect = D[indices,i]
-        distsum[i] = sum(vect[:k])
+        # Get indices for the k closest items.
+        indices = np.argsort(row)[:k]
+        total_dist[i] = sum(row[indices])
+        neighbours[i,:] = indices
         
-        ix[i,:] = indices[:k]
-        
-    # Pick the k elements with the smallest distance sum
-    indices2 = np.argsort(distsum)
-    ix = ix[indices2[:k],:]
+    # Pick the k elements with the smallest distance sum.
+    neighbours = neighbours[np.argsort(total_dist)[:k],:]
     
     # For each of these k elements, calculate the sum of
-    # all internal distances in its neighbourhood and 
-    # return the neighbourhood with the smallest sum
+    # all internal distances in its neighborhood and 
+    # return the neighborhood with the smallest sum.
+    distsum2 = np.zeros(k)
+    
     for i in range(0, k):
         
-        a1 = ix[i,:]
+        a1 = neighbours[i,:]
         
         a = D[a1[:, None], a1]
         b = sum(a)
@@ -45,6 +55,6 @@ def k_closest(k, V, metric='cosine'):
 
     mini = np.argmin(distsum2)
     
-    ixs = ix[mini,:] 
+    ixs = neighbours[mini,:] 
     
     return ixs
