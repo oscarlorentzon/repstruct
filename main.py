@@ -35,17 +35,16 @@ if extract_features:
 else:
     H = np.loadtxt("deschists_" + tag + ".txt", float)
 
-y, V = pca.neutral_sub_pca(H)
+Y, V = pca.neutral_sub_pca(H)
 
-y30 = y[:,:30]
-closest30 = kclosest.k_closest(30, y30)
-ixs = kclosest.k_closest(5, y30[closest30,:])
-closest5 = closest30[ixs]
+Y30 = Y[:,:30]
+closest30 = kclosest.k_closest(30, Y30)
+closest5 = closest30[kclosest.k_closest(5, Y30[closest30,:])]
 
 plothelper.plot_images(np.array(image_files)[closest30], 3, 10)
 plothelper.plot_images(np.array(image_files)[closest5], 1, 5)
 
-#plothelper.plot_pca_projections(y, 1, 2)
-#plothelper.plot_pca_projections(y, 3, 4)
+plothelper.plot_pca_projections(Y, 1, 2)
+plothelper.plot_pca_projections(Y, 3, 4)
 
 
