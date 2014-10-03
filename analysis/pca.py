@@ -6,7 +6,7 @@ def neutral_sub_pca(X, neut_factor = 0.8):
     row_count = x_shape[0]
     vector_length = x_shape[1]
     
-    # Subracting a neutral vector for row in X before performing SVD
+    # Subtracting a neutral vector for row in X before performing SVD
     N = np.sqrt(1.0/vector_length)*np.array([np.ones(vector_length),]*row_count)
     X_neut = X-neut_factor*N
     
