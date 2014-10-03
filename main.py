@@ -35,7 +35,7 @@ if extract_features:
 else:
     H = np.loadtxt("deschists_" + tag + ".txt", float)
 
-y, V = pca.generate_feature_vectors(H)
+y, V = pca.neutral_sub_pca(H)
 
 y30 = y[:,:30]
 closest30 = kclosest.k_closest(30, y30)

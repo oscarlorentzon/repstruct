@@ -1,20 +1,18 @@
 import numpy as np
 
-def generate_feature_vectors(X):
+def neutral_sub_pca(X, neut_factor = 0.8):
     
     x_shape = X.shape
+    row_count = x_shape[0]
     vector_length = x_shape[1]
-    nbr_of_vectors = x_shape[0]
-    norm_neutral_vector = 0.8
-    neutral_vector = np.sqrt(1.0 / vector_length) * np.ones(vector_length)
     
-    neutral_2d_array = np.array([neutral_vector,]*nbr_of_vectors)
+    # Subracting a neutral vector for row in X before performing SVD
+    N = np.sqrt(1.0/vector_length)*np.array([np.ones(vector_length),]*row_count)
+    X_neut = X-neut_factor*N
     
-    desc_subtracted_with_norm = X - norm_neutral_vector * neutral_2d_array
-    
-    U,S,V = np.linalg.svd(desc_subtracted_with_norm)
+    U,S,V = np.linalg.svd(X_neut)
     
     # projecting feature vectors on principal components
-    y = np.dot(desc_subtracted_with_norm, V)
+    y = np.dot(X_neut, V)
     
     return y, V
