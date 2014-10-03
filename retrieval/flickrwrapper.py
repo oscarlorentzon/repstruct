@@ -7,13 +7,14 @@ class FlickrWrapper:
     def __init__(self, api_key):
         self.api_key = api_key
         
-    def get_image_urls(self, tag, sort_mode='date-posted-desc'):
+    def get_urls(self, tag, sort_mode='date-posted-desc'):
         """Gets image URLs from Flickr.
     
-        Keyword arguments:
-        api_key -- The Flickr API key.
-        tag -- The tag for the search.
-        sort_mode -- One of the values in the Flickr sort mode enumeration.
+        Parameters
+        ----------
+        api_key : The Flickr API key.
+        tag : The tag for the search.
+        sort_mode : One of the values in the Flickr sort mode enumeration.
         """
         
         flickrApi = flickrapi.FlickrAPI(self.api_key)
@@ -21,17 +22,18 @@ class FlickrWrapper:
         
         return ["https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg".format(photo.get('farm'), photo.get('server'), photo.get('id'), photo.get('secret')) for photo in photos[0]]
 
-    def download_images(self, image_dir, tag, sort_mode='date-posted-desc'):
+    def download(self, image_dir, tag, sort_mode='date-posted-desc'):
         """ Downloads images for a tag from Flickr.
     
-        Keyword arguments:
-        image_dir -- The diriectory for sotring the images
-        api_key -- The Flickr API key.
-        tag -- The tag for the search.
-        sort_mode -- One of the values in the Flickr sort mode enumeration.
+        Parameters
+        ----------
+        image_dir : The directory for sorting the images
+        api_key : The Flickr API key.
+        tag : The tag for the search.
+        sort_mode : One of the values in the Flickr sort mode enumeration.
         """
 
-        image_urls = self.get_image_urls(tag, sort_mode)
+        image_urls = self.get_urls(tag, sort_mode)
         
         if not os.path.exists(image_dir):
             os.makedirs(image_dir)
