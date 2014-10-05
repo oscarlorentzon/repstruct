@@ -22,3 +22,8 @@ def plot_pca_projections(V, pc1, pc2):
     pyplot.axvline(0)
     pyplot.show()
     
+def plot_points(x,y):
+    pyplot.figure()
+    pyplot.plot(x, y, '*')
+    pyplot.show()
+    
