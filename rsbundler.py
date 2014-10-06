@@ -10,6 +10,7 @@ from display import plothelper
 class FlickrRsBundler:
     
     hist_file = "deschists_{0}.txt"
+    neut_file = "neut_{0}.txt"
     
     def __init__(self, api_key, tag):
         self.flickrWrapper = FlickrWrapper(api_key)
@@ -31,17 +32,21 @@ class FlickrRsBundler:
     
     def extract(self):
         self.files()
-        self.H = extractor.extract(self.image_files)
+        self.H, self.N = extractor.extract(self.image_files)
         
     def save(self):
         np.savetxt(self.hist_file.format(self.tag), self.H)
+        np.savetxt(self.neut_file.format(self.tag), self.N)
         
     def load(self):
         self.files()
         self.H = np.loadtxt(self.hist_file.format(self.tag), float)
+        self.H = np.loadtxt(self.neut_file.format(self.tag), float)
         
-    def process(self):
-        self.Y, V = pca.neutral_sub_pca(self.H)
+    def process(self):        
+        #self.Y, V = pca.neutral_sub_pca(self.H)
+        
+        self.Y, V = pca.neutral_sub_pca_vector(self.H, self.N)
 
         Y30 = self.Y[:,:30]
         self.closest30 = kclosest.k_closest(30, Y30)

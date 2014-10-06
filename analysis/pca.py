@@ -30,3 +30,29 @@ def neutral_sub_pca(X, neut_factor=0.8):
     Y = np.dot(X_neut, V)
     
     return Y, V
+
+def neutral_sub_pca_vector(X, N):
+    """ Performs PCA by singular value decomposition after subtracting
+        a neutral vector with a specified factor. 
+        
+        Parameters
+        ----------
+        X : A 2-D array with normalized row vectors.
+        neut_factor : The factor of the neutralization vector.
+      
+        Returns
+        -------
+        Y : A 2-D array of projections of the row vectors of X on the 
+            principal components.
+        V : The principal components of X.
+    """
+    
+    # Subtracting a neutral vector for each row in X before performing SVD.
+    X_neut = X-N
+    
+    U,S,V = np.linalg.svd(X_neut)
+    
+    # Projecting feature vectors on principal components.
+    Y = np.dot(X_neut, V)
+    
+    return Y, V

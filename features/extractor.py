@@ -48,18 +48,18 @@ def extract(image_files):
         
         im = np.array(image)
         
+        #if len(shape) == 3:
         locs_x = np.empty((locs.shape[0],), dtype='int')
         locs_y = np.empty((locs.shape[0],), dtype='int')
-        np.round(locs[:, 1], out=locs_x)
-        np.round(locs[:, 0], out=locs_y)
-        
-        colors_desc = im[locs_x, locs_y, :]/255.0
+        np.floor(locs[:, 1], out=locs_x)
+        np.floor(locs[:, 0], out=locs_y)
+        colors_desc = im[locs_x, locs_y]/255.0
         
         rand_x = np.empty((x.shape[0],), dtype='int')
         rand_y = np.empty((y.shape[0],), dtype='int')
         im_shape = im.shape
-        np.round(im_shape[0]*np.array(x), out=rand_x)
-        np.round(im_shape[1]*np.array(y), out=rand_y)
+        np.floor(im_shape[0]*np.array(x), out=rand_x)
+        np.floor(im_shape[1]*np.array(y), out=rand_y)
         
         colors_rand = im[rand_x, rand_y]/255.0
         
@@ -85,6 +85,9 @@ def extract(image_files):
         
         aanormhist = desc.normalize_by_division(aahist, color_cc_norm)
         bbnormhist = desc.normalize_by_division(bbhist, color_cc_norm)
+        #else:
+        #    colors_desc = np.zeros((locs.shape[0], 3))
+        
 
         w = 0.725
         cw = (1-w)/2
@@ -97,7 +100,18 @@ def extract(image_files):
         
         print "Number of descs", descs.shape[0]
         
-    return H
+    N = create_neutral_vector(np.array([[desc_cc.shape[0], np.sqrt(w)],[color_cc.shape[0], np.sqrt(cw)],[color_cc.shape[0], np.sqrt(cw)]]), H.shape[0])
+            
+    return H, N
+
+def create_neutral_vector(D, rows):
+    
+    A = np.array([]).reshape(rows, 0)
+    
+    for d in D:
+        A = np.concatenate((A, d[1]*np.sqrt(1.0/d[0])*np.array([np.ones(d[0]),]*rows)), axis=1)
+    
+    return A
 
 
 
