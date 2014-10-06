@@ -7,7 +7,6 @@ import matplotlib.colors as mc
 import sift as sift
 import features.descriptor as desc
 import display.plothelper as ph
-from features.descriptor import classify_euclidean
 
 def extract(image_files):
     descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
@@ -79,10 +78,22 @@ def extract(image_files):
         #ph.plot_points(color_cc[:, 0], color_cc[:, 1])
         
         aa = np.vstack((acos, asin)).transpose()
+        bb = np.vstack((bcos, bsin)).transpose()
         
-        classify_euclidean(aa, color_cc)
+        aahist = desc.classify_euclidean(aa, color_cc)
+        bbhist = desc.classify_euclidean(bb, color_cc)
+        
+        aanormhist = desc.normalize_by_division(aahist, color_cc_norm)
+        bbnormhist = desc.normalize_by_division(bbhist, color_cc_norm)
 
-        H = np.vstack((H, norm_desc_hist))
+        w = 0.725
+        cw = (1-w)/2
+        
+        vvv = np.hstack((np.sqrt(w)*norm_desc_hist, np.sqrt(cw)*aanormhist, np.sqrt(cw)*bbnormhist))
+        
+        vvva = np.linalg.norm(vvv)
+
+        H = np.vstack((H, vvv))
         
         print "Number of descs", descs.shape[0]
         
