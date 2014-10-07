@@ -6,7 +6,6 @@ import matplotlib.colors as mc
 
 import sift as sift
 import features.descriptor as desc
-import display.plothelper as ph
 
 def extract(image_files):
     descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
@@ -51,54 +50,27 @@ def extract(image_files):
         
         print "Number of descs", descs.shape[0]
         
-        im = np.array(image)
-        
         if len(shape) == 3:
-            locs_x = np.empty((locs.shape[0],), dtype='int')
-            locs_y = np.empty((locs.shape[0],), dtype='int')
-            np.floor(locs[:, 1], out=locs_x)
-            np.floor(locs[:, 0], out=locs_y)
-            colors_desc = im[locs_x, locs_y]/255.0
             
-            rand_x = np.empty((x.shape[0],), dtype='int')
-            rand_y = np.empty((y.shape[0],), dtype='int')
-            im_shape = im.shape
-            np.floor(im_shape[0]*np.array(x), out=rand_x)
-            np.floor(im_shape[1]*np.array(y), out=rand_y)
+            im = np.array(image)/255.0
             
-            colors_rand = im[rand_x, rand_y]/255.0
+            colors_desc = get_rgb_from_locs(locs[:, 1], locs[:, 0], im)
+            colors_rand = get_rgb_from_locs(im.shape[0]*np.array(y), im.shape[1]*np.array(x), im)
             
-            a = mc.rgb_to_hsv(colors_desc)
-            b = mc.rgb_to_hsv(colors_rand)
+            colors_desc_coords = rgb_to_hs_coords(colors_desc)
+            colors_rand_coords = rgb_to_hs_coords(colors_rand)
             
-            acos = np.multiply(a[:,1], np.cos(2*np.pi*a[:,0]))
-            asin = np.multiply(a[:,1], np.sin(2*np.pi*a[:,0]))
+            colors_desc_hist = desc.classify_euclidean(colors_desc_coords, color_cc)
+            colors_rand_hist = desc.classify_euclidean(colors_rand_coords, color_cc)
             
-            bcos = np.multiply(b[:,1], np.cos(2*np.pi*b[:,0]))
-            bsin = np.multiply(b[:,1], np.sin(2*np.pi*b[:,0]))
-            
-            #ph.plot_points(acos, asin)
-            #ph.plot_points(bcos, bsin)
-            
-            #ph.plot_points(color_cc[:, 0], color_cc[:, 1])
-            
-            aa = np.vstack((acos, asin)).transpose()
-            bb = np.vstack((bcos, bsin)).transpose()
-            
-            aahist = desc.classify_euclidean(aa, color_cc)
-            bbhist = desc.classify_euclidean(bb, color_cc)
-            
-            aanormhist = desc.normalize_by_division(aahist, color_cc_norm)
-            bbnormhist = desc.normalize_by_division(bbhist, color_cc_norm)
+            colors_desc_hist_norm = desc.normalize_by_division(colors_desc_hist, color_cc_norm)
+            colors_rand_hist_norm = desc.normalize_by_division(colors_rand_hist, color_cc_norm)
         else:
-            aanormhist = np.empty((1, color_cc.shape[0]))
-            aanormhist[:] = np.NAN
-            bbnormhist = np.empty((1, color_cc.shape[0]))
-            bbnormhist[:] = np.NAN
+            colors_desc_hist_norm = create_NaN_array(1, color_cc.shape[0])
+            colors_rand_hist_norm = create_NaN_array(1, color_cc.shape[0])
         
-        C = np.vstack((C, np.hstack((aanormhist,bbnormhist))))
+        C = np.vstack((C, np.hstack((colors_desc_hist_norm, colors_rand_hist_norm))))
         
-    
     C_norm = np.linalg.norm(C, axis=1)
     
     C_real = np.mean(C[~np.isnan(C_norm), :], axis=0)
@@ -123,6 +95,25 @@ def create_neutral_vector(D, rows):
     
     return A
 
+def create_NaN_array(rows, cols):
+    nan_array = np.empty((rows, cols))
+    nan_array[:] = np.NAN
+    return nan_array
+
+def rgb_to_hs_coords(rgb):
+    hsv = mc.rgb_to_hsv(rgb)
+    
+    x = np.multiply(hsv[:,1], np.cos(2*np.pi*hsv[:,0]))
+    y = np.multiply(hsv[:,1], np.sin(2*np.pi*hsv[:,0]))
+    
+    return np.vstack((x, y)).transpose()
+
+def get_rgb_from_locs(locs_r, locs_c, im):
+    locs_row = np.empty((locs_r.shape[0],), dtype='int')
+    locs_col = np.empty((locs_r.shape[0],), dtype='int')
+    np.floor(locs_r, out=locs_row)
+    np.floor(locs_c, out=locs_col)
+    return im[locs_row, locs_col]
 
 
 
