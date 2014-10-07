@@ -6,6 +6,7 @@ from retrieval.flickrwrapper import FlickrWrapper
 from features import extractor
 from analysis import pca, kclosest
 from display import plothelper
+from features.extractor import FeatureMode
 
 class FlickrRsBundler:
     
@@ -33,7 +34,7 @@ class FlickrRsBundler:
     
     def extract(self):
         self.files()
-        self.H, self.N = extractor.extract(self.image_files)
+        self.H, self.N = extractor.extract(self.image_files, FeatureMode.Descriptors)
         
     def save(self):
         np.savetxt(self.hist_file.format(self.tag), self.H)
@@ -42,7 +43,7 @@ class FlickrRsBundler:
     def load(self):
         self.files()
         self.H = np.loadtxt(self.hist_file.format(self.tag), float)
-        self.H = np.loadtxt(self.neut_file.format(self.tag), float)
+        self.N = np.loadtxt(self.neut_file.format(self.tag), float)
         
     def process(self):        
         #self.Y, V = pca.neutral_sub_pca(self.H)
