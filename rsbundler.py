@@ -12,10 +12,11 @@ class FlickrRsBundler:
     hist_file = "deschists_{0}.txt"
     neut_file = "neut_{0}.txt"
     
-    def __init__(self, api_key, tag):
+    def __init__(self, api_key, tag, neut_factor=0.8):
         self.flickrWrapper = FlickrWrapper(api_key)
         self.tag = tag
         self.image_dir = op.dirname(op.abspath(__file__)) + "/images/" + self.tag
+        self.neut_factor = neut_factor
         
     def run(self):
         self.download()
@@ -46,7 +47,7 @@ class FlickrRsBundler:
     def process(self):        
         #self.Y, V = pca.neutral_sub_pca(self.H)
         
-        self.Y, V = pca.neutral_sub_pca_vector(self.H, self.N)
+        self.Y, V = pca.neutral_sub_pca_vector(self.H, self.neut_factor*self.N)
 
         Y30 = self.Y[:,:30]
         self.closest30 = kclosest.k_closest(30, Y30)

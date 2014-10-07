@@ -27,7 +27,7 @@ def extract(image_files):
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
     
     # Create empty histogram array
-    H = np.array([]).reshape(0, desc_cc.shape[0])
+    D = np.array([]).reshape(0, desc_cc.shape[0])
     C = np.array([]).reshape(0, 2*color_cc.shape[0])
     
     # extract descriptors and colors for all images
@@ -47,7 +47,7 @@ def extract(image_files):
         
         norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
         
-        H = np.vstack((H, norm_desc_hist))
+        D = np.vstack((D, norm_desc_hist))
         
         print "Number of descs", descs.shape[0]
         
@@ -99,29 +99,20 @@ def extract(image_files):
         C = np.vstack((C, np.hstack((aanormhist,bbnormhist))))
         
     
-    nnn = np.linalg.norm(C, axis=1)
+    C_norm = np.linalg.norm(C, axis=1)
     
-    uuu = ~np.isnan(nnn)
+    C_real = np.mean(C[~np.isnan(C_norm), :], axis=0)
+    C_real = np.sqrt(2) * C_real / np.linalg.norm(C_real)
     
-    CCC = C[uuu, :]
-    
-    mmm = np.mean(CCC, axis=0)
-    
-    mmm = np.sqrt(2) * mmm / np.linalg.norm(mmm)
-    
-    iii = np.isnan(nnn)
-    
-    C[iii, :] = np.tile(mmm, (sum(np.isnan(nnn)), 1))
+    C[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
 
     w = 0.725
     cw = (1-w)/2   
-    vvv = np.hstack((np.sqrt(w)*H, np.sqrt(cw)*C))
+    H = np.hstack((np.sqrt(w)*D, np.sqrt(cw)*C))
     
-    oooo = np.linalg.norm(C, axis=1)
-        
     N = create_neutral_vector(np.array([[desc_cc.shape[0], np.sqrt(w)],[color_cc.shape[0], np.sqrt(cw)],[color_cc.shape[0], np.sqrt(cw)]]), H.shape[0])
             
-    return vvv, N
+    return H, N
 
 def create_neutral_vector(D, rows):
     
