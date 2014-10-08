@@ -15,7 +15,7 @@ class FeatureMode(Enum):
     Colors = 2
     
 
-def extract(image_files, mode=FeatureMode.All):
+def extract(image_files, mode=FeatureMode.All, d_weight=0.725):
     descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
     color_data = scipy.io.loadmat('data/kmeans_color_results.mat')
     
@@ -49,8 +49,9 @@ def extract(image_files, mode=FeatureMode.All):
     # extract descriptors and colors for all images
     for image_file in image_files:
         
-        image = Image.open(image_file)        
-        shape = np.array(image).shape
+        image = Image.open(image_file)   
+        im = np.array(image)/255.0     
+        shape = im.shape
         
         if mode != FeatureMode.Colors:
             if len(shape) == 3:
@@ -70,9 +71,7 @@ def extract(image_files, mode=FeatureMode.All):
             
             if mode == FeatureMode.All:
                 
-                if len(shape) == 3:
-                    im = np.array(image)/255.0
-                
+                if len(shape) == 3:             
                     colors_desc = get_rgb_from_locs(locs[:, 1], locs[:, 0], im)
                     colors_desc_coords = rgb_to_hs_coords(colors_desc)
                     colors_desc_hist = desc.classify_euclidean(colors_desc_coords, color_cc)
@@ -84,7 +83,6 @@ def extract(image_files, mode=FeatureMode.All):
         
         if mode != FeatureMode.Descriptors:
             if len(shape) == 3:
-                im = np.array(image)/255.0
                 colors_rand = get_rgb_from_locs(im.shape[0]*np.array(y), im.shape[1]*np.array(x), im)
                 colors_rand_coords = rgb_to_hs_coords(colors_rand)
                 colors_rand_hist = desc.classify_euclidean(colors_rand_coords, color_cc)
@@ -95,27 +93,16 @@ def extract(image_files, mode=FeatureMode.All):
             C_rand = np.vstack((C_rand, colors_rand_hist_norm))
       
     if C_rand is not None:
-        C_norm = np.linalg.norm(C_rand, axis=1)
-        
-        C_real = np.mean(C_rand[~np.isnan(C_norm), :], axis=0)
-        C_real = C_real / np.linalg.norm(C_real)
-        
-        C_rand[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
+        C_rand = set_nan_rows_to_mean(C_rand)
       
     if C_desc is not None:
-        C_norm = np.linalg.norm(C_desc, axis=1)
-        
-        C_real = np.mean(C_desc[~np.isnan(C_norm), :], axis=0)
-        C_real = C_real / np.linalg.norm(C_real)
-        
-        C_desc[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
+        C_desc = set_nan_rows_to_mean(C_desc)
 
     if mode == FeatureMode.All:
-        w = 0.725
-        cw = (1-w)/2   
-        H = np.hstack((np.sqrt(w)*D, np.hstack((np.sqrt(cw)*C_desc, np.sqrt(cw)*C_rand))))
+        c_weight = (1-d_weight)/2   
+        H = np.hstack((np.sqrt(d_weight)*D, np.hstack((np.sqrt(c_weight)*C_desc, np.sqrt(c_weight)*C_rand))))
         
-        N = create_neutral_vector(np.array([[desc_cc.shape[0], np.sqrt(w)],[color_cc.shape[0], np.sqrt(cw)],[color_cc.shape[0], np.sqrt(cw)]]), H.shape[0])
+        N = create_neutral_vector(np.array([[desc_cc.shape[0], np.sqrt(d_weight)],[color_cc.shape[0], np.sqrt(c_weight)],[color_cc.shape[0], np.sqrt(c_weight)]]), H.shape[0])
     
     if mode == FeatureMode.Colors:
         H = C_rand
@@ -127,7 +114,18 @@ def extract(image_files, mode=FeatureMode.All):
             
     return H, N
 
+def set_nan_rows_to_mean(X):
+    C_norm = np.linalg.norm(X, axis=1)
+        
+    C_real = np.mean(X[~np.isnan(C_norm), :], axis=0)
+    C_real = C_real / np.linalg.norm(C_real)
+        
+    X[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
+    
+    return X
+
 def create_neutral_vector(D, rows):
+    
     
     A = np.array([]).reshape(rows, 0)
     

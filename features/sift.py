@@ -2,7 +2,18 @@ from numpy import loadtxt
 import os
 
 def extract_feature_vectors(image, params="--edge-thresh 10 --peak-thresh 1"):
-    """ Process an image and save the results in a file. """
+    """ Process an image and save the results in a file. 
+        
+        Parameters
+        ----------
+        image : A gray scale image represented in a 2-D array.
+    
+        Returns
+        -------
+        locs : An array with the row, column, scale and orientation
+               of each feature.
+        descs : The descriptors.
+    """
     
     tmp_dir = os.path.dirname(os.path.abspath(__file__))+"/tmp/"
     if not os.path.exists(tmp_dir):
