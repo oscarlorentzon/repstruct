@@ -2,49 +2,33 @@ import scipy.io
 from PIL import Image
 import numpy as np
 
-from enum import Enum
-
 import matplotlib.colors as mc
 
 import sift as sift
 import features.descriptor as desc
 
-class FeatureMode(Enum):
-    All = 0
-    Descriptors = 1
-    Colors = 2
-    
-
-def extract(image_files, mode=FeatureMode.All, d_weight=0.725):
+def extract(image_files):
     descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
     color_data = scipy.io.loadmat('data/kmeans_color_results.mat')
     
-    D = None
-    C_rand = None
-    C_desc = None
+    # Get descriptor training data cluster centers and descriptor training data 
+    # cluster center indexes and create histogram.
+    desc_cc = descriptor_data.get('cbest')
+    desc_cc_norm = np.histogram(descriptor_data.get('idxbest'), range(1, desc_cc.shape[0] + 2))[0]
     
-    if mode != FeatureMode.Colors:
-        # Get descriptor training data cluster centers and descriptor training data 
-        # cluster center indexes and create histogram.
-        desc_cc = descriptor_data.get('cbest')
-        desc_cc_norm = np.histogram(descriptor_data.get('idxbest'), range(1, desc_cc.shape[0] + 2))[0]
-        
-        # Create empty histogram array
-        D = np.array([]).reshape(0, desc_cc.shape[0])
+    # Create empty histogram array
+    D = np.array([]).reshape(0, desc_cc.shape[0])
 
-    if mode != FeatureMode.Descriptors:
-        color_cc = color_data.get('ccbest')
-        color_cc_norm = np.histogram(color_data.get('idxcbest'), range(1, color_cc.shape[0] + 2))[0]
-        
-        # Retrieve Gaussian distributed random points for color retrieval.
-        gaussians = scipy.io.loadmat('data/gaussians.mat').get('rands')
-        x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
-        y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
+    color_cc = color_data.get('ccbest')
+    color_cc_norm = np.histogram(color_data.get('idxcbest'), range(1, color_cc.shape[0] + 2))[0]
     
-        C_rand = np.array([]).reshape(0, color_cc.shape[0])
-        
-    if mode == FeatureMode.All:
-        C_desc = np.array([]).reshape(0, color_cc.shape[0])
+    # Retrieve Gaussian distributed random points for color retrieval.
+    gaussians = scipy.io.loadmat('data/gaussians.mat').get('rands')
+    x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
+    y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
+
+    C_rand = np.array([]).reshape(0, color_cc.shape[0]) 
+    C_desc = np.array([]).reshape(0, color_cc.shape[0])
     
     # extract descriptors and colors for all images
     for image_file in image_files:
@@ -53,66 +37,44 @@ def extract(image_files, mode=FeatureMode.All, d_weight=0.725):
         im = np.array(image)/255.0     
         shape = im.shape
         
-        if mode != FeatureMode.Colors:
-            if len(shape) == 3:
-                gray_image = image.convert('L')
-                
-            locs, descs = sift.extract_feature_vectors(gray_image)
-            
-            descs = desc.normalize(descs)
-            desc_cc = desc.normalize(desc_cc)
-            desc_hist = desc.classify_cosine(descs, desc_cc)
-            
-            norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
-            
-            D = np.vstack((D, norm_desc_hist))
-            
-            print "Number of descs", descs.shape[0]
-            
-            if mode == FeatureMode.All:
-                
-                if len(shape) == 3:             
-                    colors_desc = get_rgb_from_locs(locs[:, 1], locs[:, 0], im)
-                    colors_desc_coords = rgb_to_hs_coords(colors_desc)
-                    colors_desc_hist = desc.classify_euclidean(colors_desc_coords, color_cc)
-                    colors_desc_hist_norm = desc.normalize_by_division(colors_desc_hist, color_cc_norm)
-                else:
-                    colors_desc_hist_norm = create_NaN_array(1, color_cc.shape[0])
-                    
-                C_desc = np.vstack((C_desc, colors_desc_hist_norm))
+        # Descriptors
+        if len(shape) == 3:
+            gray_image = image.convert('L')
+         
+        locs, descs = sift.extract_feature_vectors(gray_image)
         
-        if mode != FeatureMode.Descriptors:
-            if len(shape) == 3:
-                colors_rand = get_rgb_from_locs(im.shape[0]*np.array(y), im.shape[1]*np.array(x), im)
-                colors_rand_coords = rgb_to_hs_coords(colors_rand)
-                colors_rand_hist = desc.classify_euclidean(colors_rand_coords, color_cc)
-                colors_rand_hist_norm = desc.normalize_by_division(colors_rand_hist, color_cc_norm)
-            else:
-                colors_rand_hist_norm = create_NaN_array(1, color_cc.shape[0])
+        descs = desc.normalize(descs)
+        desc_cc = desc.normalize(desc_cc)
+        desc_hist = desc.classify_cosine(descs, desc_cc)
         
-            C_rand = np.vstack((C_rand, colors_rand_hist_norm))
+        norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
+        
+        D = np.vstack((D, norm_desc_hist))
+        
+        print "Number of descs", descs.shape[0]
+        
+        # Colors in descriptor locations
+        colors_desc_hist_norm = get_color_values(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
+        C_desc = np.vstack((C_desc, colors_desc_hist_norm))
+        
+        # Colors in Gaussian distributed points.   
+        colors_rand_hist_norm = get_color_values(im, im.shape[0]*np.array(y), im.shape[1]*np.array(x), color_cc, color_cc_norm)
+        C_rand = np.vstack((C_rand, colors_rand_hist_norm))
       
-    if C_rand is not None:
-        C_rand = set_nan_rows_to_mean(C_rand)
+    C_rand = set_nan_rows_to_mean(C_rand)
+    C_desc = set_nan_rows_to_mean(C_desc)
       
-    if C_desc is not None:
-        C_desc = set_nan_rows_to_mean(C_desc)
+    return D, C_desc, C_rand
 
-    if mode == FeatureMode.All:
-        c_weight = (1-d_weight)/2   
-        H = np.hstack((np.sqrt(d_weight)*D, np.hstack((np.sqrt(c_weight)*C_desc, np.sqrt(c_weight)*C_rand))))
-        
-        N = create_neutral_vector(np.array([[desc_cc.shape[0], np.sqrt(d_weight)],[color_cc.shape[0], np.sqrt(c_weight)],[color_cc.shape[0], np.sqrt(c_weight)]]), H.shape[0])
+def get_color_values(image, rows, columns, cluster_centres, cluster_center_norm):
     
-    if mode == FeatureMode.Colors:
-        H = C_rand
-        N = create_neutral_vector(np.array([[color_cc.shape[0], 1]]), H.shape[0])
-        
-    if mode == FeatureMode.Descriptors:
-        H = D
-        N = create_neutral_vector(np.array([[desc_cc.shape[0], 1]]), H.shape[0])
-            
-    return H, N
+    if len(image.shape) == 3:             
+        colors_desc = get_rgb_from_locs(rows, columns, image)
+        colors_desc_coords = rgb_to_hs_coords(colors_desc)
+        colors_desc_hist = desc.classify_euclidean(colors_desc_coords, cluster_centres)
+        return desc.normalize_by_division(colors_desc_hist, cluster_center_norm)
+    else:
+        return create_NaN_array(1, cluster_centres.shape[0])
 
 def set_nan_rows_to_mean(X):
     C_norm = np.linalg.norm(X, axis=1)

@@ -3,15 +3,16 @@ from os import listdir
 import numpy as np
 
 from retrieval.flickrwrapper import FlickrWrapper
-from features import extractor
+from features.extractor import extract, create_neutral_vector
 from analysis import pca, kclosest
 from display import plothelper
-from features.extractor import FeatureMode
+from features.featuremode import FeatureMode
 
 class FlickrRsBundler:
     
-    hist_file = "{0}_deschists.txt"
-    neut_file = "{0}_neut.txt"
+    desc_file = "{0}_desc.txt"
+    color_desc_file = "{0}_colordesc.txt"
+    color_rand_file = "{0}_colorrand.txt"
     
     def __init__(self, api_key, tag):
         self.flickrWrapper = FlickrWrapper(api_key)
@@ -31,21 +32,35 @@ class FlickrRsBundler:
     def files(self):
         self.image_files = [op.join(self.image_dir,f) for f in listdir(self.image_dir) if op.isfile(op.join(self.image_dir,f)) and f.endswith(".jpg")]
     
-    def extract(self, mode=FeatureMode.All):
+    def extract(self):
         self.files()
-        self.H, self.N = extractor.extract(self.image_files, mode)
+        self.D, self.C_desc, self.C_rand = extract(self.image_files)
         
     def save(self):
-        np.savetxt(self.image_dir + self.hist_file.format(self.tag), self.H)
-        np.savetxt(self.image_dir + self.neut_file.format(self.tag), self.N)
+        np.savetxt(self.image_dir + self.desc_file.format(self.tag), self.D)
+        np.savetxt(self.image_dir + self.color_desc_file.format(self.tag), self.C_desc)
+        np.savetxt(self.image_dir + self.color_rand_file.format(self.tag), self.C_rand)
         
     def load(self):
         self.files()
-        self.H = np.loadtxt(self.image_dir + self.hist_file.format(self.tag), float)
-        self.N = np.loadtxt(self.image_dir + self.neut_file.format(self.tag), float)
+        self.D = np.loadtxt(self.image_dir + self.desc_file.format(self.tag), float)
+        self.C_desc = np.loadtxt(self.image_dir + self.color_desc_file.format(self.tag), float)
+        self.C_rand = np.loadtxt(self.image_dir + self.color_rand_file.format(self.tag), float)
         
-    def process(self, neut_factor=0.8):        
-        self.Y, V = pca.neutral_sub_pca_vector(self.H, neut_factor*self.N)
+    def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
+        
+        if mode == FeatureMode.Colors:
+            N = create_neutral_vector(np.array([[self.C_rand.shape[1], 1]]), self.C_rand.shape[0])
+            F = self.C_rand
+        elif mode == FeatureMode.Descriptors:
+            N = create_neutral_vector(np.array([[self.D.shape[1], 1]]), self.D.shape[0])
+            F = self.D
+        else:
+            c_weight = (1-d_weight)/2  
+            N = create_neutral_vector(np.array([[self.D.shape[1], np.sqrt(d_weight)],[self.C_desc.shape[1], np.sqrt(c_weight)],[self.C_rand.shape[1], np.sqrt(c_weight)]]), self.D.shape[0])
+            F = np.hstack((np.sqrt(d_weight)*self.D, np.hstack((np.sqrt(c_weight)*self.C_desc, np.sqrt(c_weight)*self.C_rand))))
+        
+        self.Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
 
         Y30 = self.Y[:,:30]
         self.closest30 = kclosest.k_closest(30, Y30)
