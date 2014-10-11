@@ -75,9 +75,32 @@ class FlickrRsBundler:
         
         
 def main(argv):
-    with open ("flickr_key.txt", "r") as myfile: api_key=myfile.readline().rstrip()
+    api_key = None
+    tag = None
+    
+    try:
+        opts, args = getopt.getopt(argv,"ha:t:", ["apikey=", "tag="])
+    except getopt.GetoptError:
+        print 'rsbundler.py -t <tag> -a <apikey>'
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'rsbundler.py -t <tag> -a <apikey>'
+            sys.exit()
+        elif opt in ("-a", "--apikey"):
+            api_key = arg
+        elif opt in ("-t", "--tag"):
+            tag = arg
+    
+    if tag is None:   
+        sys.exit("""Tag is required. Usage: 
+            rsbundler.py -t <tag> -a <apikey>'
+            """)
+    
+    if api_key is None:
+        with open ("flickr_key.txt", "r") as myfile: api_key=myfile.readline().rstrip()
 
-    bundler = FlickrRsBundler(api_key, 'eagle')
+    bundler = FlickrRsBundler(api_key, tag)
     # bundler.run()
     
     # bundler.download()
