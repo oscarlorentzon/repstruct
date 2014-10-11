@@ -1,6 +1,7 @@
 import os.path as op
 from os import listdir
 import numpy as np
+import sys, getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
 from features.extractor import extract, create_neutral_vector
@@ -71,5 +72,29 @@ class FlickrRsBundler:
         plothelper.plot_images(np.array(self.image_files)[self.closest5], 1, 5)
         plothelper.plot_pca_projections(self.Y, 1, 2)
         plothelper.plot_pca_projections(self.Y, 3, 4)
+        
+        
+def main(argv):
+    with open ("flickr_key.txt", "r") as myfile: api_key=myfile.readline().rstrip()
+
+    bundler = FlickrRsBundler(api_key, 'eagle')
+    # bundler.run()
+    
+    # bundler.download()
+    
+    # bundler.extract()
+    # bundler.save()
+    # bundler.process()
+    # bundler.plot()
+    
+    bundler.load()
+    bundler.process(FeatureMode.Descriptors)
+    bundler.plot()
+    
+    bundler.process(FeatureMode.Colors)
+    bundler.plot()
+    
+if __name__ == "__main__":
+    main(sys.argv[1:])
         
         
