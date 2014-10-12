@@ -10,6 +10,28 @@ class TestDescriptor(unittest.TestCase):
 
     def tearDown(self):
         pass
+    
+    def testNormalize(self):
+        v = [1, 1]
+        X = np.array([v])
+        
+        result = normalize(X)
+        
+        norm = np.sqrt(np.sum(np.multiply(result, result), axis=1))
+        
+        self.assertLess(abs(1.0 - norm), 0.0000001, 'The norm is not one for the normalized array.')
+        
+    def testNormalizeMultipleVecotrs(self):
+        v = [1, 1]
+        X = np.array([v, v, v])
+        
+        result = normalize(X)
+        
+        norm = np.sqrt(np.sum(np.multiply(result, result), axis=1))
+        
+        self.assertLess(abs(1.0 - norm[0]), 0.0000001, 'The norm is not one for the normalized array.')
+        self.assertLess(abs(1.0 - norm[1]), 0.0000001, 'The norm is not one for the normalized array.')
+        self.assertLess(abs(1.0 - norm[2]), 0.0000001, 'The norm is not one for the normalized array.')
 
     def testNormalizeByDivision(self):
         l = [1, 2]
