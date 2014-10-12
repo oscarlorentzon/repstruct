@@ -73,12 +73,12 @@ def extract(image_files):
         print "Number of descs", descs.shape[0]
         
         # Colors in descriptor locations
-        colors_desc_hist_norm = get_color_hist(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
-        C_desc = np.vstack((C_desc, colors_desc_hist_norm))
+        colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
+        C_desc = np.vstack((C_desc, colors_desc_hist))
         
         # Colors in Gaussian distributed points.   
-        colors_rand_hist_norm = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
-        C_rand = np.vstack((C_rand, colors_rand_hist_norm))
+        colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
+        C_rand = np.vstack((C_rand, colors_rand_hist))
       
     C_rand = set_nan_rows_to_mean(C_rand)
     C_desc = set_nan_rows_to_mean(C_desc)
@@ -103,10 +103,10 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
     """
     
     if len(image.shape) == 3:             
-        colors_desc = get_rgb_from_locs(rows, columns, image)
-        colors_desc_coords = rgb_to_hs_coords(colors_desc)
-        colors_desc_hist = desc.classify_euclidean(colors_desc_coords, cluster_centers)
-        return desc.normalize_by_division(colors_desc_hist, cluster_center_norm)
+        rgb = get_rgb_from_locs(rows, columns, image)
+        hs_coords = rgb_to_hs_coords(rgb)
+        hist = desc.classify_euclidean(hs_coords, cluster_centers)
+        return desc.normalize_by_division(hist, cluster_center_norm)
     else:
         return create_NaN_array(1, cluster_centers.shape[0])
 
