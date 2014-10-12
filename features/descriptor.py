@@ -25,7 +25,7 @@ def classify_cosine(X, C):
     indices = np.argmax(np.dot(X, C.transpose()), 1)
     
     cc_count = C.shape[0]
-    return np.histogram(indices, range(1, cc_count + 2))[0]
+    return np.histogram(indices, range(0, cc_count + 1))[0]
 
 def classify_euclidean(X, C):
     """ Classifies the row vectors of X on the cluster center
@@ -59,7 +59,7 @@ def classify_euclidean(X, C):
     d = np.sum(np.power(X3-C3, 2), axis=2)
     min_indices = np.argmin(d, axis=1)  
     
-    return np.histogram(min_indices, range(1, n + 2))[0] 
+    return np.histogram(min_indices, range(0, n + 1))[0] 
 
 def normalize(X):
     """ Normalizes the rows of a 2-D array.
