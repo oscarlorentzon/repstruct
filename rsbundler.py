@@ -8,6 +8,7 @@ from features.extract import extract, create_neutral_vector
 from analysis import pca, kclosest
 from display import plothelper
 from features.featuremode import FeatureMode
+from runmode import RunMode
 
 class FlickrRsBundler:
     
@@ -70,6 +71,8 @@ class FlickrRsBundler:
     def plot(self):
         plothelper.plot_images(np.array(self.image_files)[self.closest30], 3, 10)
         plothelper.plot_images(np.array(self.image_files)[self.closest5], 1, 5)
+        
+    def plot_pca(self):
         plothelper.plot_pca_projections(self.Y, 1, 2)
         plothelper.plot_pca_projections(self.Y, 3, 4)
  
@@ -77,44 +80,74 @@ class FlickrRsBundler:
 def main(argv):
     api_key = None
     tag = None
+    feature_mode = FeatureMode.All
+    run_mode = RunMode.Download
+    
+    helptext = """To run the bundler from command line enter:
+              
+               rsbundler.py -t <tag> -a <apikey>
+    
+               The following options are available:
+    
+               Required:
+               -t : The tag to search for
+               -a : The flickr api key
+               
+               Optional:
+               -f : The feature mode. Possible values:
+                    a - Both descriptors and colors. This is the default.
+                    d - Descriptors only
+                    c - Colors only
+               -r : The run mode. Possible values:
+                    d - Downloads, extracts, saves and processes images.
+                        This is the default.
+                    e - Extracts, saves and processes images.
+                    o - Loads saved data and processes images.
+               """
     
     try:
-        opts, args = getopt.getopt(argv,"ha:t:", ["apikey=", "tag="])
+        opts, args = getopt.getopt(argv,"ha:t:f:r:", ["apikey=", "tag=", "featuremode=", "runmode="])
     except getopt.GetoptError:
-        print 'rsbundler.py -t <tag> -a <apikey>'
+        print helptext
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'rsbundler.py -t <tag> -a <apikey>'
+            print helptext
             sys.exit()
         elif opt in ("-a", "--apikey"):
             api_key = arg
         elif opt in ("-t", "--tag"):
             tag = arg
+        elif opt in ("-f", "--featuremode"):
+            if (arg == "d"):
+                feature_mode = FeatureMode.Descriptors
+            elif (arg == "c"):
+                feature_mode = FeatureMode.Colors
+        elif opt in ("-r", "--runmode"):
+            if (arg == "e"):
+                run_mode = RunMode.Extract
+            elif (arg == "o"):
+                run_mode = RunMode.Load
     
     if tag is None:   
-        sys.exit("""Tag is required. Usage: 
-            rsbundler.py -t <tag> -a <apikey>'
-            """)
+        sys.exit("""Tag is required. Usage: """ + helptext)
     
     if api_key is None:
         with open ("flickr_key.txt", "r") as myfile: api_key=myfile.readline().rstrip()
 
     bundler = FlickrRsBundler(api_key, tag)
-    # bundler.run()
     
-    # bundler.download()
-    
-    # bundler.extract()
-    # bundler.save()
-    # bundler.process()
-    # bundler.plot()
-    
-    bundler.load()
-    bundler.process(FeatureMode.Descriptors)
-    bundler.plot()
-    
-    bundler.process(FeatureMode.Colors)
+    if (run_mode == RunMode.Download):
+        bundler.download()
+        bundler.extract()
+        bundler.save()
+    elif (run_mode == RunMode.Extract):
+        bundler.extract()
+        bundler.save()
+    else:
+        bundler.load()
+        
+    bundler.process(feature_mode)
     bundler.plot()
     
 if __name__ == "__main__":
