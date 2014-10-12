@@ -29,7 +29,7 @@ def classify_cosine(X, C):
 
 def classify_euclidean(X, C):
     """ Classifies the row vectors of X on the cluster center
-        row vectors of C using euclidean distance.
+        row vectors of C using Euclidean distance.
         
         Parameters
         ----------
@@ -51,10 +51,7 @@ def classify_euclidean(X, C):
     n = C.shape[0]
     dim = X.shape[1]
 
-    #X3 = np.zeros((m,n,dim))
     X3 = X.reshape(m, 1, dim).repeat(n, axis=1)
-    
-    #C3 = np.zeros((m,n,dim))
     C3 = C.reshape(1, n, dim).repeat(m, axis=0)
     
     # Calculate the respective distances for all row vectors to all cluster centers

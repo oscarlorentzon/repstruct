@@ -4,7 +4,7 @@ import numpy as np
 import sys, getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
-from features.extractor import extract, create_neutral_vector
+from features.extract import extract, create_neutral_vector
 from analysis import pca, kclosest
 from display import plothelper
 from features.featuremode import FeatureMode
@@ -72,8 +72,8 @@ class FlickrRsBundler:
         plothelper.plot_images(np.array(self.image_files)[self.closest5], 1, 5)
         plothelper.plot_pca_projections(self.Y, 1, 2)
         plothelper.plot_pca_projections(self.Y, 3, 4)
-        
-        
+ 
+             
 def main(argv):
     api_key = None
     tag = None
@@ -119,5 +119,3 @@ def main(argv):
     
 if __name__ == "__main__":
     main(sys.argv[1:])
-        
-        

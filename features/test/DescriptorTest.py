@@ -1,8 +1,3 @@
-'''
-Created on Oct 8, 2014
-
-@author: admininstrator
-'''
 import unittest
 import numpy as np
 from features.descriptor import normalize_by_division, normalize
