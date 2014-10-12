@@ -77,7 +77,7 @@ def extract(image_files):
         C_desc = np.vstack((C_desc, colors_desc_hist_norm))
         
         # Colors in Gaussian distributed points.   
-        colors_rand_hist_norm = get_color_hist(im, im.shape[0]*np.array(y), im.shape[1]*np.array(x), color_cc, color_cc_norm)
+        colors_rand_hist_norm = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
         C_rand = np.vstack((C_rand, colors_rand_hist_norm))
       
     C_rand = set_nan_rows_to_mean(C_rand)
