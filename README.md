@@ -2,7 +2,7 @@
 
 Repstruct is a python library for finding representative structures in large image collections. It is implemented according to the theory of the Master's thesis [Finding reprensentative structures in large image collections](http://www2.maths.lth.se/vision/education/pages/OscarNils09/) by Oscar Lorentzon and Nils Lundahl.
 
-The implementation extracts SIFT descriptors as well as colors from the images in the collection and creates feature vectors from histograms created by classifying the features against training data. The results for the most representative images according to the algorithm are presented by plotting the 30 closest images and the the 5 closest.
+The implementation extracts SIFT descriptors as well as colors from the images in the collection and creates feature vectors from histograms created by classifying the features against training data. The results for the most representative images according to the algorithm are presented by plotting the 30 closest images and then the 5 closest.
 
 ## Running
 To be able to download images from flickr.com an API key is required. An API key can be obtained from flickr.com.
