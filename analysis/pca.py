@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def neutral_sub_pca(X, neut_factor=0.8):
     """ Performs PCA by singular value decomposition after subtracting
         a neutral vector with a specified factor. 
@@ -30,6 +31,7 @@ def neutral_sub_pca(X, neut_factor=0.8):
     Y = np.dot(X_neut, VT.T)
     
     return Y, VT.T
+
 
 def neutral_sub_pca_vector(X, N):
     """ Performs PCA by singular value decomposition after subtracting

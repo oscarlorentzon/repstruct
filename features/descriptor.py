@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def classify_cosine(X, C):
     """ Classifies the row vectors of X on the cluster center
         row vectors of C using cosine similarity.
@@ -27,6 +28,7 @@ def classify_cosine(X, C):
     cc_count = C.shape[0]
     return np.histogram(indices, range(0, cc_count + 1))[0]
 
+
 def classify_euclidean(X, C):
     """ Classifies the row vectors of X on the cluster center
         row vectors of C using Euclidean distance.
@@ -44,7 +46,6 @@ def classify_euclidean(X, C):
         -----
         The length of the row vectors in X must be the same as the length of the cluster
         center row vectors i C.
-    
     """
     
     m = X.shape[0]
@@ -60,6 +61,7 @@ def classify_euclidean(X, C):
     min_indices = np.argmin(d, axis=1)  
     
     return np.histogram(min_indices, range(0, n + 1))[0] 
+
 
 def normalize(X):
     """ Normalizes the rows of a 2-D array.
@@ -101,7 +103,3 @@ def normalize_by_division(v, n):
     divided = np.divide([float(i) for i in v], n)
     
     return divided / np.linalg.norm(divided)
-    
-
-
-

@@ -32,7 +32,7 @@ class FlickrWrapper:
         data = json.loads(response.read())
 
         url = "https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg"
-        return [url.format(photo.get('farm'), photo.get('server'), photo.get('id'), photo.get('secret'))
+        return [url.format(photo['farm'], photo['server'], photo['id'], photo['secret'])
                 for photo in data['photos']['photo']]
 
     def download(self, image_dir, tag, sort_mode='relevance'):

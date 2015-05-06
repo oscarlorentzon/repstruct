@@ -1,6 +1,7 @@
 import matplotlib.pyplot as pyplot
 import cv2
 
+
 def plot_images(image_files, rows, columns):
     """ Plots image files in a figure with the defined
         number of rows and columns.
@@ -24,6 +25,7 @@ def plot_images(image_files, rows, columns):
     
     pyplot.show()
 
+
 def plot_pca_projections(V, pc1, pc2):
     """ Plots the projections for the specified principal components.
         
@@ -40,6 +42,7 @@ def plot_pca_projections(V, pc1, pc2):
     pyplot.axvline(0)
     pyplot.show()
 
+
 def plot_points(x,y):
     """ Plots the values in y against the values in x.
         
@@ -52,4 +55,3 @@ def plot_points(x,y):
     pyplot.figure()
     pyplot.plot(x, y, '*')
     pyplot.show()
-    

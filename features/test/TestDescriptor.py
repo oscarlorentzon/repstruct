@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 from features.descriptor import normalize_by_division, classify_euclidean, normalize, classify_cosine
 
+
 class TestDescriptor(unittest.TestCase):
 
     def setUp(self):

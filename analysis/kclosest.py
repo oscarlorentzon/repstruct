@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
+
 def k_closest(k, V, metric='cosine'):
     """ Performs an approximate solution to the problem of
         finding the closest group of k elements in a set of 
@@ -52,6 +53,4 @@ def k_closest(k, V, metric='cosine'):
         internal_dists[i] = sum(sum(D[D_indices[:, None], D_indices]))
 
     # Return the row of neighbor indices with the smallest internal distance.
-    return neighbors[np.argmin(internal_dists),:] 
-
-
+    return neighbors[np.argmin(internal_dists),:]

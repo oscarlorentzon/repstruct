@@ -10,6 +10,7 @@ from display import plothelper
 from features.featuremode import FeatureMode
 from runmode import RunMode
 
+
 class FlickrRsBundler:
     
     desc_file = "{0}_desc.txt"
@@ -150,6 +151,7 @@ def main(argv):
     bundler.process(feature_mode)
     bundler.plot()
     bundler.plot_pca()
-    
+
+
 if __name__ == "__main__":
     main(sys.argv[1:])

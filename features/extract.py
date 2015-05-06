@@ -6,6 +6,7 @@ import cv2
 import sift as sift
 import features.descriptor as desc
 
+
 def extract(image_files):
     """ Extracts feature histogram vectors of classified SIFT features, 
         SIFT location colors and random Gaussian distributed colors 
@@ -84,6 +85,7 @@ def extract(image_files):
       
     return D, C_desc, C_rand
 
+
 def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
     """ Creates a normalized histogram of for the colors of the rows and 
         columns of an image when classified against the cluster centers on the
@@ -109,6 +111,7 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
     else:
         return create_NaN_array(1, cluster_centers.shape[0])
 
+
 def set_nan_rows_to_mean(X):
     """ Sets rows of a 2-D array with NaN values to 
         the mean of the non NaN values for each column.
@@ -133,6 +136,7 @@ def set_nan_rows_to_mean(X):
     X[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
     
     return X
+
 
 def create_neutral_vector(D, rows):
     """ Creates a 2-D array with neutral vectors according to the 
@@ -161,6 +165,7 @@ def create_neutral_vector(D, rows):
         N = np.concatenate((N, d[1]*np.sqrt(1.0/d[0])*np.array([np.ones(d[0]),]*rows)), axis=1)
     
     return N
+
 
 def create_NaN_array(rows, cols):
     """ Creates a 2-D array with NaN values.
@@ -202,6 +207,7 @@ def rgb_to_hs_coords(rgb):
     y = np.multiply(hsv[:, 0, 1], np.sin(2*np.pi*hsv[:, 0, 0]))
     
     return np.vstack((x, y)).transpose()
+
 
 def get_rgb_from_locs(locs_r, locs_c, im):
     """ Retrieves the RGB values for an image in the specified
