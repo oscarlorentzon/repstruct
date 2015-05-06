@@ -55,7 +55,7 @@ class FlickrWrapper:
 
         url_paths = []
         for index, image_url in enumerate(image_urls):
-            url_paths.append((image_url, image_dir + "/" + tag + str(index + 1) + ".jpg"))
+            url_paths.append((image_url, image_dir + tag + str(index + 1) + ".jpg"))
 
         downloader = Downloader()
         if processes == 1:
