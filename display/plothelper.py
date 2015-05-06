@@ -1,5 +1,5 @@
 import matplotlib.pyplot as pyplot
-from PIL import Image
+import cv2
 
 def plot_images(image_files, rows, columns):
     """ Plots image files in a figure with the defined
@@ -16,8 +16,8 @@ def plot_images(image_files, rows, columns):
     fig = pyplot.figure()
     
     for image_file in image_files:
-        image = Image.open(image_file)   
-        
+        image = cv2.imread(image_file)[:,:,::-1] # Turn BGR to RGB
+
         sub = fig.add_subplot(rows, columns, i)
         sub.imshow(image)
         i += 1
@@ -39,7 +39,7 @@ def plot_pca_projections(V, pc1, pc2):
     pyplot.axhline(0)
     pyplot.axvline(0)
     pyplot.show()
-    
+
 def plot_points(x,y):
     """ Plots the values in y against the values in x.
         

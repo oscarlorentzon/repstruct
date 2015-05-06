@@ -24,12 +24,12 @@ def neutral_sub_pca(X, neut_factor=0.8):
     N = np.sqrt(1.0/vector_length)*np.array([np.ones(vector_length),]*row_count)
     X_neut = X-neut_factor*N
     
-    U,S,V = np.linalg.svd(X_neut)
+    U, S, VT = np.linalg.svd(X_neut)
     
     # Projecting feature vectors on principal components.
-    Y = np.dot(X_neut, V)
+    Y = np.dot(X_neut, VT.T)
     
-    return Y, V
+    return Y, VT.T
 
 def neutral_sub_pca_vector(X, N):
     """ Performs PCA by singular value decomposition after subtracting
@@ -50,9 +50,9 @@ def neutral_sub_pca_vector(X, N):
     # Subtracting a neutral vector for each row in X before performing SVD.
     X_neut = X-N
     
-    U,S,V = np.linalg.svd(X_neut)
+    U, S, VT = np.linalg.svd(X_neut)
     
     # Projecting feature vectors on principal components.
-    Y = np.dot(X_neut, V)
+    Y = np.dot(X_neut, VT.T)
     
-    return Y, V
+    return Y, VT.T

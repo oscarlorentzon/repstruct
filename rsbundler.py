@@ -149,6 +149,7 @@ def main(argv):
         
     bundler.process(feature_mode)
     bundler.plot()
+    bundler.plot_pca()
     
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -1,8 +1,7 @@
 import scipy.io
-from PIL import Image
 import numpy as np
-
 import matplotlib.colors as mc
+import cv2
 
 import sift as sift
 import features.descriptor as desc
@@ -52,13 +51,13 @@ def extract(image_files):
     # extract descriptors and colors for all images
     for image_file in image_files:
         
-        image = Image.open(image_file)   
+        image = cv2.imread(image_file)[:,:,::-1]
         im = np.array(image)/255.0     
         shape = im.shape
         
         # Descriptors
         if len(shape) == 3:
-            gray_image = image.convert('L')
+            gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
          
         locs, descs = sift.extract_feature_vectors(gray_image)
         
@@ -180,6 +179,7 @@ def create_NaN_array(rows, cols):
     nan_array[:] = np.NAN
     return nan_array
 
+
 def rgb_to_hs_coords(rgb):
     """ Converts RGB values to x and y coordinates on 
         the HSV disc irrespective of the value component.
@@ -198,8 +198,8 @@ def rgb_to_hs_coords(rgb):
     
     hsv = mc.rgb_to_hsv(rgb)
     
-    x = np.multiply(hsv[:,1], np.cos(2*np.pi*hsv[:,0]))
-    y = np.multiply(hsv[:,1], np.sin(2*np.pi*hsv[:,0]))
+    x = np.multiply(hsv[:, 0, 1], np.cos(2*np.pi*hsv[:, 0, 0]))
+    y = np.multiply(hsv[:, 0, 1], np.sin(2*np.pi*hsv[:, 0, 0]))
     
     return np.vstack((x, y)).transpose()
 
@@ -222,14 +222,7 @@ def get_rgb_from_locs(locs_r, locs_c, im):
     locs_col = np.empty((locs_r.shape[0],), dtype='int')
     np.floor(locs_r, out=locs_row)
     np.floor(locs_c, out=locs_col)
-    
-    return im[locs_row, locs_col]
 
+    rgb = im[locs_row, locs_col]
 
-
-
-
-
-
-
-
+    return np.resize(rgb, (rgb.shape[0], 1, rgb.shape[1]))

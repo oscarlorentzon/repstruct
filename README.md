@@ -20,15 +20,18 @@ To view additional bundler options run the bundler with the -h flag:
 	$python rsbundler.py -h
 
 ## Dependencies
-You need to have Python 2.7+ and the following python libraries:
+You need to have Python 2.7+ and the following libraries:
 
-* [PIL](http://www.pythonware.com/products/pil/)
-* [NumPy](http://numpy.scipy.org/)
-* [SciPy](http://scipy.org/)
-* [Matplotlib](http://matplotlib.sourceforge.net/)
-* [Python Flicker API](https://pypi.python.org/pypi/flickrapi)
-* [Enum34](https://pypi.python.org/pypi/enum34)
+* [OpenCV][]
+* [NumPy][]
+* [SciPy][]
+* [Matplotlib][]
+* [Enum34][]
 
-The SIFT extraction is made using [VLFeat](http://www.vlfeat.org/). The VLFeat binaries needs to be downloaded and added to the PATH.
+[OpenCV]: http://opencv.org/ (Computer vision and machine learning software library)
+[NumPy]: http://www.numpy.org/ (Scientific computing with Python)
+[SciPy]: http://www.scipy.org/ (Fundamental library for scientific computing)
+[Matplotlib]: http://matplotlib.sourceforge.net (Plotting in python)
+[Enum34]: https://pypi.python.org/pypi/enum34 (Enum support in python 2.*)
 
 

@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
-from features.descriptor import normalize_by_division, classify_euclidean, normalize,\
-    classify_cosine
+from features.descriptor import normalize_by_division, classify_euclidean, normalize, classify_cosine
 
 class TestDescriptor(unittest.TestCase):
 
@@ -21,7 +20,7 @@ class TestDescriptor(unittest.TestCase):
         
         self.assertLess(abs(1.0 - norm), 0.0000001, 'The norm is not one for the normalized array.')
         
-    def testNormalizeMultipleVecotrs(self):
+    def testNormalizeMultipleVectors(self):
         v = [1, 1]
         X = np.array([v, v, v])
         
