@@ -2,6 +2,8 @@ import os.path
 import urllib
 import json
 
+from multiprocessing import Pool
+
 
 class FlickrWrapper:
     
@@ -35,7 +37,7 @@ class FlickrWrapper:
         return [url.format(photo['farm'], photo['server'], photo['id'], photo['secret'])
                 for photo in data['photos']['photo']]
 
-    def download(self, image_dir, tag, sort_mode='relevance'):
+    def download(self, image_dir, tag, sort_mode='relevance', processes=6):
         """ Downloads images for a tag from Flickr.
     
         Parameters
@@ -50,11 +52,29 @@ class FlickrWrapper:
         
         if not os.path.exists(image_dir):
             os.makedirs(image_dir)
-    
-        i = 1
-        for image_url in image_urls:
-            urllib.urlretrieve(image_url, image_dir + "/" + tag + str(i) + ".jpg")
-            i += 1
-        
-        print "images downloaded"
 
+        url_paths = []
+        for index, image_url in enumerate(image_urls):
+            url_paths.append((image_url, image_dir + "/" + tag + str(index + 1) + ".jpg"))
+
+        downloader = Downloader()
+        if processes == 1:
+            for url_path in url_paths:
+                downloader(url_path)
+        else:
+            pool = Pool(processes)
+            pool.map(downloader, url_paths)
+        
+        print "Images downloaded"
+
+
+class Downloader:
+
+    def __call__(self, url_path):
+        """ Downloads data from a url and saves it in the path.
+
+        :param url_path: A tuple containing a url and a path.
+        """
+
+        urllib.urlretrieve(url_path[0], url_path[1])
+        print 'Downloaded ' + url_path[1]
