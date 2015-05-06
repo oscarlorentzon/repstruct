@@ -21,7 +21,17 @@ class FlickrRsBundler:
         self.flickrWrapper = FlickrWrapper(api_key)
         self.tag = tag
         self.image_dir = op.dirname(op.abspath(__file__)) + "/images/" + self.tag + "/"
-        
+
+        self.image_files = None
+
+        self.D = None
+        self.C_desc = None
+        self.C_rand = None
+
+        self.Y = None
+        self.closest30 = None
+        self.closest5 = None
+
     def run(self):
         self.download()
         self.extract()
@@ -60,8 +70,13 @@ class FlickrRsBundler:
             F = self.D
         else:
             c_weight = (1-d_weight)/2  
-            N = create_neutral_vector(np.array([[self.D.shape[1], np.sqrt(d_weight)],[self.C_desc.shape[1], np.sqrt(c_weight)],[self.C_rand.shape[1], np.sqrt(c_weight)]]), self.D.shape[0])
-            F = np.hstack((np.sqrt(d_weight)*self.D, np.hstack((np.sqrt(c_weight)*self.C_desc, np.sqrt(c_weight)*self.C_rand))))
+            N = create_neutral_vector(
+                np.array([[self.D.shape[1], np.sqrt(d_weight)],
+                          [self.C_desc.shape[1], np.sqrt(c_weight)],
+                          [self.C_rand.shape[1], np.sqrt(c_weight)]]),
+                self.D.shape[0])
+            F = np.hstack((np.sqrt(d_weight)*self.D,
+                           np.hstack((np.sqrt(c_weight)*self.C_desc, np.sqrt(c_weight)*self.C_rand))))
         
         self.Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
 
