@@ -2,9 +2,41 @@ import os
 import cv2
 import numpy as np
 
+from multiprocessing import Pool
 
-def extract(image_files, image_path, feature_path):
-    """ Extracts SIFT features for a list of images. Saves the descriptors to file.
+
+class SiftExtractor:
+
+    def __init__(self, image_path, feature_path):
+        """ Creates a SiftExtractor.
+
+            Parameters
+            ----------
+            image_path: Path to image files.
+            feature_path: Path to feature files.
+        """
+
+        self.image_path = image_path
+        self.feature_path = feature_path
+
+    def __call__(self, image):
+        """ Extracts SIFT features for an image and saves the descriptors and locations to file.
+
+            Parameters
+            ----------
+            image: Image name.
+        """
+
+        im = cv2.imread(os.path.join(self.image_path, image), cv2.IMREAD_GRAYSCALE)
+        locs, descs = extract_feature_vectors(im)
+
+        save_features(self.feature_path, image, locs, descs)
+
+        print 'Extracted {0} features for {1}'.format(descs.shape[0], image)
+
+
+def extract(images, image_path, feature_path, processes=6):
+    """ Extracts SIFT features for a list of images. Saves the descriptors and locations to file.
 
         Parameters
         ----------
@@ -15,13 +47,13 @@ def extract(image_files, image_path, feature_path):
     if not os.path.exists(feature_path):
         os.makedirs(feature_path)
 
-    for image_file in image_files:
-        image = cv2.imread(os.path.join(image_path, image_file), cv2.IMREAD_GRAYSCALE)
-        locs, descs = extract_feature_vectors(image)
-
-        save_features(feature_path, image_file, locs, descs)
-
-        print 'Extracted {0} features for {1}'.format(descs.shape[0], image_file)
+    sift_extractor = SiftExtractor(image_path, feature_path)
+    if processes == 1:
+        for image in images:
+            sift_extractor(image)
+    else:
+        pool = Pool(processes)
+        pool.map(sift_extractor, images)
 
     print 'Features extracted'
 
