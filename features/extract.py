@@ -2,12 +2,13 @@ import scipy.io
 import numpy as np
 import matplotlib.colors as mc
 import cv2
+import os
 
 import sift as sift
 import features.descriptor as desc
 
 
-def extract(image_files):
+def extract(image_files, image_path, feature_path):
     """ Extracts feature histogram vectors of classified SIFT features, 
         SIFT location colors and random Gaussian distributed colors 
         for the images.
@@ -52,15 +53,11 @@ def extract(image_files):
     # extract descriptors and colors for all images
     for image_file in image_files:
         
-        image = cv2.imread(image_file)[:,:,::-1]
+        image = cv2.imread(os.path.join(image_path, image_file))[:, :, ::-1]
         im = np.array(image)/255.0     
         shape = im.shape
-        
-        # Descriptors
-        if len(shape) == 3:
-            gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
          
-        locs, descs = sift.extract_feature_vectors(gray_image)
+        locs, descs = sift.load_features(feature_path, image_file)
         
         descs = desc.normalize(descs)
         desc_cc = desc.normalize(desc_cc)
@@ -70,8 +67,6 @@ def extract(image_files):
         
         D = np.vstack((D, norm_desc_hist))
         
-        print "Number of descs", descs.shape[0]
-        
         # Colors in descriptor locations
         colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
         C_desc = np.vstack((C_desc, colors_desc_hist))
@@ -79,9 +74,13 @@ def extract(image_files):
         # Colors in Gaussian distributed points.   
         colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
         C_rand = np.vstack((C_rand, colors_rand_hist))
+
+        print 'Processed {0}'.format(image_file)
       
     C_rand = set_nan_rows_to_mean(C_rand)
     C_desc = set_nan_rows_to_mean(C_desc)
+
+    print 'Feature vectors created'
       
     return D, C_desc, C_rand
 

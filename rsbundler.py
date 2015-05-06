@@ -8,6 +8,7 @@ from features.extract import extract, create_neutral_vector
 from analysis import pca, kclosest
 from display import plothelper
 from features.featuremode import FeatureMode
+from features import sift
 from runmode import RunMode
 
 
@@ -22,6 +23,7 @@ class FlickrRsBundler:
         self.tag = tag
         self.data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.tag + "/"
         self.image_dir = self.data_dir + "images/"
+        self.feature_dir = self.data_dir + "features/"
 
         self.image_files = None
 
@@ -39,16 +41,20 @@ class FlickrRsBundler:
         self.save()
         self.process()
         self.plot()
+
+    def images(self):
+        return [im for im in listdir(self.image_dir) if op.isfile(op.join(self.image_dir,im)) and im.endswith(".jpg")]
         
     def download(self):
         self.flickrWrapper.download(self.image_dir, self.tag)
         
     def files(self):
-        self.image_files = [op.join(self.image_dir,f) for f in listdir(self.image_dir) if op.isfile(op.join(self.image_dir,f)) and f.endswith(".jpg")]
-    
+        self.image_files = [op.join(self.image_dir, im) for im in self.images()]
+
     def extract(self):
+        sift.extract(self.images(), self.image_dir, self.feature_dir)
         self.files()
-        self.D, self.C_desc, self.C_rand = extract(self.image_files)
+        self.D, self.C_desc, self.C_rand = extract(self.images(), self.image_dir, self.feature_dir)
         
     def save(self):
         np.savetxt(self.image_dir + self.desc_file.format(self.tag), self.D)
