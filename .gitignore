@@ -5,5 +5,4 @@ deschists_*.txt
 neut_*.txt
 
 *.*~
-images/*
-features/tmp/*
+tags/*

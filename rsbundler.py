@@ -20,7 +20,8 @@ class FlickrRsBundler:
     def __init__(self, api_key, tag):
         self.flickrWrapper = FlickrWrapper(api_key)
         self.tag = tag
-        self.image_dir = op.dirname(op.abspath(__file__)) + "/images/" + self.tag + "/"
+        self.data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.tag + "/"
+        self.image_dir = self.data_dir + "images/"
 
         self.image_files = None
 
