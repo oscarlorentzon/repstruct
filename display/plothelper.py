@@ -104,21 +104,32 @@ def plot_pca_images(image_dir, images, V, pc1, pc2):
     pl.show()
 
 
-def plot_result(images, index30, index5, image_dir):
+def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10):
+    """ Shows the result by plotting all images on top, then the thirty closest images
+        and at last the five closest in double size.
 
-    im_dim = 100
-    cols = 10
+        Parameters
+        ----------
+        images: Image names.
+        index_thirty: Indexes for the thirty closest images.
+        index_five: Indexes for the five closest images.
+        image_dir: Image directory.
+        im_dim: Dimension of the longest side of the image.
+        cols: Number of image columns. The five closest images will have half the columns.
+    """
+
     space = im_dim / 10
     border = 2 * space
+    k_space = (cols - 1.) / (cols / 2 - 1)
 
     r_a = math.ceil(len(images) / float(cols))
     h_a = r_a * im_dim + (r_a - 1) * space + 2 * border
 
-    r_t = math.ceil(len(index30) / float(cols))
+    r_t = math.ceil(len(index_thirty) / float(cols))
     h_t = r_t * im_dim + (r_t - 1) * space + 2 * border
 
-    r_f = math.ceil(len(index5) / float(cols / 2))
-    h_f = r_f * 2 * im_dim + (r_f - 1) * 2.25 * space + 2 * border
+    r_f = math.ceil(len(index_five) / float(cols / 2))
+    h_f = r_f * 2 * im_dim + (r_f - 1) * k_space * space + 2 * border
 
     w = cols * im_dim + (cols - 1) * space + 2 * border
     h = h_a + space + h_t + space + h_f
@@ -133,14 +144,14 @@ def plot_result(images, index30, index5, image_dir):
         row, col = get_row_col(index, 0, im_dim, space, border, cols)
         insert_image(background, im, col, row)
 
-    for index, image in enumerate(np.array(images)[index30]):
+    for index, image in enumerate(np.array(images)[index_thirty]):
         im = load_image(image, image_dir, im_dim)
         row, col = get_row_col(index, h_a + space, im_dim, space, border, cols)
         insert_image(background, im, col, row)
 
-    for index, image in enumerate(np.array(images)[index5]):
+    for index, image in enumerate(np.array(images)[index_five]):
         im = load_image(image, image_dir, 2 * im_dim)
-        row, col = get_row_col(index, h_a + space + h_t + space, 2 * im_dim, 2.25 * space, border, cols / 2)
+        row, col = get_row_col(index, h_a + space + h_t + space, 2 * im_dim, k_space * space, border, cols / 2)
         insert_image(background, im, col, row)
 
     pl.figure()
@@ -153,6 +164,23 @@ def plot_result(images, index30, index5, image_dir):
 
 
 def get_row_col(index, translation, im_dim, space, border, columns):
+    """ Retrieves the middle row and middle column based on an index.
+
+        Parameters
+        ----------
+        index: The index.
+        translation: The row translation.
+        im_dim: The dimension of the image.
+        space: The space between images.
+        border: The image border size.
+        columns: The number of columns.
+
+        Returns
+        -------
+        row: The row.
+        col: The column.
+    """
+
     index_col = index % columns
     index_row = index / columns
     col = border + np.round(index_col * space + index_col * im_dim + im_dim / 2)
@@ -162,6 +190,19 @@ def get_row_col(index, translation, im_dim, space, border, columns):
 
 
 def load_image(image, image_dir, max_size):
+    """ Loads an image and resizes it to the specified max size.
+
+        Parameters
+        ----------
+        image: Image name.
+        image_dir: Image directory..
+        max_size: The max dimension of the image.
+
+        Returns
+        -------
+        row: The image array.
+    """
+
     im = cv2.imread(os.path.join(image_dir, image))[:, :, ::-1]  # Reverse to RGB
     size = np.array(im.shape[:2])
     thumb_size = max_size * size / np.max(size)
@@ -171,6 +212,16 @@ def load_image(image, image_dir, max_size):
 
 
 def insert_image(background, im, col, row):
+    """ Inserts an image into a background image.
+
+        Parameters
+        ----------
+        background: Background image array.
+        im: Image array.
+        col: The middle row to insert the image to.
+        row: The middle column to insert the image to.
+    """
+
     size = np.array(im.shape[:2])
     middle = np.mean([[1, 1], 1 + size], axis=0)
     middle_row = middle[0] - 1
