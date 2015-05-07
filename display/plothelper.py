@@ -46,7 +46,7 @@ def plot_pca_projections(V, pc1, pc2):
     pl.show()
 
 
-def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_axis=0.):
+def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_axis=0., ticks=False):
     """ Plots the images onto the projections for the specified principal components.
         Crops the projection image to the outermost images automatically. This can be
         overridden by setting the min_axis.
@@ -61,11 +61,12 @@ def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_ax
         im_dim : Dimension of longest side of collection images.
         dim : Dimension of projection background.
         min_axis : Minimum axis span in interval [0, 1].
+        ticks : Boolean specifying if the plot should display custom ticks.
     """
 
     unit = dim / 2
 
-    center = np.round(unit * np.max([np.max(np.abs(V[:, [pc1, pc2]])), min_axis])) + im_dim
+    center = int(np.round(unit * np.max([np.max(np.abs(V[:, [pc1, pc2]])), min_axis]))) + im_dim
     background_dim = 2 * center
     background = 255 * np.ones((background_dim, background_dim, 3), np.uint8)
     background[center-2:center+3, :, :] = np.zeros((5, background_dim, 3))
@@ -73,15 +74,23 @@ def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_ax
 
     for index, image in enumerate(images):
         im = load_image(image, image_dir, im_dim)
-        row = np.round(unit * V[index, pc1]) + center
-        col = np.round(unit * V[index, pc2]) + center
+        row = center - np.round(unit * V[index, pc1])
+        col = center + np.round(unit * V[index, pc2])
         insert_image(background, im, col, row)
 
-    fig = pl.figure()
+    fig = pl.figure(figsize=(12, 12))
     fig.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0)
-    pl.tick_params(axis='both', which='both',
-                   bottom='off', top='off', left='off', right='off',
-                   labelbottom='off', labelleft='off')
+
+    if ticks:
+        neg_positions = np.arange(im_dim, center, (center - im_dim) / 2)[:2]
+        pos_positions = np.arange(center, background_dim, (center - im_dim) / 2)[:3]
+        positions = np.hstack((neg_positions, pos_positions)).astype(np.float)
+        labels = (positions - center) / unit
+        pl.xticks(positions, ['%.2g' % label for label in labels])
+        pl.yticks(positions, ['%.2g' % label for label in -labels])
+    else:
+        pl.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off',
+                       labelbottom='off', labelleft='off')
 
     pl.xlabel('Principal component {0}'.format(pc1), fontsize=12)
     pl.ylabel('Principal component {0}'.format(pc2), fontsize=12)
