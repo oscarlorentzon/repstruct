@@ -46,8 +46,10 @@ def plot_pca_projections(V, pc1, pc2):
     pl.show()
 
 
-def plot_pca_images(image_dir, images, V, pc1, pc2):
+def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_axis=0.):
     """ Plots the images onto the projections for the specified principal components.
+        Crops the projection image to the outermost images automatically. This can be
+        overridden by setting the min_axis.
 
         Parameters
         ----------
@@ -56,42 +58,24 @@ def plot_pca_images(image_dir, images, V, pc1, pc2):
         V : The principal component projections in rows.
         pc1 : The first principal component to plot against.
         pc2 : The second principal component to plot against.
+        im_dim : Dimension of longest side of collection images.
+        dim : Dimension of projection background.
+        min_axis : Minimum axis span in interval [0, 1].
     """
 
-    sz = 3601
-    xm = (sz + 1) / 2
-    ym = xm
-    unit = (sz + 1) / 2
-    im_project = 255 * np.ones((sz, sz, 3), np.uint8)
-    im_project[xm-2:xm+3, :, :] = np.zeros((5, sz, 3))
-    im_project[:, ym-2:ym+3, :] = np.zeros((sz, 5, 3))
+    unit = dim / 2
 
-    middles = []
+    center = np.round(unit * np.max([np.max(np.abs(V[:, [pc1, pc2]])), min_axis])) + im_dim
+    background_dim = 2 * center
+    background = 255 * np.ones((background_dim, background_dim, 3), np.uint8)
+    background[center-2:center+3, :, :] = np.zeros((5, background_dim, 3))
+    background[:, center-2:center+3, :] = np.zeros((background_dim, 5, 3))
+
     for index, image in enumerate(images):
-        im = cv2.imread(os.path.join(image_dir, image))[:, :, ::-1]  # Reverse to RGB
-        size = np.array(im.shape[:2])
-        thumb_size = 100 * size / np.max(size)
-        im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
-        middle = np.mean([[1, 1], 1 + thumb_size], axis=0)
-        middle_x = middle[0] - 1
-        middle_y = middle[1] - 1
-
-        x = np.round(unit * V[index, pc1]) + xm
-        y = np.round(unit * V[index, pc2]) + ym
-
-        im_project[x-middle_x:x+middle_x, y-middle_y:y+middle_y, :] = im
-
-        middles.append(np.array(x, y))
-
-    middles = np.array(middles).astype(np.int)
-    coord_max = np.max(middles, axis=0)
-    coord_min = np.min(middles, axis=0)
-    coord_diff = np.subtract(coord_max, coord_min)
-    k = (np.max(coord_diff) - coord_diff) / 2
-    min_lim = np.max([coord_min - k - 100, 0])
-    max_lim = np.min([coord_max + k + 100, sz])
-
-    im_project = im_project[min_lim:max_lim, min_lim:max_lim, :]
+        im = load_image(image, image_dir, im_dim)
+        row = np.round(unit * V[index, pc1]) + center
+        col = np.round(unit * V[index, pc2]) + center
+        insert_image(background, im, col, row)
 
     fig = pl.figure()
     fig.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0)
@@ -101,7 +85,7 @@ def plot_pca_images(image_dir, images, V, pc1, pc2):
 
     pl.xlabel('Principal component {0}'.format(pc1), fontsize=12)
     pl.ylabel('Principal component {0}'.format(pc2), fontsize=12)
-    pl.imshow(im_project)
+    pl.imshow(background)
     pl.show()
 
 
@@ -221,12 +205,10 @@ def insert_image(background, im, col, row):
         row: The middle column to insert the image to.
     """
 
-    size = np.array(im.shape[:2])
-    middle = np.mean([[1, 1], 1 + size], axis=0)
-    middle_row = middle[0] - 1
-    middle_col = middle[1] - 1
+    rows = im.shape[0] / 2.
+    cols = im.shape[1] / 2.
 
-    background[row-middle_row:row+middle_row, col-middle_col:col+middle_col, :] = im
+    background[row-rows:row+rows, col-cols:col+cols, :] = im
 
 
 def plot_points(x,y):
