@@ -106,57 +106,41 @@ def plot_pca_images(image_dir, images, V, pc1, pc2):
 
 def plot_result(images, index30, index5, image_dir):
 
-    space = 10
+    im_dim = 100
+    cols = 10
+    space = im_dim / 10
     border = 2 * space
-    w_im = 100
 
-    r_all = math.ceil(len(images) / 10.)
-    h_all = r_all * w_im + (r_all - 1) * space + 2 * border
+    r_a = math.ceil(len(images) / float(cols))
+    h_a = r_a * im_dim + (r_a - 1) * space + 2 * border
 
-    h_t = 3 * w_im + 2 * space + 2 * border
-    h_f = 2 * w_im + 2 * border
+    r_t = math.ceil(len(index30) / float(cols))
+    h_t = r_t * im_dim + (r_t - 1) * space + 2 * border
 
-    h_ast = h_all + space + h_t
+    r_f = math.ceil(len(index5) / float(cols / 2))
+    h_f = r_f * 2 * im_dim + (r_f - 1) * 2.25 * space + 2 * border
 
-    w = 10 * w_im + 9 * space + 2 * border
-    h = h_all + space + h_t + space + h_f
+    w = cols * im_dim + (cols - 1) * space + 2 * border
+    h = h_a + space + h_t + space + h_f
 
     background = 255 * np.ones((h, w, 3), np.uint8)
-    background[h_all+1:h_all+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
-    background[h_ast+1:h_ast+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
+    background[h_a+1:h_a+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
+    background[h_a + space + h_t+1:h_a + space + h_t+space+1, border:w-border, :] = \
+        np.zeros((space, w-2*border, 3), np.uint8)
 
-    index_row = 0
     for index, image in enumerate(images):
-        im = load_image(image, image_dir, 100)
-
-        index_col = index % 10
-        col = 10 + np.round(index_col * space + index_col * w_im + w_im / 2)
-        row = 10 + np.round((index_row + 1) * space + index_row * w_im + w_im / 2)
-
+        im = load_image(image, image_dir, im_dim)
+        row, col = get_row_col(index, 0, im_dim, space, border, cols)
         insert_image(background, im, col, row)
 
-        if index_col == 9:
-            index_row += 1
-
-    index_row = 0
     for index, image in enumerate(np.array(images)[index30]):
-        im = load_image(image, image_dir, 100)
-
-        index_col = index % 10
-        col = border + np.round(index_col * space + index_col * w_im + w_im / 2)
-        row = h_all + border + np.round((index_row + 1) * space + index_row * w_im + w_im / 2)
-
+        im = load_image(image, image_dir, im_dim)
+        row, col = get_row_col(index, h_a + space, im_dim, space, border, cols)
         insert_image(background, im, col, row)
-
-        if index_col == 9:
-            index_row += 1
 
     for index, image in enumerate(np.array(images)[index5]):
-        im = load_image(image, image_dir, 200)
-
-        col = border + np.round(index * 22.5 + index * 200 + 200 / 2)
-        row = h_ast + space + border + w_im
-
+        im = load_image(image, image_dir, 2 * im_dim)
+        row, col = get_row_col(index, h_a + space + h_t + space, 2 * im_dim, 2.25 * space, border, cols / 2)
         insert_image(background, im, col, row)
 
     pl.figure()
@@ -166,6 +150,15 @@ def plot_result(images, index30, index5, image_dir):
 
     pl.imshow(background)
     pl.show()
+
+
+def get_row_col(index, translation, im_dim, space, border, columns):
+    index_col = index % columns
+    index_row = index / columns
+    col = border + np.round(index_col * space + index_col * im_dim + im_dim / 2)
+    row = translation + border + np.round(index_row * space + index_row * im_dim + im_dim / 2)
+
+    return row, col
 
 
 def load_image(image, image_dir, max_size):
