@@ -97,15 +97,17 @@ class FlickrRsBundler:
     def plot(self):
         plothelper.plot_images(self.image_dir, np.array(self.image_files)[self.closest30], 3, 10)
         plothelper.plot_images(self.image_dir, np.array(self.image_files)[self.closest5], 1, 5)
-        
-    def plot_image_pca(self):
-        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 1, 2)
-        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 3, 4)
-        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 29, 30)
 
     def plot_pca(self):
         plothelper.plot_pca_projections(self.Y, 1, 2)
         plothelper.plot_pca_projections(self.Y, 3, 4)
+        
+    def plot_image_pca(self):
+        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 1, 2)
+        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 3, 4)
+
+    def plot_result(self):
+        plothelper.plot_result(self.images(), self.closest30, self.closest5, self.image_dir)
  
              
 def main(argv):
@@ -179,8 +181,8 @@ def main(argv):
         bundler.load()
         
     bundler.process(feature_mode)
-    bundler.plot()
     bundler.plot_image_pca()
+    bundler.plot_result()
 
 
 if __name__ == "__main__":
