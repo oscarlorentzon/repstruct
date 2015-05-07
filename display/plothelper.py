@@ -93,13 +93,14 @@ def plot_pca_images(image_dir, images, V, pc1, pc2):
 
     im_project = im_project[min_lim:max_lim, min_lim:max_lim, :]
 
-    pl.figure()
+    fig = pl.figure()
+    fig.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0)
     pl.tick_params(axis='both', which='both',
                    bottom='off', top='off', left='off', right='off',
                    labelbottom='off', labelleft='off')
 
-    pl.xlabel('Principal component {0}'.format(pc1))
-    pl.ylabel('Principal component {0}'.format(pc2))
+    pl.xlabel('Principal component {0}'.format(pc1), fontsize=12)
+    pl.ylabel('Principal component {0}'.format(pc2), fontsize=12)
     pl.imshow(im_project)
     pl.show()
 
@@ -154,11 +155,9 @@ def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10
         row, col = get_row_col(index, h_a + space + h_t + space, 2 * im_dim, k_space * space, border, cols / 2)
         insert_image(background, im, col, row)
 
-    pl.figure()
-    pl.tick_params(axis='both', which='both',
-                   bottom='off', top='off', left='off', right='off',
-                   labelbottom='off', labelleft='off')
-
+    fig = pl.figure()
+    fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
+    pl.axis('off')
     pl.imshow(background)
     pl.show()
 
