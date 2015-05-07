@@ -36,7 +36,7 @@ You need to have Python 2.7+ and the following libraries:
 
 ## Example output
 
-The images below show the result from a run using the tag **steppyramid.** The first output image shows the collection images plotted against their projection onto the third and fourth principal component. 
+The images below show the result from a run using the tag **steppyramid.** The first output image shows the collection images plotted against their feature vector projection onto the third and fourth principal component. 
 
 ![PCA](example/pca.jpg)
 
