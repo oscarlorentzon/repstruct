@@ -43,17 +43,20 @@ class FlickrRsBundler:
         self.plot()
 
     def images(self):
-        return [im for im in listdir(self.image_dir) if op.isfile(op.join(self.image_dir,im)) and im.endswith(".jpg")]
+        if self.image_files is not None:
+            return self.image_files
+
+        self.image_files =\
+            [im for im in listdir(self.image_dir) if op.isfile(op.join(self.image_dir,im)) and im.endswith(".jpg")]
+
+        return self.image_files
         
     def download(self):
         self.flickrWrapper.download(self.image_dir, self.tag)
-        
-    def files(self):
-        self.image_files = [op.join(self.image_dir, im) for im in self.images()]
+
 
     def extract(self):
         sift.extract(self.images(), self.image_dir, self.feature_dir)
-        self.files()
         self.D, self.C_desc, self.C_rand = extract(self.images(), self.image_dir, self.feature_dir)
         
     def save(self):
@@ -62,7 +65,7 @@ class FlickrRsBundler:
         np.savetxt(self.image_dir + self.color_rand_file.format(self.tag), self.C_rand)
         
     def load(self):
-        self.files()
+        self.images()
         self.D = np.loadtxt(self.image_dir + self.desc_file.format(self.tag), float)
         self.C_desc = np.loadtxt(self.image_dir + self.color_desc_file.format(self.tag), float)
         self.C_rand = np.loadtxt(self.image_dir + self.color_rand_file.format(self.tag), float)
@@ -87,14 +90,19 @@ class FlickrRsBundler:
         
         self.Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
 
-        Y30 = self.Y[:,:30]
+        Y30 = self.Y[:, :30]
         self.closest30 = kclosest.k_closest(30, Y30)
-        self.closest5 = self.closest30[kclosest.k_closest(5, Y30[self.closest30,:])]
+        self.closest5 = self.closest30[kclosest.k_closest(5, Y30[self.closest30, :])]
         
     def plot(self):
-        plothelper.plot_images(np.array(self.image_files)[self.closest30], 3, 10)
-        plothelper.plot_images(np.array(self.image_files)[self.closest5], 1, 5)
+        plothelper.plot_images(self.image_dir, np.array(self.image_files)[self.closest30], 3, 10)
+        plothelper.plot_images(self.image_dir, np.array(self.image_files)[self.closest5], 1, 5)
         
+    def plot_image_pca(self):
+        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 1, 2)
+        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 3, 4)
+        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 29, 30)
+
     def plot_pca(self):
         plothelper.plot_pca_projections(self.Y, 1, 2)
         plothelper.plot_pca_projections(self.Y, 3, 4)
@@ -172,7 +180,7 @@ def main(argv):
         
     bundler.process(feature_mode)
     bundler.plot()
-    bundler.plot_pca()
+    bundler.plot_image_pca()
 
 
 if __name__ == "__main__":
