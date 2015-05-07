@@ -127,10 +127,7 @@ def plot_result(images, index30, index5, image_dir):
 
     index_row = 0
     for index, image in enumerate(images):
-        im = cv2.imread(os.path.join(image_dir, image))[:, :, ::-1]  # Reverse to RGB
-        size = np.array(im.shape[:2])
-        thumb_size = 100 * size / np.max(size)
-        im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
+        im = load_image(image, image_dir, 100)
 
         index_col = index % 10
         col = 10 + np.round(index_col * space + index_col * w_im + w_im / 2)
@@ -143,10 +140,7 @@ def plot_result(images, index30, index5, image_dir):
 
     index_row = 0
     for index, image in enumerate(np.array(images)[index30]):
-        im = cv2.imread(os.path.join(image_dir, image))[:, :, ::-1]  # Reverse to RGB
-        size = np.array(im.shape[:2])
-        thumb_size = 100 * size / np.max(size)
-        im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
+        im = load_image(image, image_dir, 100)
 
         index_col = index % 10
         col = border + np.round(index_col * space + index_col * w_im + w_im / 2)
@@ -158,10 +152,7 @@ def plot_result(images, index30, index5, image_dir):
             index_row += 1
 
     for index, image in enumerate(np.array(images)[index5]):
-        im = cv2.imread(os.path.join(image_dir, image))[:, :, ::-1]  # Reverse to RGB
-        size = np.array(im.shape[:2])
-        thumb_size = 200 * size / np.max(size)
-        im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
+        im = load_image(image, image_dir, 200)
 
         col = border + np.round(index * 22.5 + index * 200 + 200 / 2)
         row = h_ast + space + border + w_im
@@ -175,6 +166,15 @@ def plot_result(images, index30, index5, image_dir):
 
     pl.imshow(background)
     pl.show()
+
+
+def load_image(image, image_dir, max_size):
+    im = cv2.imread(os.path.join(image_dir, image))[:, :, ::-1]  # Reverse to RGB
+    size = np.array(im.shape[:2])
+    thumb_size = max_size * size / np.max(size)
+    im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
+
+    return im
 
 
 def insert_image(background, im, col, row):
