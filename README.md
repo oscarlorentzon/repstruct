@@ -34,4 +34,12 @@ You need to have Python 2.7+ and the following libraries:
 [Matplotlib]: http://matplotlib.sourceforge.net (Plotting in python)
 [Enum34]: https://pypi.python.org/pypi/enum34 (Enum support in python 2.*)
 
+## Example output
 
+The images below show the result from a run using the tag **steppyramid.** The first output image shows the collection images plotted against their projection onto the third and forth principal component. 
+
+![PCA](example/pca.jpg)
+
+The second output image shows the result after running the algorithm. On top all collection images are shown, in the middle the thirty closest images are shown and at the bottom the five most representative images are shown.
+
+![Result](example/result.jpg)
