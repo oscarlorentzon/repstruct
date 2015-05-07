@@ -131,15 +131,12 @@ def plot_result(images, index30, index5, image_dir):
         size = np.array(im.shape[:2])
         thumb_size = 100 * size / np.max(size)
         im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
-        middle = np.mean([[1, 1], 1 + thumb_size], axis=0)
-        middle_row = middle[0] - 1
-        middle_col = middle[1] - 1
 
         index_col = index % 10
         col = 10 + np.round(index_col * space + index_col * w_im + w_im / 2)
         row = 10 + np.round((index_row + 1) * space + index_row * w_im + w_im / 2)
 
-        background[row-middle_row:row+middle_row, col-middle_col:col+middle_col, :] = im
+        insert_image(background, im, col, row)
 
         if index_col == 9:
             index_row += 1
@@ -150,15 +147,12 @@ def plot_result(images, index30, index5, image_dir):
         size = np.array(im.shape[:2])
         thumb_size = 100 * size / np.max(size)
         im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
-        middle = np.mean([[1, 1], 1 + thumb_size], axis=0)
-        middle_row = middle[0] - 1
-        middle_col = middle[1] - 1
 
         index_col = index % 10
         col = border + np.round(index_col * space + index_col * w_im + w_im / 2)
         row = h_all + border + np.round((index_row + 1) * space + index_row * w_im + w_im / 2)
 
-        background[row-middle_row:row+middle_row, col-middle_col:col+middle_col, :] = im
+        insert_image(background, im, col, row)
 
         if index_col == 9:
             index_row += 1
@@ -168,14 +162,11 @@ def plot_result(images, index30, index5, image_dir):
         size = np.array(im.shape[:2])
         thumb_size = 200 * size / np.max(size)
         im = cv2.resize(im, dsize=(thumb_size[1], thumb_size[0]))
-        middle = np.mean([[1, 1], 1 + thumb_size], axis=0)
-        middle_row = middle[0] - 1
-        middle_col = middle[1] - 1
 
         col = border + np.round(index * 22.5 + index * 200 + 200 / 2)
         row = h_ast + space + border + w_im
 
-        background[row-middle_row:row+middle_row, col-middle_col:col+middle_col, :] = im
+        insert_image(background, im, col, row)
 
     pl.figure()
     pl.tick_params(axis='both', which='both',
@@ -184,6 +175,15 @@ def plot_result(images, index30, index5, image_dir):
 
     pl.imshow(background)
     pl.show()
+
+
+def insert_image(background, im, col, row):
+    size = np.array(im.shape[:2])
+    middle = np.mean([[1, 1], 1 + size], axis=0)
+    middle_row = middle[0] - 1
+    middle_col = middle[1] - 1
+
+    background[row-middle_row:row+middle_row, col-middle_col:col+middle_col, :] = im
 
 
 def plot_points(x,y):
