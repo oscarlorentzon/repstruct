@@ -1,5 +1,5 @@
 import os.path as op
-from os import listdir
+from os import listdir, makedirs
 import numpy as np
 import sys, getopt
 
@@ -24,6 +24,7 @@ class FlickrRsBundler:
         self.data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.tag + "/"
         self.image_dir = self.data_dir + "images/"
         self.feature_dir = self.data_dir + "features/"
+        self.descriptor_dir = self.data_dir + "descriptors/"
 
         self.image_files = None
 
@@ -60,15 +61,18 @@ class FlickrRsBundler:
         self.D, self.C_desc, self.C_rand = extract(self.images(), self.image_dir, self.feature_dir)
         
     def save(self):
-        np.savetxt(self.image_dir + self.desc_file.format(self.tag), self.D)
-        np.savetxt(self.image_dir + self.color_desc_file.format(self.tag), self.C_desc)
-        np.savetxt(self.image_dir + self.color_rand_file.format(self.tag), self.C_rand)
+        if not op.exists(self.descriptor_dir):
+            makedirs(self.descriptor_dir)
+
+        np.savetxt(self.descriptor_dir + self.desc_file.format(self.tag), self.D)
+        np.savetxt(self.descriptor_dir + self.color_desc_file.format(self.tag), self.C_desc)
+        np.savetxt(self.descriptor_dir + self.color_rand_file.format(self.tag), self.C_rand)
         
     def load(self):
         self.images()
-        self.D = np.loadtxt(self.image_dir + self.desc_file.format(self.tag), float)
-        self.C_desc = np.loadtxt(self.image_dir + self.color_desc_file.format(self.tag), float)
-        self.C_rand = np.loadtxt(self.image_dir + self.color_rand_file.format(self.tag), float)
+        self.D = np.loadtxt(self.descriptor_dir + self.desc_file.format(self.tag), float)
+        self.C_desc = np.loadtxt(self.descriptor_dir + self.color_desc_file.format(self.tag), float)
+        self.C_rand = np.loadtxt(self.descriptor_dir + self.color_rand_file.format(self.tag), float)
         
     def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
         
