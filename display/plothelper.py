@@ -15,16 +15,14 @@ def plot_images(image_dir, image_files, rows, columns):
         rows : The number of rows in the figure.
         columns : The number of columns in the figure.
     """
-    
-    i = 1
+
     fig = pl.figure()
     
-    for image_file in image_files:
+    for index, image_file in enumerate(image_files):
         image = cv2.imread(os.path.join(image_dir, image_file))[:, :, ::-1]  # Reverse to RGB
 
-        sub = fig.add_subplot(rows, columns, i)
+        sub = fig.add_subplot(rows, columns, index + 1)
         sub.imshow(image)
-        i += 1
     
     pl.show()
 
@@ -109,12 +107,13 @@ def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10
         index_five: Indexes for the five closest images.
         image_dir: Image directory.
         im_dim: Dimension of the longest side of the image.
-        cols: Number of image columns. The five closest images will have half the columns.
+        cols: Number of image columns. Must be greater than one. The five closest images will
+              have half the columns.
     """
 
     space = im_dim / 10
     border = 2 * space
-    k_space = (cols - 1.) / (cols / 2 - 1)
+    k_space = (cols - 1) / (cols / 2. - 1) if cols > 2 else 1
 
     r_a = math.ceil(len(images) / float(cols))
     h_a = r_a * im_dim + (r_a - 1) * space + 2 * border
@@ -130,8 +129,7 @@ def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10
 
     background = 255 * np.ones((h, w, 3), np.uint8)
     background[h_a+1:h_a+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
-    background[h_a + space + h_t+1:h_a + space + h_t+space+1, border:w-border, :] = \
-        np.zeros((space, w-2*border, 3), np.uint8)
+    background[h_a+space+h_t+1:h_a+space+h_t+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
 
     for index, image in enumerate(images):
         im = load_image(image, image_dir, im_dim)
@@ -218,17 +216,3 @@ def insert_image(background, im, col, row):
     cols = im.shape[1] / 2.
 
     background[row-rows:row+rows, col-cols:col+cols, :] = im
-
-
-def plot_points(x,y):
-    """ Plots the values in y against the values in x.
-        
-        Parameters
-        ----------
-        x : An array of points.
-        y : An array of points.
-    """
-    
-    pl.figure()
-    pl.plot(x, y, '*')
-    pl.show()
