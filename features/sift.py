@@ -97,9 +97,7 @@ def save_features(file_path, image, locations, descriptors):
         descriptors: Descriptor vectors.
     """
 
-    np.savez(os.path.join(file_path, image + '.npz'),
-             locations=locations,
-             descriptors=descriptors)
+    np.savez(os.path.join(file_path, image + '.npz'), locations=locations, descriptors=descriptors)
 
 
 def load_features(file_path, image):
@@ -111,6 +109,6 @@ def load_features(file_path, image):
         image: The image name.
     """
 
-    s = np.load(os.path.join(file_path, image + '.npz'))
+    f = np.load(os.path.join(file_path, image + '.npz'))
 
-    return s['locations'], s['descriptors']
+    return f['locations'], f['descriptors']
