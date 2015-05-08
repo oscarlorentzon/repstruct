@@ -17,6 +17,8 @@ def extract(image_files, image_path, feature_path):
         Parameters
         ----------
         image_files : A list of image file paths.
+        image_path : Path to image directory.
+        feature_path : Path to feature directory.
     
         Returns
         -------
@@ -35,9 +37,6 @@ def extract(image_files, image_path, feature_path):
     # cluster center indexes and create histogram.
     desc_cc = descriptor_data.get('cbest')
     desc_cc_norm = np.histogram(descriptor_data.get('idxbest'), range(1, desc_cc.shape[0] + 2))[0]
-    
-    # Create empty histogram array
-    D = np.array([]).reshape(0, desc_cc.shape[0])
 
     color_cc = color_data.get('ccbest')
     color_cc_norm = np.histogram(color_data.get('idxcbest'), range(1, color_cc.shape[0] + 2))[0]
@@ -47,14 +46,16 @@ def extract(image_files, image_path, feature_path):
     x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
 
-    C_rand = np.array([]).reshape(0, color_cc.shape[0]) 
-    C_desc = np.array([]).reshape(0, color_cc.shape[0])
+    # Create empty histogram arrays
+    D = []
+    C_rand = []
+    C_desc = []
     
-    # extract descriptors and colors for all images
+    # Extract descriptors and colors for all images
     for image_file in image_files:
         
-        image = cv2.imread(os.path.join(image_path, image_file))[:, :, ::-1]
-        im = np.array(image)/255.0     
+        image = cv2.imread(os.path.join(image_path, image_file))[:, :, ::-1]  # Reverse to RGB
+        im = np.array(image) / 255.0
         shape = im.shape
          
         locs, descs = sift.load_features(feature_path, image_file)
@@ -62,25 +63,29 @@ def extract(image_files, image_path, feature_path):
         descs = desc.normalize(descs)
         desc_cc = desc.normalize(desc_cc)
         desc_hist = desc.classify_cosine(descs, desc_cc)
-        
+
+        # SIFT descriptors
         norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
-        
-        D = np.vstack((D, norm_desc_hist))
+        D.append(norm_desc_hist)
         
         # Colors in descriptor locations
         colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
-        C_desc = np.vstack((C_desc, colors_desc_hist))
+        C_desc.append(colors_desc_hist)
         
         # Colors in Gaussian distributed points.   
         colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
-        C_rand = np.vstack((C_rand, colors_rand_hist))
+        C_rand.append(colors_rand_hist)
 
         print 'Processed {0}'.format(image_file)
+
+    D = np.array(D)
+    C_rand = np.array(C_rand)
+    C_desc = np.array(C_desc)
       
     C_rand = set_nan_rows_to_mean(C_rand)
     C_desc = set_nan_rows_to_mean(C_desc)
 
-    print 'Feature vectors created'
+    print 'Images processed'
       
     return D, C_desc, C_rand
 
@@ -94,6 +99,9 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
         ----------
         image : A 3-D array of RGB values.
         rows : The row points of the image
+        columns : The column points of the image.
+        cluster_centers : The cluster centers.
+        cluster_center_norm : The cluster center norm.
     
         Returns
         -------
