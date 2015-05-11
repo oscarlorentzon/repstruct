@@ -2,19 +2,15 @@ import numpy as np
 
 
 def neutral_sub_pca(X, neut_factor=0.8):
-    """ Performs PCA by singular value decomposition after subtracting
-        a neutral vector with a specified factor. 
-        
-        Parameters
-        ----------
-        X : A 2-D array with normalized row vectors.
-        neut_factor : The factor of the neutralization vector.
-      
-        Returns
-        -------
-        Y : A 2-D array of projections of the row vectors of X on the 
-            principal components.
-        V : The principal components of X.
+    """ Performs PCA by singular value decomposition after
+        subtracting a neutral vector with a specified factor.
+
+    :param X: A 2-D array with normalized row vectors.
+    :param neut_factor: The factor of the neutralization vector.
+
+    :return Y: A 2-D array of projections of the row vectors
+               of X on the principal components.
+    :return V: The principal components of X.
     """
     
     X_shape = X.shape
@@ -36,17 +32,13 @@ def neutral_sub_pca(X, neut_factor=0.8):
 def neutral_sub_pca_vector(X, N):
     """ Performs PCA by singular value decomposition after subtracting
         a neutral vector with a specified factor. 
-        
-        Parameters
-        ----------
-        X : A 2-D array with normalized row vectors.
-        neut_factor : The factor of the neutralization vector.
-      
-        Returns
-        -------
-        Y : A 2-D array of projections of the row vectors of X on the 
-            principal components.
-        V : The principal components of X.
+
+    :param X: A 2-D array with normalized row vectors.
+    :param neut_factor: The factor of the neutralization vector.
+
+    :return Y: A 2-D array of projections of the row vectors of X on
+               the principal components.
+    :return V: The principal components of X.
     """
     
     # Subtracting a neutral vector for each row in X before performing SVD.

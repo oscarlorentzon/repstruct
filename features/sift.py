@@ -10,21 +10,18 @@ class SiftExtractor:
     def __init__(self, image_path, feature_path):
         """ Creates a SiftExtractor.
 
-            Parameters
-            ----------
-            image_path: Path to image files.
-            feature_path: Path to feature files.
+        :param image_path: Path to image files.
+        :param feature_path: Path to feature files.
         """
 
         self.image_path = image_path
         self.feature_path = feature_path
 
     def __call__(self, image):
-        """ Extracts SIFT features for an image and saves the descriptors and locations to file.
+        """ Extracts SIFT features for an image and saves the descriptors
+            and locations to file.
 
-            Parameters
-            ----------
-            image: Image name.
+        :param image: Image name.
         """
 
         im = cv2.imread(os.path.join(self.image_path, image), cv2.IMREAD_GRAYSCALE)
@@ -36,13 +33,13 @@ class SiftExtractor:
 
 
 def extract(images, image_path, feature_path, processes=6):
-    """ Extracts SIFT features for a list of images. Saves the descriptors and locations to file.
+    """ Extracts SIFT features for a list of images. Saves the descriptors
+        and locations to file.
 
-        Parameters
-        ----------
-        image_files: Image names.
-        image_path: Folder path for image files.
-        feature_path: Folder path for features.
+    :param image_files: Image names.
+    :param image_path: Folder path for image files.
+    :param feature_path: Folder path for features.
+    :param processes: The number of processes for extracting features in parallel.
     """
     if not os.path.exists(feature_path):
         os.makedirs(feature_path)
@@ -59,18 +56,15 @@ def extract(images, image_path, feature_path, processes=6):
 
 
 def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.001):
-    """ Process a grayscale image and return the found SIFT feature points and descriptors.
+    """ Process a grayscale image and return the found SIFT feature points
+        and descriptors.
 
-        Parameters
-        ----------
-        image : A gray scale image represented in a 2-D array.
-        edge_threshold: The edge threshold.
-        peak_threshold: The peak threshold.
+    :param image : A gray scale image represented in a 2-D array.
+    :param edge_threshold: The edge threshold.
+    :param peak_threshold: The peak threshold.
 
-        Returns
-        -------
-        locs : An array with the row, column, scale and orientation of each feature.
-        descs : The descriptors.
+    :return locs : An array with the row, column, scale and orientation of each feature.
+    :return descs : The descriptors.
     """
 
     detector = cv2.FeatureDetector_create('SIFT')
@@ -89,12 +83,10 @@ def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.001):
 def save_features(file_path, image, locations, descriptors):
     """ Saves features to .npz.
 
-        Parameters
-        ----------
-        file_path: The folder.
-        image: The image name.
-        locations: Descriptor locations.
-        descriptors: Descriptor vectors.
+    :param file_path: The folder.
+    :param image: The image name.
+    :param locations: Descriptor locations.
+    :param descriptors: Descriptor vectors.
     """
 
     np.savez(os.path.join(file_path, image + '.npz'), locations=locations, descriptors=descriptors)
@@ -103,10 +95,10 @@ def save_features(file_path, image, locations, descriptors):
 def load_features(file_path, image):
     """ Loads features from .npz.
 
-        Parameters
-        ----------
-        file_path: The folder.
-        image: The image name.
+    :param file_path: The folder.
+    :param image: The image name.
+
+    :return Feature locations and feature descriptors.
     """
 
     f = np.load(os.path.join(file_path, image + '.npz'))

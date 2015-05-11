@@ -10,8 +10,6 @@ class FlickrWrapper:
     def __init__(self, api_key):
         """ Initializes a FlickrWrapper.
 
-        Parameters
--       ----------
         :param api_key: The Flickr API key.
         """
 
@@ -20,11 +18,9 @@ class FlickrWrapper:
     def get_urls(self, tag, sort_mode='relevance'):
         """Gets image URLs from Flickr.
 
-        Parameters
-        ----------
-        tag : The tag for the search.
-        sort_mode : One of the values in the Flickr sort mode enumeration.
-                    E.g. date-posted-desc, interestingness-desc and relevance.
+        :param tag: The tag for the search.
+        :param sort_mode: One of the values in the Flickr sort mode enumeration.
+                          E.g. date-posted-desc, interestingness-desc and relevance.
         """
 
         request = 'https://api.flickr.com/services/rest/?method=flickr.photos.search' +\
@@ -39,13 +35,12 @@ class FlickrWrapper:
 
     def download(self, image_dir, tag, sort_mode='relevance', processes=6):
         """ Downloads images for a tag from Flickr.
-    
-        Parameters
-        ----------
-        image_dir : The directory for sorting the images
-        tag : The tag for the search.
-        sort_mode : One of the values in the Flickr sort mode enumeration.
-                    E.g. date-posted-desc, interestingness-desc and relevance.
+
+        :param image_dir: The directory for sorting the images
+        :param tag: The tag for the search.
+        :param sort_mode: One of the values in the Flickr sort mode enumeration.
+                          E.g. date-posted-desc, interestingness-desc and relevance.
+        :param processes: The number of processes for downloading images in parallel.
         """
 
         image_urls = self.get_urls(tag, sort_mode)

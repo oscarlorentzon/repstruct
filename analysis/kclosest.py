@@ -3,21 +3,17 @@ from scipy.spatial.distance import pdist, squareform
 
 
 def k_closest(k, V, metric='cosine'):
-    """ Performs an approximate solution to the problem of
-        finding the closest group of k elements in a set of 
-        vectors.
-        
-        Parameters
-        ----------
-        k : The number of elements in the result set.
-        V : A 2-D array with vectors in rows for which to find the 
-            closest set of k vectors.
-        metric : The metric for which to perform the distance measure.
-            Possible values are the ones defined for scipy.spatial.distance.pdist.
-    
-        Returns
-        -------
-        An array of row indices for the k closest row vectors.
+    """ Performs an approximate solution to the problem of finding
+        the closest group of k elements in a set of vectors.
+
+    :param k: The number of elements in the result set.
+    :param V: A 2-D array with vectors in rows for which to find
+              the closest set of k vectors.
+    :param metric: The metric for which to perform the distance measure.
+                   Possible values are the ones defined for
+                   scipy.spatial.distance.pdist.
+
+    :return An array of row indices for the k closest row vectors.
     """
     
     d = pdist(V, metric)

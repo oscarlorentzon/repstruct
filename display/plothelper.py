@@ -6,20 +6,19 @@ import math
 
 
 def plot_images(image_dir, image_files, rows, columns):
-    """ Plots image files in a figure with the defined
-        number of rows and columns.
-        
-        Parameters
-        ----------
-        image_files : A list of image file names.
-        rows : The number of rows in the figure.
-        columns : The number of columns in the figure.
+    """ Plots image files in a figure with the defined number of
+        rows and columns.
+
+    :param image_files: A list of image file names.
+    :param rows: The number of rows in the figure.
+    :param columns: The number of columns in the figure.
     """
 
     fig = pl.figure()
     
     for index, image_file in enumerate(image_files):
-        image = cv2.imread(os.path.join(image_dir, image_file))[:, :, ::-1]  # Reverse to RGB
+        # Load image and reverse to RGB
+        image = cv2.imread(os.path.join(image_dir, image_file))[:, :, ::-1]
 
         sub = fig.add_subplot(rows, columns, index + 1)
         sub.imshow(image)
@@ -29,12 +28,10 @@ def plot_images(image_dir, image_files, rows, columns):
 
 def plot_pca_projections(V, pc1, pc2):
     """ Plots the projections for the specified principal components.
-        
-        Parameters
-        ----------
-        V : The principal component projections in rows.
-        pc1 : The first principal component to plot against.
-        pc2 : The second principal component to plot against.
+
+    :param V: The principal component projections in rows.
+    :param pc1: The first principal component to plot against.
+    :param pc2: The second principal component to plot against.
     """
     
     pl.figure()
@@ -45,21 +42,20 @@ def plot_pca_projections(V, pc1, pc2):
 
 
 def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_axis=0., ticks=False):
-    """ Plots the images onto the projections for the specified principal components.
-        Crops the projection image to the outermost images automatically. This can be
-        overridden by setting the min_axis.
+    """ Plots the images onto the projections for the specified
+        principal components. Crops the projection image to the
+        outermost images automatically. This can be overridden by
+        setting the min_axis.
 
-        Parameters
-        ----------
-        image_dir: The image directory.
-        images: The image names.
-        V : The principal component projections in rows.
-        pc1 : The first principal component to plot against.
-        pc2 : The second principal component to plot against.
-        im_dim : Dimension of longest side of collection images.
-        dim : Dimension of projection background.
-        min_axis : Minimum axis span in interval [0, 1].
-        ticks : Boolean specifying if the plot should display custom ticks.
+    :param image_dir: The image directory.
+    :param images: The image names.
+    :param V: The principal component projections in rows.
+    :param pc1: The first principal component to plot against.
+    :param pc2: The second principal component to plot against.
+    :param im_dim: Dimension of longest side of collection images.
+    :param dim: Dimension of projection background.
+    :param min_axis: Minimum axis span in interval [0, 1].
+    :param ticks: Boolean specifying if the plot should display custom ticks.
     """
 
     unit = dim / 2
@@ -97,18 +93,16 @@ def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_ax
 
 
 def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10):
-    """ Shows the result by plotting all images on top, then the thirty closest images
-        and at last the five closest in double size.
+    """ Shows the result by plotting all images on top, then the thirty
+        closest images and at last the five closest in double size.
 
-        Parameters
-        ----------
-        images: Image names.
-        index_thirty: Indexes for the thirty closest images.
-        index_five: Indexes for the five closest images.
-        image_dir: Image directory.
-        im_dim: Dimension of the longest side of the image.
-        cols: Number of image columns. Must be greater than one. The five closest images will
-              have half the columns.
+    :param images: Image names.
+    :param index_thirty: Indexes for the thirty closest images.
+    :param index_five: Indexes for the five closest images.
+    :param image_dir: Image directory.
+    :param im_dim: Dimension of the longest side of the image.
+    :param cols: Number of image columns. Must be greater than one. The five
+                 closest images will have half the columns.
     """
 
     space = im_dim / 10
@@ -156,19 +150,15 @@ def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10
 def get_row_col(index, translation, im_dim, space, border, columns):
     """ Retrieves the middle row and middle column based on an index.
 
-        Parameters
-        ----------
-        index: The index.
-        translation: The row translation.
-        im_dim: The dimension of the image.
-        space: The space between images.
-        border: The image border size.
-        columns: The number of columns.
+    :param index: The index.
+    :param translation: The row translation.
+    :param im_dim: The dimension of the image.
+    :param space: The space between images.
+    :param border: The image border size.
+    :param columns: The number of columns.
 
-        Returns
-        -------
-        row: The row.
-        col: The column.
+    :return row: The row.
+    :return col: The column.
     """
 
     index_col = index % columns
@@ -204,12 +194,10 @@ def load_image(image, image_dir, max_size):
 def insert_image(background, im, col, row):
     """ Inserts an image into a background image.
 
-        Parameters
-        ----------
-        background: Background image array.
-        im: Image array.
-        col: The middle row to insert the image to.
-        row: The middle column to insert the image to.
+    :param background: Background image array.
+    :param im: Image array.
+    :param col: The middle row to insert the image to.
+    :param row: The middle column to insert the image to.
     """
 
     rows = im.shape[0] / 2.

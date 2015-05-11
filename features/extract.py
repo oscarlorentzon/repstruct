@@ -12,22 +12,17 @@ def extract(image_files, image_path, feature_path):
     """ Extracts feature histogram vectors of classified SIFT features, 
         SIFT location colors and random Gaussian distributed colors 
         for the images.
-        
-         
-        Parameters
-        ----------
-        image_files : A list of image file paths.
-        image_path : Path to image directory.
-        feature_path : Path to feature directory.
-    
-        Returns
-        -------
-        D : A 2-D array with SIFT descriptor feature histograms for each image
-            in rows.
-        C_desc : A 2-D array with histograms for colors for SIFT descriptor 
-                 feature locations for each image in rows.
-        C_rand : A 2-D array with histograms for colors for Gaussian 
-                 distributed random points for each image in rows.
+
+    :param image_files: A list of image file paths.
+    :param image_path: Path to image directory.
+    :param feature_path: Path to feature directory.
+
+    :return D: A 2-D array with SIFT descriptor feature histograms for
+               each image in rows.
+    :return C_desc: A 2-D array with histograms for colors for SIFT
+                    descriptor feature locations for each image in rows.
+    :return C_rand : A 2-D array with histograms for colors for Gaussian
+                     distributed random points for each image in rows.
     """
     
     descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
@@ -94,20 +89,15 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
     """ Creates a normalized histogram of for the colors of the rows and 
         columns of an image when classified against the cluster centers on the
         HS disc of the HSV color space and divided with the cluster center norm.
-         
-        Parameters
-        ----------
-        image : A 3-D array of RGB values.
-        rows : The row points of the image
-        columns : The column points of the image.
-        cluster_centers : The cluster centers.
-        cluster_center_norm : The cluster center norm.
-    
-        Returns
-        -------
-        A 2-D array where the row vectors with NaN values 
-        have been changed to the mean of the rest of the 
-        row vectors for each column.
+
+    :param image: A 3-D array of RGB values.
+    :param rows: The row points of the image
+    :param columns: The column points of the image.
+    :param cluster_centers: The cluster centers.
+    :param cluster_center_norm: The cluster center norm.
+
+    :return A 2-D array where the row vectors with NaN values have been changed to the mean
+            of the rest of the row vectors for each column.
     """
     
     if len(image.shape) == 3:             
@@ -122,16 +112,11 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
 def set_nan_rows_to_mean(X):
     """ Sets rows of a 2-D array with NaN values to 
         the mean of the non NaN values for each column.
-         
-        Parameters
-        ----------
-        X : A 2-D array of row vectors.
-    
-        Returns
-        -------
-        A 2-D array where the row vectors with NaN values 
-        have been changed to the mean of the rest of the 
-        row vectors for each column.
+
+    :param X: A 2-D array of row vectors.
+
+    :return A 2-D array where the row vectors with NaN values have been
+            changed to the mean of the rest of the row vectors for each column.
     """
     
     C_norm = np.linalg.norm(X, axis=1)
@@ -146,24 +131,19 @@ def set_nan_rows_to_mean(X):
 
 
 def create_neutral_vector(D, rows):
-    """ Creates a 2-D array with neutral vectors according to the 
+    """ Creates a 2-D array with neutral vectors according to the
         size and weights specified in a 2-D array.
-         
-        Parameters
-        ----------
-        D : 2-D array with rows specifying the length and weight
-            for each section of the neutral vector.
-        rows : An integer specifying the number of rows in the neutral 2-D array.
-    
-        Returns
-        -------
-        A 2-D array with rows with values according to the length and weight 
-        requirements in the input.
-        
-        Notes
-        -----
-        The neutral vector rows is only normalized if the input parameters
-        are weighted correctly.
+
+    The neutral vector rows is only normalized if the input
+    parameters are weighted correctly.
+
+    :param D: 2-D array with rows specifying the length and weight
+              for each section of the neutral vector.
+    :param rows: An integer specifying the number of rows in the
+                 neutral 2-D array.
+
+    :return A 2-D array with rows with values according to the length
+            and weight requirements in the input.
     """
     
     N = np.array([]).reshape(rows, 0)
@@ -176,15 +156,11 @@ def create_neutral_vector(D, rows):
 
 def create_NaN_array(rows, cols):
     """ Creates a 2-D array with NaN values.
-         
-        Parameters
-        ----------
-        rows : The number of rows.
-        cols : The number of columns.
-    
-        Returns
-        -------
-        A 2-D array with only NaN values.
+
+     :param rows: The number of rows.
+     :param cols: The number of columns.
+
+     :return A 2-D array with only NaN values.
     """
     
     nan_array = np.empty((rows, cols))
@@ -193,19 +169,13 @@ def create_NaN_array(rows, cols):
 
 
 def rgb_to_hs_coords(rgb):
-    """ Converts RGB values to x and y coordinates on 
-        the HSV disc irrespective of the value component.
-         
-        Parameters
-        ----------
-        rgb : (..., 3) array-like
-        All values must be in the range [0, 1]
-    
-        Returns
-        -------
-        coords : (..., 2) ndarray
-        Colors converted to x and y coordinates on the 
-        HS disc of the HSV color space in the in range [0, 1].
+    """ Converts RGB values to x and y coordinates on the HSV
+        disc irrespective of the value component.
+
+    :param rgb: (..., 3) array-like. All values must be in the range [0, 1]
+
+    :return coords: (..., 2) ndarray Colors converted to x and y
+            coordinates on the HS disc of the HS color space in the in range [0, 1].
     """
     
     hsv = mc.rgb_to_hsv(rgb)
@@ -217,18 +187,13 @@ def rgb_to_hs_coords(rgb):
 
 
 def get_rgb_from_locs(locs_r, locs_c, im):
-    """ Retrieves the RGB values for an image in the specified
-        locations.
-         
-        Parameters
-        ----------
-        locs_r : An array with the rows of the image locations.
-        locs_r : An array with the columns of the image locations.
-    
-        Returns
-        -------
-        rgb : (..., 2) ndarray
-        The RGB values in the specified locations.
+    """ Retrieves the RGB values for an image in the specified locations.
+
+    :param locs_r: An array with the rows of the image locations.
+    :param locs_c: An array with the columns of the image locations.
+    :param im: Image array.
+
+    :return rgb: (..., 2) ndarray The RGB values in the specified locations.
     """
     
     locs_row = np.empty((locs_r.shape[0],), dtype='int')
