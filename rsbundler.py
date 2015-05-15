@@ -69,7 +69,6 @@ class FlickrRsBundler:
         np.savetxt(self.descriptor_dir + self.color_rand_file.format(self.tag), self.C_rand)
         
     def load(self):
-        self.images()
         self.D = np.loadtxt(self.descriptor_dir + self.desc_file.format(self.tag), float)
         self.C_desc = np.loadtxt(self.descriptor_dir + self.color_desc_file.format(self.tag), float)
         self.C_rand = np.loadtxt(self.descriptor_dir + self.color_rand_file.format(self.tag), float)
@@ -99,16 +98,16 @@ class FlickrRsBundler:
         self.closest5 = self.closest30[kclosest.k_closest(5, Y30[self.closest30, :])]
         
     def plot(self):
-        plothelper.plot_images(self.image_dir, np.array(self.image_files)[self.closest30], 3, 10)
-        plothelper.plot_images(self.image_dir, np.array(self.image_files)[self.closest5], 1, 5)
+        plothelper.plot_images(self.image_dir, np.array(self.images())[self.closest30], 3, 10)
+        plothelper.plot_images(self.image_dir, np.array(self.images())[self.closest5], 1, 5)
 
     def plot_pca(self):
         plothelper.plot_pca_projections(self.Y, 1, 2)
         plothelper.plot_pca_projections(self.Y, 3, 4)
         
     def plot_image_pca(self):
-        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 1, 2)
-        plothelper.plot_pca_images(self.image_dir, self.image_files, self.Y, 3, 4)
+        plothelper.plot_pca_images(self.image_dir, self.images(), self.Y, 1, 2)
+        plothelper.plot_pca_images(self.image_dir, self.images(), self.Y, 3, 4)
 
     def plot_result(self):
         plothelper.plot_result(self.images(), self.closest30, self.closest5, self.image_dir)
