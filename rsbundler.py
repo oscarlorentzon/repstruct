@@ -14,9 +14,9 @@ from runmode import RunMode
 
 class FlickrRsBundler:
     
-    __desc_file = "{0}_desc.txt"
-    __color_desc_file = "{0}_colordesc.txt"
-    __color_rand_file = "{0}_colorrand.txt"
+    __desc_file = "desc.txt"
+    __color_desc_file = "colordesc.txt"
+    __color_rand_file = "colorrand.txt"
     
     def __init__(self, api_key, tag):
         self.__flickrWrapper = FlickrWrapper(api_key)
@@ -63,14 +63,14 @@ class FlickrRsBundler:
         if not op.exists(self.__descriptor_dir):
             makedirs(self.__descriptor_dir)
 
-        np.savetxt(self.__descriptor_dir + self.__desc_file.format(self.__tag), self.__D)
-        np.savetxt(self.__descriptor_dir + self.__color_desc_file.format(self.__tag), self.__C_desc)
-        np.savetxt(self.__descriptor_dir + self.__color_rand_file.format(self.__tag), self.__C_rand)
+        np.savetxt(self.__descriptor_dir + self.__desc_file, self.__D)
+        np.savetxt(self.__descriptor_dir + self.__color_desc_file, self.__C_desc)
+        np.savetxt(self.__descriptor_dir + self.__color_rand_file, self.__C_rand)
         
     def load(self):
-        self.__D = np.loadtxt(self.__descriptor_dir + self.__desc_file.format(self.__tag), float)
-        self.__C_desc = np.loadtxt(self.__descriptor_dir + self.__color_desc_file.format(self.__tag), float)
-        self.__C_rand = np.loadtxt(self.__descriptor_dir + self.__color_rand_file.format(self.__tag), float)
+        self.__D = np.loadtxt(self.__descriptor_dir + self.__desc_file, float)
+        self.__C_desc = np.loadtxt(self.__descriptor_dir + self.__color_desc_file, float)
+        self.__C_rand = np.loadtxt(self.__descriptor_dir + self.__color_rand_file, float)
         
     def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
         
