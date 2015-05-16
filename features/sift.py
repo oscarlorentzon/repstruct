@@ -41,8 +41,6 @@ def extract(images, image_path, feature_path, processes=6):
     :param feature_path: Folder path for features.
     :param processes: The number of processes for extracting features in parallel.
     """
-    if not os.path.exists(feature_path):
-        os.makedirs(feature_path)
 
     sift_extractor = SiftExtractor(image_path, feature_path)
     if processes == 1:
@@ -89,7 +87,7 @@ def save_features(file_path, image, locations, descriptors):
     :param descriptors: Descriptor vectors.
     """
 
-    np.savez(os.path.join(file_path, image + '.npz'), locations=locations, descriptors=descriptors)
+    np.savez(os.path.join(file_path, image + '.sift.npz'), locations=locations, descriptors=descriptors)
 
 
 def load_features(file_path, image):
@@ -101,6 +99,6 @@ def load_features(file_path, image):
     :return Feature locations and feature descriptors.
     """
 
-    f = np.load(os.path.join(file_path, image + '.npz'))
+    f = np.load(os.path.join(file_path, image + '.sift.npz'))
 
     return f['locations'], f['descriptors']

@@ -8,7 +8,7 @@ import sift as sift
 import features.descriptor as desc
 
 
-def extract(image_files, image_path, feature_path):
+def extract(image_files, image_path, feature_path, descriptor_path):
     """ Extracts feature histogram vectors of classified SIFT features, 
         SIFT location colors and random Gaussian distributed colors 
         for the images.
@@ -16,6 +16,7 @@ def extract(image_files, image_path, feature_path):
     :param image_files: A list of image file paths.
     :param image_path: Path to image directory.
     :param feature_path: Path to feature directory.
+    :param descriptor_path: Path to descriptor directory.
 
     :return D: A 2-D array with SIFT descriptor feature histograms for
                each image in rows.
@@ -70,6 +71,8 @@ def extract(image_files, image_path, feature_path):
         # Colors in Gaussian distributed points.   
         colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
         C_rand.append(colors_rand_hist)
+
+        save_descriptors(descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
 
         print 'Processed {0}'.format(image_file)
 
@@ -204,3 +207,35 @@ def get_rgb_from_locs(locs_r, locs_c, im):
     rgb = im[locs_row, locs_col]
 
     return np.resize(rgb, (rgb.shape[0], 1, rgb.shape[1]))
+
+
+def save_descriptors(file_path, image, descriptors, descriptor_colors, random_colors):
+    """ Saves descriptors to .npz.
+
+    :param file_path: The folder.
+    :param image: The image name.
+    :param descriptors: Descriptor histogram.
+    :param descriptor_colors: Histogram for colors in descriptor locations.
+    :param random_colors: Histogram for colors in random locations.
+    """
+
+    np.savez(os.path.join(file_path, image + '.descriptors.npz'),
+             descriptors=descriptors,
+             descriptor_colors=descriptor_colors,
+             random_colors=random_colors)
+
+
+def load_features(file_path, image):
+    """ Loads descriptors from .npz.
+
+    :param file_path: The folder.
+    :param image: The image name.
+
+    :return descriptors: Descriptor histogram.
+    :return descriptor_colors: Histogram for colors in descriptor locations.
+    :return random_colors: Histogram for colors in random locations.
+    """
+
+    d = np.load(os.path.join(file_path, image + '.descriptors.npz'))
+
+    return d['descriptors'], d['descriptor_colors'], d['random_colors']

@@ -21,6 +21,7 @@ class FlickrRsBundler:
     def __init__(self, api_key, tag):
         self.__flickrWrapper = FlickrWrapper(api_key)
         self.__tag = tag
+
         self.__data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.__tag + "/"
         self.__image_dir = self.__data_dir + "images/"
         self.__feature_dir = self.__data_dir + "features/"
@@ -35,6 +36,15 @@ class FlickrRsBundler:
         self.__Y = None
         self.__closest30 = None
         self.__closest5 = None
+
+        if not op.exists(self.__image_dir):
+            makedirs(self.__image_dir)
+
+        if not op.exists(self.__feature_dir):
+            makedirs(self.__feature_dir)
+
+        if not op.exists(self.__descriptor_dir):
+            makedirs(self.__descriptor_dir)
 
     def run(self):
         self.download()
@@ -57,12 +67,9 @@ class FlickrRsBundler:
 
     def extract(self):
         sift.extract(self.__images(), self.__image_dir, self.__feature_dir)
-        self.__D, self.__C_desc, self.__C_rand = extract(self.__images(), self.__image_dir, self.__feature_dir)
+        self.__D, self.__C_desc, self.__C_rand = extract(self.__images(), self.__image_dir, self.__feature_dir, self.__descriptor_dir)
         
     def save(self):
-        if not op.exists(self.__descriptor_dir):
-            makedirs(self.__descriptor_dir)
-
         np.savetxt(self.__descriptor_dir + self.__desc_file, self.__D)
         np.savetxt(self.__descriptor_dir + self.__color_desc_file, self.__C_desc)
         np.savetxt(self.__descriptor_dir + self.__color_rand_file, self.__C_rand)

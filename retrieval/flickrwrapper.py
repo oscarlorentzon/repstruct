@@ -44,9 +44,6 @@ class FlickrWrapper:
         """
 
         image_urls = self.get_urls(tag, sort_mode)
-        
-        if not os.path.exists(image_dir):
-            os.makedirs(image_dir)
 
         url_paths = []
         for index, image_url in enumerate(image_urls):
