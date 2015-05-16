@@ -14,27 +14,27 @@ from runmode import RunMode
 
 class FlickrRsBundler:
     
-    desc_file = "{0}_desc.txt"
-    color_desc_file = "{0}_colordesc.txt"
-    color_rand_file = "{0}_colorrand.txt"
+    __desc_file = "{0}_desc.txt"
+    __color_desc_file = "{0}_colordesc.txt"
+    __color_rand_file = "{0}_colorrand.txt"
     
     def __init__(self, api_key, tag):
-        self.flickrWrapper = FlickrWrapper(api_key)
-        self.tag = tag
-        self.data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.tag + "/"
-        self.image_dir = self.data_dir + "images/"
-        self.feature_dir = self.data_dir + "features/"
-        self.descriptor_dir = self.data_dir + "descriptors/"
+        self.__flickrWrapper = FlickrWrapper(api_key)
+        self.__tag = tag
+        self.__data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.__tag + "/"
+        self.__image_dir = self.__data_dir + "images/"
+        self.__feature_dir = self.__data_dir + "features/"
+        self.__descriptor_dir = self.__data_dir + "descriptors/"
 
-        self.image_files = None
+        self.__image_files = None
 
-        self.D = None
-        self.C_desc = None
-        self.C_rand = None
+        self.__D = None
+        self.__C_desc = None
+        self.__C_rand = None
 
-        self.Y = None
-        self.closest30 = None
-        self.closest5 = None
+        self.__Y = None
+        self.__closest30 = None
+        self.__closest5 = None
 
     def run(self):
         self.download()
@@ -43,74 +43,73 @@ class FlickrRsBundler:
         self.process()
         self.plot()
 
-    def images(self):
-        if self.image_files is not None:
-            return self.image_files
+    def __images(self):
+        if self.__image_files is not None:
+            return self.__image_files
 
-        self.image_files =\
-            [im for im in listdir(self.image_dir) if op.isfile(op.join(self.image_dir,im)) and im.endswith(".jpg")]
+        self.__image_files =\
+            [im for im in listdir(self.__image_dir) if op.isfile(op.join(self.__image_dir,im)) and im.endswith(".jpg")]
 
-        return self.image_files
+        return self.__image_files
         
     def download(self):
-        self.flickrWrapper.download(self.image_dir, self.tag)
-
+        self.__flickrWrapper.download(self.__image_dir, self.__tag)
 
     def extract(self):
-        sift.extract(self.images(), self.image_dir, self.feature_dir)
-        self.D, self.C_desc, self.C_rand = extract(self.images(), self.image_dir, self.feature_dir)
+        sift.extract(self.__images(), self.__image_dir, self.__feature_dir)
+        self.__D, self.__C_desc, self.__C_rand = extract(self.__images(), self.__image_dir, self.__feature_dir)
         
     def save(self):
-        if not op.exists(self.descriptor_dir):
-            makedirs(self.descriptor_dir)
+        if not op.exists(self.__descriptor_dir):
+            makedirs(self.__descriptor_dir)
 
-        np.savetxt(self.descriptor_dir + self.desc_file.format(self.tag), self.D)
-        np.savetxt(self.descriptor_dir + self.color_desc_file.format(self.tag), self.C_desc)
-        np.savetxt(self.descriptor_dir + self.color_rand_file.format(self.tag), self.C_rand)
+        np.savetxt(self.__descriptor_dir + self.__desc_file.format(self.__tag), self.__D)
+        np.savetxt(self.__descriptor_dir + self.__color_desc_file.format(self.__tag), self.__C_desc)
+        np.savetxt(self.__descriptor_dir + self.__color_rand_file.format(self.__tag), self.__C_rand)
         
     def load(self):
-        self.D = np.loadtxt(self.descriptor_dir + self.desc_file.format(self.tag), float)
-        self.C_desc = np.loadtxt(self.descriptor_dir + self.color_desc_file.format(self.tag), float)
-        self.C_rand = np.loadtxt(self.descriptor_dir + self.color_rand_file.format(self.tag), float)
+        self.__D = np.loadtxt(self.__descriptor_dir + self.__desc_file.format(self.__tag), float)
+        self.__C_desc = np.loadtxt(self.__descriptor_dir + self.__color_desc_file.format(self.__tag), float)
+        self.__C_rand = np.loadtxt(self.__descriptor_dir + self.__color_rand_file.format(self.__tag), float)
         
     def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
         
         if mode == FeatureMode.Colors:
-            N = create_neutral_vector(np.array([[self.C_rand.shape[1], 1]]), self.C_rand.shape[0])
-            F = self.C_rand
+            N = create_neutral_vector(np.array([[self.__C_rand.shape[1], 1]]), self.__C_rand.shape[0])
+            F = self.__C_rand
         elif mode == FeatureMode.Descriptors:
-            N = create_neutral_vector(np.array([[self.D.shape[1], 1]]), self.D.shape[0])
-            F = self.D
+            N = create_neutral_vector(np.array([[self.__D.shape[1], 1]]), self.__D.shape[0])
+            F = self.__D
         else:
             c_weight = (1-d_weight)/2  
             N = create_neutral_vector(
-                np.array([[self.D.shape[1], np.sqrt(d_weight)],
-                          [self.C_desc.shape[1], np.sqrt(c_weight)],
-                          [self.C_rand.shape[1], np.sqrt(c_weight)]]),
-                self.D.shape[0])
-            F = np.hstack((np.sqrt(d_weight)*self.D,
-                           np.hstack((np.sqrt(c_weight)*self.C_desc, np.sqrt(c_weight)*self.C_rand))))
+                np.array([[self.__D.shape[1], np.sqrt(d_weight)],
+                          [self.__C_desc.shape[1], np.sqrt(c_weight)],
+                          [self.__C_rand.shape[1], np.sqrt(c_weight)]]),
+                self.__D.shape[0])
+            F = np.hstack((np.sqrt(d_weight)*self.__D,
+                           np.hstack((np.sqrt(c_weight)*self.__C_desc, np.sqrt(c_weight)*self.__C_rand))))
         
-        self.Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
+        self.__Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
 
-        Y30 = self.Y[:, :30]
-        self.closest30 = kclosest.k_closest(30, Y30)
-        self.closest5 = self.closest30[kclosest.k_closest(5, Y30[self.closest30, :])]
+        Y30 = self.__Y[:, :30]
+        self.__closest30 = kclosest.k_closest(30, Y30)
+        self.__closest5 = self.__closest30[kclosest.k_closest(5, Y30[self.__closest30, :])]
         
     def plot(self):
-        plothelper.plot_images(self.image_dir, np.array(self.images())[self.closest30], 3, 10)
-        plothelper.plot_images(self.image_dir, np.array(self.images())[self.closest5], 1, 5)
+        plothelper.plot_images(self.__image_dir, np.array(self.__images())[self.__closest30], 3, 10)
+        plothelper.plot_images(self.__image_dir, np.array(self.__images())[self.__closest5], 1, 5)
 
     def plot_pca(self):
-        plothelper.plot_pca_projections(self.Y, 1, 2)
-        plothelper.plot_pca_projections(self.Y, 3, 4)
+        plothelper.plot_pca_projections(self.__Y, 1, 2)
+        plothelper.plot_pca_projections(self.__Y, 3, 4)
         
     def plot_image_pca(self):
-        plothelper.plot_pca_images(self.image_dir, self.images(), self.Y, 1, 2)
-        plothelper.plot_pca_images(self.image_dir, self.images(), self.Y, 3, 4)
+        plothelper.plot_pca_images(self.__image_dir, self.__images(), self.__Y, 1, 2)
+        plothelper.plot_pca_images(self.__image_dir, self.__images(), self.__Y, 3, 4)
 
     def plot_result(self):
-        plothelper.plot_result(self.images(), self.closest30, self.closest5, self.image_dir)
+        plothelper.plot_result(self.__images(), self.__closest30, self.__closest5, self.__image_dir)
  
              
 def main(argv):
