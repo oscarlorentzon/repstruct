@@ -36,32 +36,24 @@ class FlickrRsBundler:
         self.plot()
         
     def download(self):
-        self.__flickr_wrapper.download(self.__data.image_dir, self.__data.tag)
+        self.__flickr_wrapper.download(self.__data.image_dir, self.__data.tag, self.__data.processes)
 
     def extract(self):
-        sift.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir)
-        extract.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir, self.__data.descriptor_dir)
-        
-    def process(self):
-        feature_mode = self.__data.config['feature_mode'].upper()
-        if feature_mode == 'ALL':
-            mode = FeatureMode.All
-        elif feature_mode == 'DESCRIPTORS':
-            mode = FeatureMode.Descriptors
-        elif feature_mode == 'COLORS':
-            mode = FeatureMode.Colors
-        else:
-            raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
+        sift.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir,
+                     self.__data.processes)
+        extract.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir,
+                        self.__data.descriptor_dir, self.__data.processes)
 
-        neutral_factor = self.__data.config['neutral_factor']
-        descriptor_weight = self.__data.config['descriptor_weight']
+    def process(self):
+        neutral_factor = self.__data.neutral_factor
+        descriptor_weight = self.__data.descriptor_weight
 
         descriptors, descriptor_colors, random_colors = \
             extract.load_descriptors(self.__data.descriptor_dir, self.__data.images())
         
-        if mode == FeatureMode.Colors:
+        if self.__data.feature_mode == FeatureMode.Colors:
             self.__Y = process.process(random_colors, neutral_factor)
-        elif mode == FeatureMode.Descriptors:
+        elif self.__data.feature_mode == FeatureMode.Descriptors:
             self.__Y = process.process(descriptors, neutral_factor)
         else:
             self.__Y = process.process_combined(descriptors, descriptor_colors, random_colors,

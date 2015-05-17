@@ -33,7 +33,7 @@ class FlickrWrapper:
         return [url.format(photo['farm'], photo['server'], photo['id'], photo['secret'])
                 for photo in data['photos']['photo']]
 
-    def download(self, image_dir, tag, sort_mode='relevance', processes=6):
+    def download(self, image_dir, tag, processes=6, sort_mode='relevance'):
         """ Downloads images for a tag from Flickr.
 
         :param image_dir: The directory for sorting the images

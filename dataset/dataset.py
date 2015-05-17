@@ -2,6 +2,8 @@ import yaml
 import os.path as op
 from os import makedirs, listdir
 
+from features.featuremode import FeatureMode
+
 
 class DataSet:
 
@@ -15,14 +17,32 @@ class DataSet:
 
         self.tag = tag
 
-        config_file = op.join(root_path, 'config.yaml')
-        with open(config_file) as fin:
-            self.config = yaml.load(fin)
+        self.__load_config(root_path)
 
         for p in [self.image_dir, self.feature_dir, self.descriptor_dir]:
             if not op.exists(p):
                 makedirs(p)
 
+    def __load_config(self, root_path):
+
+        with open(op.join(root_path, 'config.yaml')) as fin:
+            self.__config = yaml.load(fin)
+
+        self.descriptor_weight = self.__config['descriptor_weight']
+        self.neutral_factor = self.__config['neutral_factor']
+        self.processes = self.__config['processes']
+
+        feature_mode = self.__config['feature_mode'].upper()
+        if feature_mode == 'ALL':
+            self.feature_mode = FeatureMode.All
+        elif feature_mode == 'DESCRIPTORS':
+            self.feature_mode = FeatureMode.Descriptors
+        elif feature_mode == 'COLORS':
+            self.feature_mode = FeatureMode.Colors
+        else:
+            raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
+
     def images(self):
+
         return [im for im in listdir(self.image_dir)
                 if op.isfile(op.join(self.image_dir, im)) and im.endswith(".jpg")]
