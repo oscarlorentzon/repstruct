@@ -36,7 +36,7 @@ def extract(images, image_path, feature_path, processes=6):
     """ Extracts SIFT features for a list of images. Saves the descriptors
         and locations to file.
 
-    :param image_files: Image names.
+    :param images: Image names.
     :param image_path: Folder path for image files.
     :param feature_path: Folder path for features.
     :param processes: The number of processes for extracting features in parallel.
