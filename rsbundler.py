@@ -1,9 +1,10 @@
 import os.path as op
 import numpy as np
-import sys, getopt
+import sys
+import getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
-from analysis import pca, kclosest
+from analysis import pca, kclosest, process
 from display import plothelper
 from features.featuremode import FeatureMode
 from features import sift, extract
@@ -52,29 +53,19 @@ class FlickrRsBundler:
         else:
             raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
 
-        neut_factor = self.__data.config['neutral_factor']
-        d_weight = self.__data.config['descriptor_weight']
+        neutral_factor = self.__data.config['neutral_factor']
+        descriptor_weight = self.__data.config['descriptor_weight']
 
         descriptors, descriptor_colors, random_colors = \
             extract.load_descriptors(self.__data.descriptor_dir, self.__data.images())
         
         if mode == FeatureMode.Colors:
-            N = extract.create_neutral_vector(np.array([[random_colors.shape[1], 1]]), random_colors.shape[0])
-            F = random_colors
+            self.__Y = process.process(random_colors, neutral_factor)
         elif mode == FeatureMode.Descriptors:
-            N = extract.create_neutral_vector(np.array([[descriptors.shape[1], 1]]), descriptors.shape[0])
-            F = descriptors
+            self.__Y = process.process(descriptors, neutral_factor)
         else:
-            c_weight = (1-d_weight)/2  
-            N = extract.create_neutral_vector(
-                np.array([[descriptors.shape[1], np.sqrt(d_weight)],
-                          [descriptor_colors.shape[1], np.sqrt(c_weight)],
-                          [random_colors.shape[1], np.sqrt(c_weight)]]),
-                descriptors.shape[0])
-            F = np.hstack((np.sqrt(d_weight)*descriptors,
-                           np.hstack((np.sqrt(c_weight)*descriptor_colors, np.sqrt(c_weight)*random_colors))))
-        
-        self.__Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
+            self.__Y = process.process_combined(descriptors, descriptor_colors, random_colors,
+                                                descriptor_weight, neutral_factor)
 
         Y30 = self.__Y[:, :30]
         self.__closest30 = kclosest.k_closest(30, Y30)
