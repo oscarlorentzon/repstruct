@@ -64,7 +64,7 @@ def extract(image_files, image_path, feature_path, descriptor_path):
         # Colors in Gaussian distributed points.   
         colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
 
-        save_descriptors(descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
+        save_descriptor(descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
 
         print 'Processed {0}'.format(image_file)
 
@@ -192,7 +192,7 @@ def get_rgb_from_locs(locs_r, locs_c, im):
     return np.resize(rgb, (rgb.shape[0], 1, rgb.shape[1]))
 
 
-def save_descriptors(file_path, image, descriptors, descriptor_colors, random_colors):
+def save_descriptor(file_path, image, descriptors, descriptor_colors, random_colors):
     """ Saves descriptors to .npz.
 
     :param file_path: The folder.
@@ -208,7 +208,39 @@ def save_descriptors(file_path, image, descriptors, descriptor_colors, random_co
              random_colors=random_colors)
 
 
-def load_features(file_path, image):
+def load_descriptors(file_path, images):
+    """ Loads descriptors from .npz. Descriptor color values for grayscale images are set to
+        mean of values for RGB images.
+
+    :param file_path: The folder.
+    :param images: The image names.
+
+    :return descriptors: Descriptor histograms for all images in rows.
+    :return descriptor_colors: Histogram for colors in descriptor locations for all images in rows.
+    :return random_colors: Histogram for colors in random locations for all images in rows.
+    """
+
+    descriptors = []
+    descriptor_colors = []
+    random_colors = []
+
+    for image in images:
+        d, dc, rc = load_descriptor(file_path, image)
+
+        descriptors.append(d)
+        descriptor_colors.append(dc)
+        random_colors.append(rc)
+
+    descriptors = np.array(descriptors)
+
+    # Set colors for grayscale images to mean of other feature vectors.
+    descriptor_colors = set_nan_rows_to_mean(np.array(descriptor_colors))
+    random_colors = set_nan_rows_to_mean(np.array(random_colors))
+
+    return descriptors, descriptor_colors, random_colors
+
+
+def load_descriptor(file_path, image):
     """ Loads descriptors from .npz.
 
     :param file_path: The folder.

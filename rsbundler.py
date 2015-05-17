@@ -50,26 +50,6 @@ class FlickrRsBundler:
 
         return self.__image_files
 
-    def __load(self):
-        descriptors = []
-        descriptor_colors = []
-        random_colors = []
-
-        for image in self.__images():
-            d, dc, rc = extract.load_features(self.__descriptor_dir, image)
-
-            descriptors.append(d)
-            descriptor_colors.append(dc)
-            random_colors.append(rc)
-
-        descriptors = np.array(descriptors)
-
-        # Set colors for grayscale images to mean of other feature vectors.
-        descriptor_colors = extract.set_nan_rows_to_mean(np.array(descriptor_colors))
-        random_colors = extract.set_nan_rows_to_mean(np.array(random_colors))
-
-        return descriptors, descriptor_colors, random_colors
-
     def run(self):
         self.download()
         self.extract()
@@ -84,7 +64,7 @@ class FlickrRsBundler:
         extract.extract(self.__images(), self.__image_dir, self.__feature_dir, self.__descriptor_dir)
         
     def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
-        descriptors, descriptor_colors, random_colors = self.__load()
+        descriptors, descriptor_colors, random_colors = extract.load_descriptors(self.__descriptor_dir, self.__images())
         
         if mode == FeatureMode.Colors:
             N = extract.create_neutral_vector(np.array([[random_colors.shape[1], 1]]), random_colors.shape[0])
