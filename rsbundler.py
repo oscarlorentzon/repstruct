@@ -4,11 +4,10 @@ import numpy as np
 import sys, getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
-from features.extract import extract, create_neutral_vector
 from analysis import pca, kclosest
 from display import plothelper
 from features.featuremode import FeatureMode
-from features import sift
+from features import sift, extract
 from runmode import RunMode
 
 
@@ -29,10 +28,6 @@ class FlickrRsBundler:
 
         self.__image_files = None
 
-        self.__D = None
-        self.__C_desc = None
-        self.__C_rand = None
-
         self.__Y = None
         self.__closest30 = None
         self.__closest5 = None
@@ -46,56 +41,66 @@ class FlickrRsBundler:
         if not op.exists(self.__descriptor_dir):
             makedirs(self.__descriptor_dir)
 
-    def run(self):
-        self.download()
-        self.extract()
-        self.save()
-        self.process()
-        self.plot()
-
     def __images(self):
         if self.__image_files is not None:
             return self.__image_files
 
         self.__image_files =\
-            [im for im in listdir(self.__image_dir) if op.isfile(op.join(self.__image_dir,im)) and im.endswith(".jpg")]
+            [im for im in listdir(self.__image_dir) if op.isfile(op.join(self.__image_dir, im)) and im.endswith(".jpg")]
 
         return self.__image_files
+
+    def __load(self):
+        descriptors = []
+        descriptor_colors = []
+        random_colors = []
+
+        for image in self.__images():
+            d, dc, rc = extract.load_features(self.__descriptor_dir, image)
+
+            descriptors.append(d)
+            descriptor_colors.append(dc)
+            random_colors.append(rc)
+
+        descriptors = np.array(descriptors)
+
+        # Set colors for grayscale images to mean of other feature vectors.
+        descriptor_colors = extract.set_nan_rows_to_mean(np.array(descriptor_colors))
+        random_colors = extract.set_nan_rows_to_mean(np.array(random_colors))
+
+        return descriptors, descriptor_colors, random_colors
+
+    def run(self):
+        self.download()
+        self.extract()
+        self.process()
+        self.plot()
         
     def download(self):
         self.__flickrWrapper.download(self.__image_dir, self.__tag)
 
     def extract(self):
         sift.extract(self.__images(), self.__image_dir, self.__feature_dir)
-        self.__D, self.__C_desc, self.__C_rand = extract(self.__images(), self.__image_dir, self.__feature_dir, self.__descriptor_dir)
-        
-    def save(self):
-        np.savetxt(self.__descriptor_dir + self.__desc_file, self.__D)
-        np.savetxt(self.__descriptor_dir + self.__color_desc_file, self.__C_desc)
-        np.savetxt(self.__descriptor_dir + self.__color_rand_file, self.__C_rand)
-        
-    def load(self):
-        self.__D = np.loadtxt(self.__descriptor_dir + self.__desc_file, float)
-        self.__C_desc = np.loadtxt(self.__descriptor_dir + self.__color_desc_file, float)
-        self.__C_rand = np.loadtxt(self.__descriptor_dir + self.__color_rand_file, float)
+        extract.extract(self.__images(), self.__image_dir, self.__feature_dir, self.__descriptor_dir)
         
     def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
+        descriptors, descriptor_colors, random_colors = self.__load()
         
         if mode == FeatureMode.Colors:
-            N = create_neutral_vector(np.array([[self.__C_rand.shape[1], 1]]), self.__C_rand.shape[0])
-            F = self.__C_rand
+            N = extract.create_neutral_vector(np.array([[random_colors.shape[1], 1]]), random_colors.shape[0])
+            F = random_colors
         elif mode == FeatureMode.Descriptors:
-            N = create_neutral_vector(np.array([[self.__D.shape[1], 1]]), self.__D.shape[0])
-            F = self.__D
+            N = extract.create_neutral_vector(np.array([[descriptors.shape[1], 1]]), descriptors.shape[0])
+            F = descriptors
         else:
             c_weight = (1-d_weight)/2  
-            N = create_neutral_vector(
-                np.array([[self.__D.shape[1], np.sqrt(d_weight)],
-                          [self.__C_desc.shape[1], np.sqrt(c_weight)],
-                          [self.__C_rand.shape[1], np.sqrt(c_weight)]]),
-                self.__D.shape[0])
-            F = np.hstack((np.sqrt(d_weight)*self.__D,
-                           np.hstack((np.sqrt(c_weight)*self.__C_desc, np.sqrt(c_weight)*self.__C_rand))))
+            N = extract.create_neutral_vector(
+                np.array([[descriptors.shape[1], np.sqrt(d_weight)],
+                          [descriptor_colors.shape[1], np.sqrt(c_weight)],
+                          [random_colors.shape[1], np.sqrt(c_weight)]]),
+                descriptors.shape[0])
+            F = np.hstack((np.sqrt(d_weight)*descriptors,
+                           np.hstack((np.sqrt(c_weight)*descriptor_colors, np.sqrt(c_weight)*random_colors))))
         
         self.__Y, V = pca.neutral_sub_pca_vector(F, neut_factor*N)
 
@@ -182,12 +187,8 @@ def main(argv):
     if (run_mode == RunMode.Download):
         bundler.download()
         bundler.extract()
-        bundler.save()
     elif (run_mode == RunMode.Extract):
         bundler.extract()
-        bundler.save()
-    else:
-        bundler.load()
         
     bundler.process(feature_mode)
     bundler.plot_image_pca()

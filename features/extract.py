@@ -42,11 +42,6 @@ def extract(image_files, image_path, feature_path, descriptor_path):
     x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
 
-    # Create empty histogram arrays
-    D = []
-    C_rand = []
-    C_desc = []
-    
     # Extract descriptors and colors for all images
     for image_file in image_files:
         
@@ -62,30 +57,18 @@ def extract(image_files, image_path, feature_path, descriptor_path):
 
         # SIFT descriptors
         norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
-        D.append(norm_desc_hist)
         
         # Colors in descriptor locations
         colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
-        C_desc.append(colors_desc_hist)
         
         # Colors in Gaussian distributed points.   
         colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
-        C_rand.append(colors_rand_hist)
 
         save_descriptors(descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
 
         print 'Processed {0}'.format(image_file)
 
-    D = np.array(D)
-    C_rand = np.array(C_rand)
-    C_desc = np.array(C_desc)
-      
-    C_rand = set_nan_rows_to_mean(C_rand)
-    C_desc = set_nan_rows_to_mean(C_desc)
-
     print 'Images processed'
-      
-    return D, C_desc, C_rand
 
 
 def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
