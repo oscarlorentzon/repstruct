@@ -13,7 +13,7 @@ class FlickrWrapper:
         :param api_key: The Flickr API key.
         """
 
-        self.api_key = api_key
+        self.__api_key = api_key
 
     def get_urls(self, tag, sort_mode='relevance'):
         """Gets image URLs from Flickr.
@@ -26,7 +26,7 @@ class FlickrWrapper:
         request = 'https://api.flickr.com/services/rest/?method=flickr.photos.search' +\
                   '&api_key={0}&tags={1}&sort={2}&format=json&nojsoncallback=1'
 
-        response = urllib.urlopen(request.format(self.api_key, tag, sort_mode))
+        response = urllib.urlopen(request.format(self.__api_key, tag, sort_mode))
         data = json.loads(response.read())
 
         url = "https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg"

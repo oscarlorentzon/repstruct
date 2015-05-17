@@ -14,8 +14,8 @@ class SiftExtractor:
         :param feature_path: Path to feature files.
         """
 
-        self.image_path = image_path
-        self.feature_path = feature_path
+        self.__image_path = image_path
+        self.__feature_path = feature_path
 
     def __call__(self, image):
         """ Extracts SIFT features for an image and saves the descriptors
@@ -24,10 +24,10 @@ class SiftExtractor:
         :param image: Image name.
         """
 
-        im = cv2.imread(os.path.join(self.image_path, image), cv2.IMREAD_GRAYSCALE)
+        im = cv2.imread(os.path.join(self.__image_path, image), cv2.IMREAD_GRAYSCALE)
         locs, descs = extract_feature_vectors(im)
 
-        save_features(self.feature_path, image, locs, descs)
+        save_features(self.__feature_path, image, locs, descs)
 
         print 'Extracted {0} features for {1}'.format(descs.shape[0], image)
 

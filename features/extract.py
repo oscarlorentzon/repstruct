@@ -23,21 +23,20 @@ class DescriptorExtractor:
         :param color_cc_norm: Color cluster center normalization histogram..
         :param x: Gaussian randomly distributed x values.
         :param y: Gaussian randomly distributed y values.
-        :return:
         """
 
-        self.image_path = image_path
-        self.descriptor_path = descriptor_path
-        self.feature_path = feature_path
+        self.__image_path = image_path
+        self.__descriptor_path = descriptor_path
+        self.__feature_path = feature_path
 
-        self.desc_cc = desc_cc
-        self.desc_cc_norm = desc_cc_norm
+        self.__desc_cc = desc_cc
+        self.__desc_cc_norm = desc_cc_norm
 
-        self.color_cc = color_cc
-        self.color_cc_norm = color_cc_norm
+        self.__color_cc = color_cc
+        self.__color_cc_norm = color_cc_norm
 
-        self.x = x
-        self.y = y
+        self.__x = x
+        self.__y = y
 
     def __call__(self, image_file):
         """ Extracts descriptor, descriptor location color and random location color histograms and saves to .npz.
@@ -45,7 +44,7 @@ class DescriptorExtractor:
         :param image_file: Image name.
         """
 
-        image = cv2.imread(os.path.join(self.image_path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
+        image = cv2.imread(os.path.join(self.__image_path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
 
         if len(image.shape) == 3:
             image = image[:, :, ::-1]  # Reverse to RGB if color image
@@ -53,23 +52,23 @@ class DescriptorExtractor:
         im = np.array(image) / 255.0
         shape = im.shape
 
-        locs, descs = sift.load_features(self.feature_path, image_file)
+        locs, descs = sift.load_features(self.__feature_path, image_file)
 
         descs = desc.normalize(descs)
-        desc_cc = desc.normalize(self.desc_cc)
+        desc_cc = desc.normalize(self.__desc_cc)
         desc_hist = desc.classify_cosine(descs, desc_cc)
 
         # SIFT descriptors
-        norm_desc_hist = desc.normalize_by_division(desc_hist, self.desc_cc_norm)
+        norm_desc_hist = desc.normalize_by_division(desc_hist, self.__desc_cc_norm)
 
         # Colors in descriptor locations
-        colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], self.color_cc, self.color_cc_norm)
+        colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], self.__color_cc, self.__color_cc_norm)
 
         # Colors in Gaussian distributed points.
-        colors_rand_hist = \
-            get_color_hist(im, shape[0]*np.array(self.y), shape[1]*np.array(self.x), self.color_cc, self.color_cc_norm)
+        colors_rand_hist = get_color_hist(im, shape[0]*np.array(self.__y), shape[1]*np.array(self.__x),
+                                          self.__color_cc, self.__color_cc_norm)
 
-        save_descriptor(self.descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
+        save_descriptor(self.__descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
 
         print 'Processed {0}'.format(image_file)
 
