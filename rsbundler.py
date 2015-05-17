@@ -13,11 +13,7 @@ from dataset.dataset import DataSet
 
 
 class FlickrRsBundler:
-    
-    __desc_file = "desc.txt"
-    __color_desc_file = "colordesc.txt"
-    __color_rand_file = "colorrand.txt"
-    
+
     def __init__(self, api_key, tag):
 
         self.__data = DataSet(op.dirname(op.abspath(__file__)), tag)
@@ -64,8 +60,8 @@ class FlickrRsBundler:
         self.__closest5 = self.__closest30[kclosest.k_closest(5, Y30[self.__closest30, :])]
         
     def plot(self):
-        plothelper.plot_images(self.__data.image_dir, np.array(self.__data.images())[self.__closest30], 3, 10)
-        plothelper.plot_images(self.__data.image_dir, np.array(self.__data.images())[self.__closest5], 1, 5)
+        plothelper.plot_images(self.__data.image_dir, self.__data.images()[self.__closest30], 3, 10)
+        plothelper.plot_images(self.__data.image_dir, self.__data.images()[self.__closest5], 1, 5)
 
     def plot_pca(self):
         plothelper.plot_pca_projections(self.__Y, 1, 2)
@@ -76,7 +72,7 @@ class FlickrRsBundler:
         plothelper.plot_pca_images(self.__data.image_dir, self.__data.images(), self.__Y, 3, 4)
 
     def plot_result(self):
-        plothelper.plot_result(self.__data.images(), self.__closest30, self.__closest5, self.__data.image_dir)
+        plothelper.plot_result(self.__data.image_dir, self.__data.images(), self.__closest30, self.__closest5)
  
              
 def main(argv):

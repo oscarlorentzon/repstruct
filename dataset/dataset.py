@@ -1,5 +1,6 @@
 import yaml
 import os.path as op
+import numpy as np
 from os import makedirs, listdir
 
 from features.featuremode import FeatureMode
@@ -8,6 +9,8 @@ from features.featuremode import FeatureMode
 class DataSet:
 
     def __init__(self, root_path, tag):
+        """ Creates a data set which holds paths, image list and config values.
+        """
 
         self.__data_dir = root_path + "/tags/" + tag + "/"
 
@@ -23,9 +26,13 @@ class DataSet:
             if not op.exists(p):
                 makedirs(p)
 
-    def __load_config(self, root_path):
+    def __load_config(self, config_path):
+        """ Loads the configuration file and stores values in properties.
 
-        with open(op.join(root_path, 'config.yaml')) as fin:
+        :param config_path: The path to the folder containing the configuration file.
+        """
+
+        with open(op.join(config_path, 'config.yaml')) as fin:
             self.__config = yaml.load(fin)
 
         self.descriptor_weight = self.__config['descriptor_weight']
@@ -43,6 +50,10 @@ class DataSet:
             raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
 
     def images(self):
+        """ Lists all images in the image directory.
 
-        return [im for im in listdir(self.image_dir)
-                if op.isfile(op.join(self.image_dir, im)) and im.endswith(".jpg")]
+        :return: List of image names.
+        """
+
+        return np.array([im for im in listdir(self.image_dir)
+                         if op.isfile(op.join(self.image_dir, im)) and im.endswith(".jpg")])

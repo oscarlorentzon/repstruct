@@ -92,14 +92,14 @@ def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_ax
     pl.show()
 
 
-def plot_result(images, index_thirty, index_five, image_dir, im_dim=200, cols=10):
+def plot_result(image_dir, images, index_thirty, index_five, im_dim=200, cols=10):
     """ Shows the result by plotting all images on top, then the thirty
         closest images and at last the five closest in double size.
 
+    :param image_dir: Image directory.
     :param images: Image names.
     :param index_thirty: Indexes for the thirty closest images.
     :param index_five: Indexes for the five closest images.
-    :param image_dir: Image directory.
     :param im_dim: Dimension of the longest side of the image.
     :param cols: Number of image columns. Must be greater than one. The five
                  closest images will have half the columns.
