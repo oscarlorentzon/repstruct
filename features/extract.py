@@ -45,7 +45,11 @@ def extract(image_files, image_path, feature_path, descriptor_path):
     # Extract descriptors and colors for all images
     for image_file in image_files:
         
-        image = cv2.imread(os.path.join(image_path, image_file))[:, :, ::-1]  # Reverse to RGB
+        image = cv2.imread(os.path.join(image_path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
+
+        if len(image.shape) == 3:
+            image = image[:, :, ::-1]  # Reverse to RGB if color image
+
         im = np.array(image) / 255.0
         shape = im.shape
          
@@ -92,7 +96,7 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
         hist = desc.classify_euclidean(hs_coords, cluster_centers)
         return desc.normalize_by_division(hist, cluster_center_norm)
     else:
-        return create_NaN_array(1, cluster_centers.shape[0])
+        return create_NaN_array(cluster_centers.shape[0])
 
 
 def set_nan_rows_to_mean(X):
@@ -140,7 +144,7 @@ def create_neutral_vector(D, rows):
     return N
 
 
-def create_NaN_array(rows, cols):
+def create_NaN_array(cols):
     """ Creates a 2-D array with NaN values.
 
      :param rows: The number of rows.
@@ -149,7 +153,7 @@ def create_NaN_array(rows, cols):
      :return A 2-D array with only NaN values.
     """
     
-    nan_array = np.empty((rows, cols))
+    nan_array = np.empty((cols))
     nan_array[:] = np.NAN
     return nan_array
 
@@ -232,10 +236,12 @@ def load_descriptors(file_path, images):
         random_colors.append(rc)
 
     descriptors = np.array(descriptors)
+    descriptor_colors = np.array(descriptor_colors)
+    random_colors = np.array(random_colors)
 
     # Set colors for grayscale images to mean of other feature vectors.
-    descriptor_colors = set_nan_rows_to_mean(np.array(descriptor_colors))
-    random_colors = set_nan_rows_to_mean(np.array(random_colors))
+    descriptor_colors = set_nan_rows_to_mean(descriptor_colors)
+    random_colors = set_nan_rows_to_mean(random_colors)
 
     return descriptors, descriptor_colors, random_colors
 
