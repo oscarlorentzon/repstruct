@@ -1,7 +1,7 @@
 # Params for principal component analysis
 descriptor_weight: 0.725    # The weight of the descriptors with respect to the L2 norm of the combined feature vector.
 neutral_factor: 0.8         # The factor of the neutral vector to be subtracted in the neutral vector subtraction PCA.
-feature_mode: all           # Features to be used. Possible values: all, colors, descriptors
+feature_mode: ALL           # Features to be used. Possible values: ALL, COLORS, DESCRIPTORS
 
 # General params
 processes: 6                # Number of parallel processes for downloading and extraction.

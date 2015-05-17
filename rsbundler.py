@@ -1,5 +1,4 @@
 import os.path as op
-from os import listdir, makedirs
 import numpy as np
 import sys, getopt
 
@@ -29,7 +28,6 @@ class FlickrRsBundler:
         self.__closest30 = None
         self.__closest5 = None
 
-
     def run(self):
         self.download()
         self.extract()
@@ -43,7 +41,20 @@ class FlickrRsBundler:
         sift.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir)
         extract.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir, self.__data.descriptor_dir)
         
-    def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
+    def process(self):
+        feature_mode = self.__data.config['feature_mode'].upper()
+        if feature_mode == 'ALL':
+            mode = FeatureMode.All
+        elif feature_mode == 'DESCRIPTORS':
+            mode = FeatureMode.Descriptors
+        elif feature_mode == 'COLORS':
+            mode = FeatureMode.Colors
+        else:
+            raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
+
+        neut_factor = self.__data.config['neutral_factor']
+        d_weight = self.__data.config['descriptor_weight']
+
         descriptors, descriptor_colors, random_colors = \
             extract.load_descriptors(self.__data.descriptor_dir, self.__data.images())
         
@@ -88,7 +99,6 @@ class FlickrRsBundler:
 def main(argv):
     api_key = None
     tag = None
-    feature_mode = FeatureMode.All
     run_mode = RunMode.Download
     
     helptext = """To run the bundler from command line enter:
@@ -102,10 +112,6 @@ def main(argv):
                -a : The flickr api key
                
                Optional:
-               -f : The feature mode. Possible values:
-                    a - Both descriptors and colors. This is the default.
-                    d - Descriptors only
-                    c - Colors only
                -r : The run mode. Possible values:
                     d - Downloads, extracts, saves and processes images.
                         This is the default.
@@ -126,11 +132,6 @@ def main(argv):
             api_key = arg
         elif opt in ("-t", "--tag"):
             tag = arg
-        elif opt in ("-f", "--featuremode"):
-            if (arg == "d"):
-                feature_mode = FeatureMode.Descriptors
-            elif (arg == "c"):
-                feature_mode = FeatureMode.Colors
         elif opt in ("-r", "--runmode"):
             if (arg == "e"):
                 run_mode = RunMode.Extract
@@ -141,17 +142,18 @@ def main(argv):
         sys.exit("""Tag is required. Usage: """ + helptext)
     
     if api_key is None:
-        with open ("flickr_key.txt", "r") as myfile: api_key=myfile.readline().rstrip()
+        with open("flickr_key.txt", "r") as f_out:
+            api_key = f_out.readline().rstrip()
 
     bundler = FlickrRsBundler(api_key, tag)
     
-    if (run_mode == RunMode.Download):
+    if run_mode == RunMode.Download:
         bundler.download()
         bundler.extract()
-    elif (run_mode == RunMode.Extract):
+    elif run_mode == RunMode.Extract:
         bundler.extract()
         
-    bundler.process(feature_mode)
+    bundler.process()
     bundler.plot_image_pca()
     bundler.plot_result()
 
