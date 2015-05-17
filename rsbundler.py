@@ -19,8 +19,6 @@ class FlickrRsBundler:
         self.__data = DataSet(op.dirname(op.abspath(__file__)), tag)
         self.__flickr_wrapper = FlickrWrapper(api_key)
 
-        self.__image_files = None
-
         self.__Y = None
         self.__closest30 = None
         self.__closest5 = None
@@ -29,7 +27,8 @@ class FlickrRsBundler:
         self.download()
         self.extract()
         self.process()
-        self.plot()
+        self.plot_image_pca()
+        self.plot_result()
         
     def download(self):
         self.__flickr_wrapper.download(self.__data.image_dir, self.__data.tag, self.__data.processes)
