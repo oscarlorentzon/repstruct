@@ -3,12 +3,78 @@ import numpy as np
 import matplotlib.colors as mc
 import cv2
 import os
+from multiprocessing import Pool
 
 import sift as sift
 import features.descriptor as desc
 
 
-def extract(image_files, image_path, feature_path, descriptor_path):
+class DescriptorExtractor:
+
+    def __init__(self, image_path, descriptor_path, feature_path, desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
+        """ Creates a descriptor extractor.
+
+        :param image_path: Path to image files.
+        :param descriptor_path: Path to descriptor files.
+        :param feature_path: Path to feature files.
+        :param desc_cc: Descriptor cluster centers.
+        :param desc_cc_norm: Descriptor cluster center normalization histogram..
+        :param color_cc: Color cluster centers.
+        :param color_cc_norm: Color cluster center normalization histogram..
+        :param x: Gaussian randomly distributed x values.
+        :param y: Gaussian randomly distributed y values.
+        :return:
+        """
+
+        self.image_path = image_path
+        self.descriptor_path = descriptor_path
+        self.feature_path = feature_path
+
+        self.desc_cc = desc_cc
+        self.desc_cc_norm = desc_cc_norm
+
+        self.color_cc = color_cc
+        self.color_cc_norm = color_cc_norm
+
+        self.x = x
+        self.y = y
+
+    def __call__(self, image_file):
+        """ Extracts descriptor, descriptor location color and random location color histograms and saves to .npz.
+
+        :param image_file: Image name.
+        """
+
+        image = cv2.imread(os.path.join(self.image_path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
+
+        if len(image.shape) == 3:
+            image = image[:, :, ::-1]  # Reverse to RGB if color image
+
+        im = np.array(image) / 255.0
+        shape = im.shape
+
+        locs, descs = sift.load_features(self.feature_path, image_file)
+
+        descs = desc.normalize(descs)
+        desc_cc = desc.normalize(self.desc_cc)
+        desc_hist = desc.classify_cosine(descs, desc_cc)
+
+        # SIFT descriptors
+        norm_desc_hist = desc.normalize_by_division(desc_hist, self.desc_cc_norm)
+
+        # Colors in descriptor locations
+        colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], self.color_cc, self.color_cc_norm)
+
+        # Colors in Gaussian distributed points.
+        colors_rand_hist = \
+            get_color_hist(im, shape[0]*np.array(self.y), shape[1]*np.array(self.x), self.color_cc, self.color_cc_norm)
+
+        save_descriptor(self.descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
+
+        print 'Processed {0}'.format(image_file)
+
+
+def extract(image_files, image_path, feature_path, descriptor_path, processes=6):
     """ Extracts feature histogram vectors of classified SIFT features, 
         SIFT location colors and random Gaussian distributed colors 
         for the images.
@@ -42,35 +108,15 @@ def extract(image_files, image_path, feature_path, descriptor_path):
     x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
 
-    # Extract descriptors and colors for all images
-    for image_file in image_files:
-        
-        image = cv2.imread(os.path.join(image_path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
+    descriptor_extractor = DescriptorExtractor(image_path, descriptor_path, feature_path,
+                                               desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y)
 
-        if len(image.shape) == 3:
-            image = image[:, :, ::-1]  # Reverse to RGB if color image
-
-        im = np.array(image) / 255.0
-        shape = im.shape
-         
-        locs, descs = sift.load_features(feature_path, image_file)
-        
-        descs = desc.normalize(descs)
-        desc_cc = desc.normalize(desc_cc)
-        desc_hist = desc.classify_cosine(descs, desc_cc)
-
-        # SIFT descriptors
-        norm_desc_hist = desc.normalize_by_division(desc_hist, desc_cc_norm)
-        
-        # Colors in descriptor locations
-        colors_desc_hist = get_color_hist(im, locs[:, 1], locs[:, 0], color_cc, color_cc_norm)
-        
-        # Colors in Gaussian distributed points.   
-        colors_rand_hist = get_color_hist(im, shape[0]*np.array(y), shape[1]*np.array(x), color_cc, color_cc_norm)
-
-        save_descriptor(descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
-
-        print 'Processed {0}'.format(image_file)
+    if processes == 1:
+        for image_file in image_files:
+            descriptor_extractor(image_file)
+    else:
+        pool = Pool(processes)
+        pool.map(descriptor_extractor, image_files)
 
     print 'Images processed'
 
