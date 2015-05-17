@@ -9,6 +9,7 @@ from display import plothelper
 from features.featuremode import FeatureMode
 from features import sift, extract
 from runmode import RunMode
+from dataset.dataset import DataSet
 
 
 class FlickrRsBundler:
@@ -18,13 +19,9 @@ class FlickrRsBundler:
     __color_rand_file = "colorrand.txt"
     
     def __init__(self, api_key, tag):
-        self.__flickrWrapper = FlickrWrapper(api_key)
-        self.__tag = tag
 
-        self.__data_dir = op.dirname(op.abspath(__file__)) + "/tags/" + self.__tag + "/"
-        self.__image_dir = self.__data_dir + "images/"
-        self.__feature_dir = self.__data_dir + "features/"
-        self.__descriptor_dir = self.__data_dir + "descriptors/"
+        self.__data = DataSet(op.dirname(op.abspath(__file__)), tag)
+        self.__flickr_wrapper = FlickrWrapper(api_key)
 
         self.__image_files = None
 
@@ -32,23 +29,6 @@ class FlickrRsBundler:
         self.__closest30 = None
         self.__closest5 = None
 
-        if not op.exists(self.__image_dir):
-            makedirs(self.__image_dir)
-
-        if not op.exists(self.__feature_dir):
-            makedirs(self.__feature_dir)
-
-        if not op.exists(self.__descriptor_dir):
-            makedirs(self.__descriptor_dir)
-
-    def __images(self):
-        if self.__image_files is not None:
-            return self.__image_files
-
-        self.__image_files =\
-            [im for im in listdir(self.__image_dir) if op.isfile(op.join(self.__image_dir, im)) and im.endswith(".jpg")]
-
-        return self.__image_files
 
     def run(self):
         self.download()
@@ -57,14 +37,15 @@ class FlickrRsBundler:
         self.plot()
         
     def download(self):
-        self.__flickrWrapper.download(self.__image_dir, self.__tag)
+        self.__flickr_wrapper.download(self.__data.image_dir, self.__data.tag)
 
     def extract(self):
-        sift.extract(self.__images(), self.__image_dir, self.__feature_dir)
-        extract.extract(self.__images(), self.__image_dir, self.__feature_dir, self.__descriptor_dir)
+        sift.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir)
+        extract.extract(self.__data.images(), self.__data.image_dir, self.__data.feature_dir, self.__data.descriptor_dir)
         
     def process(self, mode=FeatureMode.All, neut_factor=0.8, d_weight=0.725):
-        descriptors, descriptor_colors, random_colors = extract.load_descriptors(self.__descriptor_dir, self.__images())
+        descriptors, descriptor_colors, random_colors = \
+            extract.load_descriptors(self.__data.descriptor_dir, self.__data.images())
         
         if mode == FeatureMode.Colors:
             N = extract.create_neutral_vector(np.array([[random_colors.shape[1], 1]]), random_colors.shape[0])
@@ -89,19 +70,19 @@ class FlickrRsBundler:
         self.__closest5 = self.__closest30[kclosest.k_closest(5, Y30[self.__closest30, :])]
         
     def plot(self):
-        plothelper.plot_images(self.__image_dir, np.array(self.__images())[self.__closest30], 3, 10)
-        plothelper.plot_images(self.__image_dir, np.array(self.__images())[self.__closest5], 1, 5)
+        plothelper.plot_images(self.__data.image_dir, np.array(self.__data.images())[self.__closest30], 3, 10)
+        plothelper.plot_images(self.__data.image_dir, np.array(self.__data.images())[self.__closest5], 1, 5)
 
     def plot_pca(self):
         plothelper.plot_pca_projections(self.__Y, 1, 2)
         plothelper.plot_pca_projections(self.__Y, 3, 4)
         
     def plot_image_pca(self):
-        plothelper.plot_pca_images(self.__image_dir, self.__images(), self.__Y, 1, 2)
-        plothelper.plot_pca_images(self.__image_dir, self.__images(), self.__Y, 3, 4)
+        plothelper.plot_pca_images(self.__data.image_dir, self.__data.images(), self.__Y, 1, 2)
+        plothelper.plot_pca_images(self.__data.image_dir, self.__data.images(), self.__Y, 3, 4)
 
     def plot_result(self):
-        plothelper.plot_result(self.__images(), self.__closest30, self.__closest5, self.__image_dir)
+        plothelper.plot_result(self.__data.images(), self.__closest30, self.__closest5, self.__data.image_dir)
  
              
 def main(argv):
