@@ -73,15 +73,12 @@ class DescriptorExtractor:
         print 'Processed {0}'.format(image_file)
 
 
-def extract(image_files, image_path, feature_path, descriptor_path, processes=6):
+def extract(data):
     """ Extracts feature histogram vectors of classified SIFT features, 
         SIFT location colors and random Gaussian distributed colors 
         for the images.
 
-    :param image_files: A list of image file paths.
-    :param image_path: Path to image directory.
-    :param feature_path: Path to feature directory.
-    :param descriptor_path: Path to descriptor directory.
+    :param data: Data set.
 
     :return D: A 2-D array with SIFT descriptor feature histograms for
                each image in rows.
@@ -107,15 +104,15 @@ def extract(image_files, image_path, feature_path, descriptor_path, processes=6)
     x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
 
-    descriptor_extractor = DescriptorExtractor(image_path, descriptor_path, feature_path,
+    descriptor_extractor = DescriptorExtractor(data.image_path, data.descriptor_path, data.feature_path,
                                                desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y)
 
-    if processes == 1:
-        for image_file in image_files:
+    if data.processes == 1:
+        for image_file in data.images():
             descriptor_extractor(image_file)
     else:
-        pool = Pool(processes)
-        pool.map(descriptor_extractor, image_files)
+        pool = Pool(data.processes)
+        pool.map(descriptor_extractor, data.images())
 
     print 'Images processed'
 

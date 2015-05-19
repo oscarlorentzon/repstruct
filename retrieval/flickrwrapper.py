@@ -33,28 +33,26 @@ class FlickrWrapper:
         return [url.format(photo['farm'], photo['server'], photo['id'], photo['secret'])
                 for photo in data['photos']['photo']]
 
-    def download(self, image_dir, tag, processes=6, sort_mode='relevance'):
+    def download(self, data, sort_mode='relevance'):
         """ Downloads images for a tag from Flickr.
 
-        :param image_dir: The directory for sorting the images
-        :param tag: The tag for the search.
+        :param data: Data set.
         :param sort_mode: One of the values in the Flickr sort mode enumeration.
                           E.g. date-posted-desc, interestingness-desc and relevance.
-        :param processes: The number of processes for downloading images in parallel.
         """
 
-        image_urls = self.get_urls(tag, sort_mode)
+        image_urls = self.get_urls(data.tag, sort_mode)
 
         url_paths = []
         for index, image_url in enumerate(image_urls):
-            url_paths.append((image_url, image_dir + tag + str(index + 1) + ".jpg"))
+            url_paths.append((image_url, data.image_path + data.tag + str(index + 1) + ".jpg"))
 
         downloader = Downloader()
-        if processes == 1:
+        if data.processes == 1:
             for url_path in url_paths:
                 downloader(url_path)
         else:
-            pool = Pool(processes)
+            pool = Pool(data.processes)
             pool.map(downloader, url_paths)
         
         print "Images downloaded"

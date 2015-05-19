@@ -4,7 +4,7 @@ import sys
 import getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
-from analysis import pca, kclosest, process
+from analysis import kclosest, process
 from display import plothelper
 from features.featuremode import FeatureMode
 from features import sift, extract
@@ -31,13 +31,11 @@ class FlickrRsBundler:
         self.plot_result()
         
     def download(self):
-        self.__flickr_wrapper.download(self.__data.image_path, self.__data.tag, self.__data.processes)
+        self.__flickr_wrapper.download(self.__data)
 
     def extract(self):
-        sift.extract(self.__data.images(), self.__data.image_path, self.__data.feature_path,
-                     self.__data.processes)
-        extract.extract(self.__data.images(), self.__data.image_path, self.__data.feature_path,
-                        self.__data.descriptor_path, self.__data.processes)
+        sift.extract(self.__data)
+        extract.extract(self.__data)
 
     def process(self):
         neutral_factor = self.__data.neutral_factor

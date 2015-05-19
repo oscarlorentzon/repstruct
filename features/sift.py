@@ -32,23 +32,20 @@ class SiftExtractor:
         print 'Extracted {0} features for {1}'.format(descs.shape[0], image)
 
 
-def extract(images, image_path, feature_path, processes=6):
+def extract(data):
     """ Extracts SIFT features for a list of images. Saves the descriptors
         and locations to file.
 
-    :param images: Image names.
-    :param image_path: Folder path for image files.
-    :param feature_path: Folder path for features.
-    :param processes: The number of processes for extracting features in parallel.
+    :param data: Data set.
     """
 
-    sift_extractor = SiftExtractor(image_path, feature_path)
-    if processes == 1:
-        for image in images:
+    sift_extractor = SiftExtractor(data.image_path, data.feature_path)
+    if data.processes == 1:
+        for image in data.images():
             sift_extractor(image)
     else:
-        pool = Pool(processes)
-        pool.map(sift_extractor, images)
+        pool = Pool(data.processes)
+        pool.map(sift_extractor, data.images())
 
     print 'Features extracted'
 
