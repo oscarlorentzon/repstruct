@@ -25,6 +25,7 @@ class DataSet:
         self.__image_path = self.__data_path + "images/"
         self.__feature_path = self.__data_path + "features/"
         self.__descriptor_path = self.__data_path + "descriptors/"
+        self.__result_path = self.__data_path + "results/"
 
         # Load the configuration file and stores values in properties.
         with open(op.join(root_path, 'config.yaml')) as fin:
@@ -46,7 +47,7 @@ class DataSet:
         self.__processes = self.__config['processes']
 
         # Create tag directories if not created.
-        for p in [self.image_path, self.feature_path, self.descriptor_path]:
+        for p in [self.__image_path, self.__feature_path, self.__descriptor_path, self.__result_path]:
             if not op.exists(p):
                 makedirs(p)
 
@@ -84,6 +85,15 @@ class DataSet:
     @descriptor_path.setter
     def descriptor_path(self, descriptor_path):
         self.__descriptor_path = descriptor_path
+
+    @property
+    def result_path(self):
+        """ The path to the result directory. """
+        return self.__result_path
+
+    @result_path.setter
+    def result_path(self, result_path):
+        self.__result_path = result_path
 
     @property
     def descriptor_weight(self):

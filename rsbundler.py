@@ -1,12 +1,10 @@
 import os.path as op
-import numpy as np
 import sys
 import getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
-from analysis import kclosest, process
+from analysis import process
 from display import plothelper
-from features.featuremode import FeatureMode
 from features import sift, extract
 from runmode import RunMode
 from dataset.dataset import DataSet
@@ -15,13 +13,8 @@ from dataset.dataset import DataSet
 class FlickrRsBundler:
 
     def __init__(self, api_key, tag):
-
         self.__data = DataSet(tag, op.dirname(op.abspath(__file__)))
         self.__flickr_wrapper = FlickrWrapper(api_key)
-
-        self.__Y = None
-        self.__closest30 = None
-        self.__closest5 = None
 
     def run(self):
         self.download()
@@ -38,38 +31,22 @@ class FlickrRsBundler:
         extract.extract(self.__data)
 
     def process(self):
-        neutral_factor = self.__data.neutral_factor
-        descriptor_weight = self.__data.descriptor_weight
-
-        descriptors, descriptor_colors, random_colors = \
-            extract.load_descriptors(self.__data.descriptor_path, self.__data.images())
-        
-        if self.__data.feature_mode == FeatureMode.Colors:
-            self.__Y = process.process(random_colors, neutral_factor)
-        elif self.__data.feature_mode == FeatureMode.Descriptors:
-            self.__Y = process.process(descriptors, neutral_factor)
-        else:
-            self.__Y = process.process_combined(descriptors, descriptor_colors, random_colors,
-                                                descriptor_weight, neutral_factor)
-
-        Y30 = self.__Y[:, :30]
-        self.__closest30 = kclosest.k_closest(30, Y30)
-        self.__closest5 = self.__closest30[kclosest.k_closest(5, Y30[self.__closest30, :])]
+        process.process(self.__data)
         
     def plot(self):
-        plothelper.plot_images(self.__data.image_path, self.__data.images()[self.__closest30], 3, 10)
-        plothelper.plot_images(self.__data.image_path, self.__data.images()[self.__closest5], 1, 5)
+        images, Y, closest_group, representative = process.load_result(self.__data.result_path)
 
-    def plot_pca(self):
-        plothelper.plot_pca_projections(self.__Y, 1, 2)
-        plothelper.plot_pca_projections(self.__Y, 3, 4)
-        
-    def plot_image_pca(self):
-        plothelper.plot_pca_images(self.__data.image_path, self.__data.images(), self.__Y, 1, 2)
-        plothelper.plot_pca_images(self.__data.image_path, self.__data.images(), self.__Y, 3, 4)
+        plothelper.plot_pca_projections(Y, 1, 2)
+        plothelper.plot_pca_projections(Y, 3, 4)
+        plothelper.plot_images(self.__data.image_path, images[closest_group], 3, 10)
+        plothelper.plot_images(self.__data.image_path, images[representative], 1, 5)
 
     def plot_result(self):
-        plothelper.plot_result(self.__data.image_path, self.__data.images(), self.__closest30, self.__closest5)
+        images, Y, closest_group, representative = process.load_result(self.__data.result_path)
+
+        plothelper.plot_pca_images(self.__data.image_path, images, Y, 1, 2)
+        plothelper.plot_pca_images(self.__data.image_path, images, Y, 3, 4)
+        plothelper.plot_result(self.__data.image_path, images, closest_group, representative)
  
              
 def main(argv):
@@ -130,7 +107,6 @@ def main(argv):
         bundler.extract()
         
     bundler.process()
-    bundler.plot_image_pca()
     bundler.plot_result()
 
 
