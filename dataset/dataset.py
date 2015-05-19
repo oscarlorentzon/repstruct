@@ -9,7 +9,11 @@ from features.featuremode import FeatureMode
 class DataSet:
 
     def __init__(self, tag=None, root_path=None):
-        """ Creates a data set which holds paths, image list and config values. """
+        """ Creates a data set which holds paths, image list and config values.
+
+        :param tag: Flickr tag.
+        :param root_path: Path to directory including config file. Path where tags directory will be created.
+        """
 
         self.__tag = tag
 
