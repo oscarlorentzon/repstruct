@@ -8,46 +8,114 @@ from features.featuremode import FeatureMode
 
 class DataSet:
 
-    def __init__(self, root_path, tag):
-        """ Creates a data set which holds paths, image list and config values.
-        """
+    def __init__(self, tag=None, root_path=None):
+        """ Creates a data set which holds paths, image list and config values. """
 
-        self.__data_dir = root_path + "/tags/" + tag + "/"
+        self.__tag = tag
 
-        self.image_dir = self.__data_dir + "images/"
-        self.feature_dir = self.__data_dir + "features/"
-        self.descriptor_dir = self.__data_dir + "descriptors/"
+        if root_path is None:
+            return
 
-        self.tag = tag
+        self.__data_path = root_path + "/tags/" + self.__tag + "/"
 
-        self.__load_config(root_path)
+        self.__image_path = self.__data_path + "images/"
+        self.__feature_path = self.__data_path + "features/"
+        self.__descriptor_path = self.__data_path + "descriptors/"
 
-        for p in [self.image_dir, self.feature_dir, self.descriptor_dir]:
-            if not op.exists(p):
-                makedirs(p)
-
-    def __load_config(self, config_path):
-        """ Loads the configuration file and stores values in properties.
-
-        :param config_path: The path to the folder containing the configuration file.
-        """
-
-        with open(op.join(config_path, 'config.yaml')) as fin:
+        # Load the configuration file and stores values in properties.
+        with open(op.join(root_path, 'config.yaml')) as fin:
             self.__config = yaml.load(fin)
 
-        self.descriptor_weight = self.__config['descriptor_weight']
-        self.neutral_factor = self.__config['neutral_factor']
-        self.processes = self.__config['processes']
+        self.__descriptor_weight = self.__config['descriptor_weight']
+        self.__neutral_factor = self.__config['neutral_factor']
 
         feature_mode = self.__config['feature_mode'].upper()
         if feature_mode == 'ALL':
-            self.feature_mode = FeatureMode.All
+            self.__feature_mode = FeatureMode.All
         elif feature_mode == 'DESCRIPTORS':
-            self.feature_mode = FeatureMode.Descriptors
+            self.__feature_mode = FeatureMode.Descriptors
         elif feature_mode == 'COLORS':
-            self.feature_mode = FeatureMode.Colors
+            self.__feature_mode = FeatureMode.Colors
         else:
             raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
+
+        self.__processes = self.__config['processes']
+
+        # Create tag directories if not created.
+        for p in [self.image_path, self.feature_path, self.descriptor_path]:
+            if not op.exists(p):
+                makedirs(p)
+
+    @property
+    def tag(self):
+        return self.__tag
+
+    @tag.setter
+    def tag(self, tag):
+        self.__tag = tag
+
+    @property
+    def image_path(self):
+        """ The path to the image directory. """
+        return self.__image_path
+
+    @image_path.setter
+    def image_path(self, image_path):
+        self.__image_path = image_path
+
+    @property
+    def feature_path(self):
+        """ The path to the feature directory. """
+        return self.__feature_path
+
+    @feature_path.setter
+    def feature_path(self, feature_path):
+        self.__feature_path = feature_path
+
+    @property
+    def descriptor_path(self):
+        """ The path to the descriptor directory. """
+        return self.__descriptor_path
+
+    @descriptor_path.setter
+    def descriptor_path(self, descriptor_path):
+        self.__descriptor_path = descriptor_path
+
+    @property
+    def descriptor_weight(self):
+        """ The weight of the descriptors with respect to the L2 norm of the combined feature vector. """
+        return self.__descriptor_weight
+
+    @descriptor_weight.setter
+    def descriptor_weight(self, descriptor_weight):
+        self.__descriptor_weight = descriptor_weight
+
+    @property
+    def neutral_factor(self):
+        """ The factor of the neutral vector to be subtracted in the neutral vector subtraction PCA. """
+        return self.__neutral_factor
+
+    @neutral_factor.setter
+    def neutral_factor(self, neutral_factor):
+        self.__neutral_factor = neutral_factor
+
+    @property
+    def feature_mode(self):
+        """ Feature mode to be used when processing feature vectors. """
+        return self.__feature_mode
+
+    @feature_mode.setter
+    def feature_mode(self, feature_mode):
+        self.__feature_mode = feature_mode
+
+    @property
+    def processes(self):
+        """ Number of parallel processes for downloading and extraction. """
+        return self.__processes
+
+    @processes.setter
+    def processes(self, processes):
+        self.__processes = processes
 
     def images(self):
         """ Lists all images in the image directory.
@@ -55,5 +123,5 @@ class DataSet:
         :return: List of image names.
         """
 
-        return np.array([im for im in listdir(self.image_dir)
-                         if op.isfile(op.join(self.image_dir, im)) and im.endswith(".jpg")])
+        return np.array([im for im in listdir(self.image_path)
+                         if op.isfile(op.join(self.image_path, im)) and im.endswith(".jpg")])
