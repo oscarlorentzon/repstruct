@@ -46,6 +46,9 @@ class DataSet:
 
         self.__processes = self.__config['processes']
 
+        self.__edge_threshold = self.__config['edge_threshold']
+        self.__peak_threshold = self.__config['peak_threshold']
+
         # Create tag directories if not created.
         for p in [self.__image_path, self.__feature_path, self.__descriptor_path, self.__result_path]:
             if not op.exists(p):
@@ -130,6 +133,24 @@ class DataSet:
     @processes.setter
     def processes(self, processes):
         self.__processes = processes
+
+    @property
+    def edge_threshold(self):
+        """ SIFT edge threshold. """
+        return self.__edge_threshold
+
+    @edge_threshold.setter
+    def edge_threshold(self, edge_threshold):
+        self.__edge_threshold = edge_threshold
+
+    @property
+    def peak_threshold(self):
+        """ SIFT peak threshold. """
+        return self.__peak_threshold
+
+    @peak_threshold.setter
+    def peak_threshold(self, peak_threshold):
+        self.__peak_threshold = peak_threshold
 
     def images(self):
         """ Lists all images in the image directory.

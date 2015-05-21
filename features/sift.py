@@ -7,15 +7,19 @@ from multiprocessing import Pool
 
 class SiftExtractor:
 
-    def __init__(self, image_path, feature_path):
+    def __init__(self, image_path, feature_path, edge_threshold, peak_threshold):
         """ Creates a SiftExtractor.
 
         :param image_path: Path to image files.
         :param feature_path: Path to feature files.
+        :param edge_threshold: SIFT edge threshold.
+        :param peak_threshold: SIFT peak threshold.
         """
 
         self.__image_path = image_path
         self.__feature_path = feature_path
+        self.__edge_threshold = edge_threshold
+        self.__peak_threshold = peak_threshold
 
     def __call__(self, image):
         """ Extracts SIFT features for an image and saves the descriptors
@@ -25,11 +29,11 @@ class SiftExtractor:
         """
 
         im = cv2.imread(os.path.join(self.__image_path, image), cv2.IMREAD_GRAYSCALE)
-        locs, descs = extract_feature_vectors(im)
+        locations, descriptors = extract_feature_vectors(im, self.__edge_threshold, self.__peak_threshold)
 
-        save_features(self.__feature_path, image, locs, descs)
+        save_features(self.__feature_path, image, locations, descriptors)
 
-        print 'Extracted {0} features for {1}'.format(descs.shape[0], image)
+        print 'Extracted {0} features for {1}'.format(descriptors.shape[0], image)
 
 
 def extract(data):
@@ -39,7 +43,7 @@ def extract(data):
     :param data: Data set.
     """
 
-    sift_extractor = SiftExtractor(data.image_path, data.feature_path)
+    sift_extractor = SiftExtractor(data.image_path, data.feature_path, data.edge_threshold, data.peak_threshold)
     if data.processes == 1:
         for image in data.images():
             sift_extractor(image)
