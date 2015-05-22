@@ -107,11 +107,11 @@ def extract(data):
     descriptor_extractor = DescriptorExtractor(data.image_path, data.descriptor_path, data.feature_path,
                                                desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y)
 
-    if data.processes == 1:
+    if data.config.processes == 1:
         for image_file in data.images():
             descriptor_extractor(image_file)
     else:
-        pool = Pool(data.processes)
+        pool = Pool(data.config.processes)
         pool.map(descriptor_extractor, data.images())
 
     print 'Images processed'

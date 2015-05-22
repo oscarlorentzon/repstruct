@@ -63,13 +63,13 @@ def process(data, principal_component_count=30, closest_group_count=30, represen
 
     descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor_path, images)
 
-    if data.feature_mode == FeatureMode.Colors:
-        Y = process_features(random_colors, data.neutral_factor)
-    elif data.feature_mode == FeatureMode.Descriptors:
-        Y = process_features(descriptors, data.neutral_factor)
+    if data.config.feature_mode == FeatureMode.Colors:
+        Y = process_features(random_colors, data.config.neutral_factor)
+    elif data.config.feature_mode == FeatureMode.Descriptors:
+        Y = process_features(descriptors, data.config.neutral_factor)
     else:
         Y = process_combined_features(descriptors, descriptor_colors, random_colors,
-                                      data.descriptor_weight, data.neutral_factor)
+                                      data.config.descriptor_weight, data.config.neutral_factor)
 
     Y_truncated = Y[:, :principal_component_count]
     closest_group = kclosest.k_closest(closest_group_count, Y_truncated)

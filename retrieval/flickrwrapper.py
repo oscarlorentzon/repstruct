@@ -48,11 +48,11 @@ class FlickrWrapper:
             url_paths.append((image_url, data.image_path + data.tag + str(index + 1) + ".jpg"))
 
         downloader = Downloader()
-        if data.processes == 1:
+        if data.config.processes == 1:
             for url_path in url_paths:
                 downloader(url_path)
         else:
-            pool = Pool(data.processes)
+            pool = Pool(data.config.processes)
             pool.map(downloader, url_paths)
         
         print "Images downloaded"

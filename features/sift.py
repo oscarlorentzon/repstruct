@@ -43,12 +43,13 @@ def extract(data):
     :param data: Data set.
     """
 
-    sift_extractor = SiftExtractor(data.image_path, data.feature_path, data.edge_threshold, data.peak_threshold)
-    if data.processes == 1:
+    sift_extractor = SiftExtractor(data.image_path, data.feature_path,
+                                   data.config.edge_threshold, data.config.peak_threshold)
+    if data.config.processes == 1:
         for image in data.images():
             sift_extractor(image)
     else:
-        pool = Pool(data.processes)
+        pool = Pool(data.config.processes)
         pool.map(sift_extractor, data.images())
 
     print 'Features extracted'
