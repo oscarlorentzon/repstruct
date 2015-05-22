@@ -27,18 +27,20 @@ You need to have Python 2.7+ and the following libraries:
 * [NumPy][]
 * [Matplotlib][]
 * [Enum34][]
+* [PyYAML][]
 
 ### Installing dependencies on Ubuntu
 
 1. [OpenCV][] - Install by following the steps in the Ubuntu OpenCV [installation guide](https://help.ubuntu.com/community/OpenCV).
 
-2. [SciPy][], [NumPy][], [Matplotlib][] and [Enum34][]  - Install [pip](https://pypi.python.org/pypi/pip) and run:
+2. [SciPy][], [NumPy][], [Matplotlib][], [Enum34][] and [PyYAML][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
 
         sudo apt-get install gfortran
         sudo pip install scipy
         sudo pip install numpy
         sudo apt-get install python-matplotlib
         sudo apt-get install python-enum34
+        sudo pip install pyyaml
 
 ## Example output
 
@@ -56,3 +58,4 @@ The second output image shows the result after running the algorithm. On top all
 [SciPy]: http://www.scipy.org/ (Fundamental library for scientific computing)
 [Matplotlib]: http://matplotlib.sourceforge.net (Plotting in python)
 [Enum34]: https://pypi.python.org/pypi/enum34 (Enum support in python 2.*)
+[PyYAML]: http://pyyaml.org/ (YAML implementations for Python)
