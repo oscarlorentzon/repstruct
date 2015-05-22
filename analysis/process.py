@@ -69,8 +69,8 @@ def process(data):
                                       data.config.descriptor_weight, data.config.neutral_factor)
 
     Y_truncated = Y[:, :data.config.pc_projection_count]
-    closest_group = kclosest.k_closest(int(data.config.closest_group * images.shape[0]), Y_truncated)
-    representative = closest_group[kclosest.k_closest(int(data.config.representative * images.shape[0]),
+    closest_group = kclosest.k_closest(int(round(data.config.closest_group * images.shape[0], 0)), Y_truncated)
+    representative = closest_group[kclosest.k_closest(int(round(data.config.representative * images.shape[0], 0)),
                                                       Y_truncated[closest_group, :])]
 
     save_result(data.result_path, images, Y, closest_group, representative)
