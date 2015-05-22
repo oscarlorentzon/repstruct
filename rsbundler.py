@@ -32,9 +32,11 @@ class FlickrRsBundler:
 
     def process(self):
         process.process(self.__data)
+        process.closest(self.__data)
         
     def plot(self):
-        images, Y, closest_group, representative = process.load_result(self.__data.result_path)
+        images, Y, V = process.load_principal_components(self.__data.result_path)
+        closest_group, representative = process.load_closest(self.__data.result_path)
 
         plothelper.plot_pca_projections(Y, 1, 2)
         plothelper.plot_pca_projections(Y, 3, 4)
@@ -42,7 +44,8 @@ class FlickrRsBundler:
         plothelper.plot_images(self.__data.image_path, images[representative], 1, 5)
 
     def plot_result(self):
-        images, Y, closest_group, representative = process.load_result(self.__data.result_path)
+        images, Y, V = process.load_principal_components(self.__data.result_path)
+        closest_group, representative = process.load_closest(self.__data.result_path)
 
         save_path = self.__data.result_path if self.__data.config.save_plot else None
         plothelper.plot_pca_images(self.__data.image_path, images, Y, 1, 2, save_path=save_path)

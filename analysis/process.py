@@ -20,7 +20,7 @@ def process_features(features, neutral_factor):
 
     Y, V = pca.neutral_sub_pca_vector(F, neutral_factor*N)
 
-    return Y
+    return Y, V
 
 
 def process_combined_features(descriptors, descriptor_colors, random_colors, descriptor_weight, neutral_factor):
@@ -47,63 +47,103 @@ def process_combined_features(descriptors, descriptor_colors, random_colors, des
 
     Y, V = pca.neutral_sub_pca_vector(F, neutral_factor*N)
 
-    return Y
+    return Y, V
 
 
 def process(data):
     """ Processes feature vectors according to feature mode specified in data set. Saves result to file.
 
-    :param data: Data set with feature mode, principal component count, closest group and representative.
+    :param data: Data set with feature mode, neutral factor and descriptor weight.
     """
 
     images = data.images()
-
     descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor_path, images)
 
     if data.config.feature_mode == FeatureMode.Colors:
-        Y = process_features(random_colors, data.config.neutral_factor)
+        Y, V = process_features(random_colors, data.config.neutral_factor)
     elif data.config.feature_mode == FeatureMode.Descriptors:
-        Y = process_features(descriptors, data.config.neutral_factor)
+        Y, V = process_features(descriptors, data.config.neutral_factor)
     else:
-        Y = process_combined_features(descriptors, descriptor_colors, random_colors,
-                                      data.config.descriptor_weight, data.config.neutral_factor)
+        Y, V = process_combined_features(descriptors, descriptor_colors, random_colors,
+                                         data.config.descriptor_weight, data.config.neutral_factor)
+
+    save_principal_components(data.result_path, images, Y, V)
+
+
+def closest(data):
+    """ Determines the closest group and the most representative images and saves to file. Loads image list
+        and corresponding principal components from file.
+
+    :param data: Data set.
+    """
+
+    images, Y, V = load_principal_components(data.result_path)
 
     Y_truncated = Y[:, :data.config.pc_projection_count]
-    closest_group = kclosest.k_closest(int(round(data.config.closest_group * images.shape[0], 0)), Y_truncated)
-    representative = closest_group[kclosest.k_closest(int(round(data.config.representative * images.shape[0], 0)),
-                                                      Y_truncated[closest_group, :])]
 
-    save_result(data.result_path, images, Y, closest_group, representative)
+    closest_group_count = int(round(data.config.closest_group * images.shape[0], 0))
+    representative_count = int(round(data.config.representative * images.shape[0], 0))
+
+    closest_group = kclosest.k_closest(closest_group_count, Y_truncated)
+    representative = closest_group[kclosest.k_closest(representative_count, Y_truncated[closest_group, :])]
+
+    save_closest(data.result_path, closest_group, representative)
 
 
-def save_result(file_path, images, pc_projections, closest_group, representative):
+def save_principal_components(file_path, images, pc_projections, principal_components):
     """ Saves result to .npz.
 
     :param file_path: The results folder.
     :param images: The image names.
-    :param principal_components: The principal component arrays.
+    :param pc_projections: The principal component projection arrays.
+    :param principal_components: The principal components.
+    """
+
+    np.savez(os.path.join(file_path, 'principal_components.npz'),
+             images=images,
+             pc_projections=pc_projections,
+             principal_components=principal_components)
+
+
+def load_principal_components(file_path):
+    """ Loads principal components from .npz.
+
+    :param file_path: The results folder.
+
+    :return  images: The image names.
+    :return pc_projections: The principal component projection arrays.
+    :param principal_components: The principal components.
+    """
+
+    p = np.load(os.path.join(file_path, 'principal_components.npz'))
+
+    return p['images'], p['pc_projections'], p['principal_components']
+
+
+def save_closest(file_path, closest_group, representative):
+    """ Saves result to .npz.
+
+    :param file_path: The results folder.
     :param closest_group: The image indices of the closest group.
     :param representative: The image indices of the representative group.
     """
 
-    np.savez(os.path.join(file_path, 'results.npz'),
-             images=images,
-             pc_projections=pc_projections,
+    np.savez(os.path.join(file_path, 'closest.npz'),
              closest_group=closest_group,
              representative=representative)
 
 
-def load_result(file_path):
+def load_closest(file_path):
     """ Loads result from .npz.
 
     :param file_path: The result folder.
 
-    :return  images: The image names.
-    :return pc_projections: The principal component projection arrays.
     :return closest_group: The image indices of the closest group.
     :return representative: The image indices of the representative group.
     """
 
-    r = np.load(os.path.join(file_path, 'results.npz'))
+    c = np.load(os.path.join(file_path, 'closest.npz'))
 
-    return r['images'], r['pc_projections'], r['closest_group'], r['representative']
+    return c['closest_group'], c['representative']
+
+
