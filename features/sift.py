@@ -55,7 +55,7 @@ def extract(data):
     print 'Features extracted'
 
 
-def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.001):
+def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.01):
     """ Process a grayscale image and return the found SIFT feature points
         and descriptors.
 

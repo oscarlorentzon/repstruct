@@ -1,6 +1,6 @@
 # Params for SIFT extraction.
 edge_threshold: 10          # Filters on DoG scale space curvature size. Larger value gives more features.
-peak_threshold: 0.001       # Filters on DoG scale space peak size. Smaller value gives more features.
+peak_threshold: 0.01       # Filters on DoG scale space peak size. Smaller value gives more features.
 
 # Params for principal component analysis.
 descriptor_weight: 0.725    # Weight of the descriptors with respect to the L2 norm of the combined feature vector.
