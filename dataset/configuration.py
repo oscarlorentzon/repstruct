@@ -20,6 +20,11 @@ class Configuration:
         with open(op.join(path, name)) as fin:
             self.__config = yaml.load(fin)
 
+        # Properties for SIFT extraction.
+        self.__edge_threshold = self.__config['edge_threshold']
+        self.__peak_threshold = self.__config['peak_threshold']
+
+        # Properties for principal component analysis.
         self.__descriptor_weight = self.__config['descriptor_weight']
         self.__neutral_factor = self.__config['neutral_factor']
 
@@ -33,10 +38,11 @@ class Configuration:
         else:
             raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
 
-        self.__processes = self.__config['processes']
+        # Properties for feature vector distance measuring.
+        self.__pc_projection_count = self.__config['pc_projection_count']
 
-        self.__edge_threshold = self.__config['edge_threshold']
-        self.__peak_threshold = self.__config['peak_threshold']
+        # General properties.
+        self.__processes = self.__config['processes']
 
     @property
     def descriptor_weight(self):
@@ -91,3 +97,12 @@ class Configuration:
     @peak_threshold.setter
     def peak_threshold(self, peak_threshold):
         self.__peak_threshold = peak_threshold
+
+    @property
+    def pc_projection_count(self):
+        """ Number of principal component projections used for distance measuring. """
+        return self.__pc_projection_count
+
+    @pc_projection_count.setter
+    def pc_projection_count(self, pc_projection_count):
+        self.__pc_projection_count = pc_projection_count
