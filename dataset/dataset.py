@@ -20,12 +20,12 @@ class DataSet:
         if root_path is None:
             return
 
-        self.__data_path = root_path + "/tags/" + self.__tag + "/"
+        self.__data_path = root_path + '/tags/' + self.__tag + '/'
 
-        self.__image_path = self.__data_path + "images/"
-        self.__feature_path = self.__data_path + "features/"
-        self.__descriptor_path = self.__data_path + "descriptors/"
-        self.__result_path = self.__data_path + "results/"
+        self.__image_path = self.__data_path + 'images/'
+        self.__feature_path = self.__data_path + 'features/'
+        self.__descriptor_path = self.__data_path + 'descriptors/'
+        self.__result_path = self.__data_path + 'results/'
 
         # Create tag directories if not existing..
         for p in [self.__image_path, self.__feature_path, self.__descriptor_path, self.__result_path]:

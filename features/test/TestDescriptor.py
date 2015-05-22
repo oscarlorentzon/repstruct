@@ -112,5 +112,5 @@ class TestDescriptor(unittest.TestCase):
         self.assertEqual(0, result[2])
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

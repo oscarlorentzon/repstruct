@@ -55,7 +55,7 @@ def main(argv):
     tag = None
     run_mode = RunMode.Download
     
-    helptext = """To run the bundler from command line enter:
+    help_text = """To run the bundler from command line enter:
               
                rsbundler.py -t <tag> -a <apikey>
     
@@ -74,29 +74,29 @@ def main(argv):
                """
     
     try:
-        opts, args = getopt.getopt(argv,"ha:t:f:r:", ["apikey=", "tag=", "featuremode=", "runmode="])
+        opts, args = getopt.getopt(argv,'ha:t:f:r:', ['apikey=', 'tag=', 'featuremode=', 'runmode='])
     except getopt.GetoptError:
-        print helptext
+        print help_text
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print helptext
+            print help_text
             sys.exit()
-        elif opt in ("-a", "--apikey"):
+        elif opt in ('-a', '--apikey'):
             api_key = arg
-        elif opt in ("-t", "--tag"):
+        elif opt in ('-t', '--tag'):
             tag = arg
-        elif opt in ("-r", "--runmode"):
-            if (arg == "e"):
+        elif opt in ('-r', '--runmode'):
+            if arg == 'e':
                 run_mode = RunMode.Extract
-            elif (arg == "o"):
+            elif arg == 'o':
                 run_mode = RunMode.Load
     
     if tag is None:   
-        sys.exit("""Tag is required. Usage: """ + helptext)
+        sys.exit('Tag is required. Usage: ' + help_text)
     
     if api_key is None:
-        with open("flickr_key.txt", "r") as f_out:
+        with open('flickr_key.txt', 'r') as f_out:
             api_key = f_out.readline().rstrip()
 
     bundler = FlickrRsBundler(api_key, tag)
@@ -111,5 +111,5 @@ def main(argv):
     bundler.plot_result()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main(sys.argv[1:])

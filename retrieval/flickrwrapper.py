@@ -29,7 +29,7 @@ class FlickrWrapper:
         response = urllib.urlopen(request.format(self.__api_key, tag, sort_mode))
         data = json.loads(response.read())
 
-        url = "https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg"
+        url = 'https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg'
         return [url.format(photo['farm'], photo['server'], photo['id'], photo['secret'])
                 for photo in data['photos']['photo']]
 
@@ -45,7 +45,7 @@ class FlickrWrapper:
 
         url_paths = []
         for index, image_url in enumerate(image_urls):
-            url_paths.append((image_url, data.image_path + data.tag + str(index + 1) + ".jpg"))
+            url_paths.append((image_url, data.image_path + data.tag + str(index + 1) + '.jpg'))
 
         downloader = Downloader()
         if data.config.processes == 1:
@@ -55,7 +55,7 @@ class FlickrWrapper:
             pool = Pool(data.config.processes)
             pool.map(downloader, url_paths)
         
-        print "Images downloaded"
+        print 'Images downloaded'
 
 
 class Downloader:
