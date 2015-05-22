@@ -44,6 +44,7 @@ class Configuration:
 
         # General properties.
         self.__processes = self.__config['processes']
+        self.__save_plot = self.__config['save_plot']
 
     @property
     def descriptor_weight(self):
@@ -125,3 +126,12 @@ class Configuration:
     @representative.setter
     def representative(self, representative):
         self.__representative = representative
+
+    @property
+    def save_plot(self):
+        """ Boolean specifying if plots should be saved to file. """
+        return self.__save_plot
+
+    @save_plot.setter
+    def save_plot(self, save_plot):
+        self.__save_plot = save_plot

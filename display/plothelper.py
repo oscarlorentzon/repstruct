@@ -22,7 +22,7 @@ def plot_images(image_dir, image_files, rows, columns):
 
         sub = fig.add_subplot(rows, columns, index + 1)
         sub.imshow(image)
-    
+
     pl.show()
 
 
@@ -41,7 +41,7 @@ def plot_pca_projections(V, pc1, pc2):
     pl.show()
 
 
-def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_axis=0., ticks=False):
+def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_axis=0., ticks=False, save_path=None):
     """ Plots the images onto the projections for the specified
         principal components. Crops the projection image to the
         outermost images automatically. This can be overridden by
@@ -56,6 +56,7 @@ def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_ax
     :param dim: Dimension of projection background.
     :param min_axis: Minimum axis span in interval [0, 1].
     :param ticks: Boolean specifying if the plot should display custom ticks.
+    :param save_path: Path for saving as an image. If none the plot is shown in a figure.
     """
 
     unit = dim / 2
@@ -89,10 +90,15 @@ def plot_pca_images(image_dir, images, V, pc1, pc2, im_dim=100, dim=4000, min_ax
     pl.xlabel('Principal component {0}'.format(pc1), fontsize=12)
     pl.ylabel('Principal component {0}'.format(pc2), fontsize=12)
     pl.imshow(background)
-    pl.show()
+
+    if save_path is not None:
+        fig.savefig(save_path + 'pcs_{0}_{1}.jpg'.format(pc1, pc2), dpi=100)
+        pl.close()
+    else:
+        pl.show()
 
 
-def plot_result(image_dir, images, index_thirty, index_five, im_dim=200, cols=10):
+def plot_result(image_dir, images, index_thirty, index_five, im_dim=200, cols=10, save_path=None):
     """ Shows the result by plotting all images on top, then the thirty
         closest images and at last the five closest in double size.
 
@@ -103,6 +109,7 @@ def plot_result(image_dir, images, index_thirty, index_five, im_dim=200, cols=10
     :param im_dim: Dimension of the longest side of the image.
     :param cols: Number of image columns. Must be greater than one. The five
                  closest images will have half the columns.
+    :param save_path: Path for saving as an image. If none the plot is shown in a figure.
     """
 
     space = im_dim / 10
@@ -140,11 +147,14 @@ def plot_result(image_dir, images, index_thirty, index_five, im_dim=200, cols=10
         row, col = get_row_col(index, h_a + space + h_t + space, 2 * im_dim, k_space * space, border, cols / 2)
         insert_image(background, im, col, row)
 
-    fig = pl.figure()
-    fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
-    pl.axis('off')
-    pl.imshow(background)
-    pl.show()
+    if save_path is not None:
+        cv2.imwrite(save_path + 'result.jpg', background[:, :, ::-1])
+    else:
+        fig = pl.figure()
+        fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
+        pl.axis('off')
+        pl.imshow(background)
+        pl.show()
 
 
 def get_row_col(index, translation, im_dim, space, border, columns):
