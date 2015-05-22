@@ -3,13 +3,14 @@ edge_threshold: 10          # Filters on DoG scale space curvature size. Larger 
 peak_threshold: 0.001       # Filters on DoG scale space peak size. Smaller value gives more features.
 
 # Params for principal component analysis.
-descriptor_weight: 0.725    # The weight of the descriptors with respect to the L2 norm of the combined feature vector.
-neutral_factor: 0.8         # The factor of the neutral vector to be subtracted in the neutral vector subtraction PCA.
+descriptor_weight: 0.725    # Weight of the descriptors with respect to the L2 norm of the combined feature vector.
+neutral_factor: 0.8         # Factor of the neutral vector to be subtracted in the neutral vector subtraction PCA.
 feature_mode: ALL           # Features to be used. Possible values: ALL, COLORS, DESCRIPTORS
 
 # Params for feature vector distance measuring.
-pc_projection_count: 30     # The number of principal component projections used.
-closest_group: 0.3          # The proportion of the images to be included in the closest group. In interval [0, 1].
+pc_projection_count: 30     # Number of principal component projections used.
+closest_group: 0.3          # Proportion of the images to be included in the closest group. In interval [0, 1].
+representative: 0.05        # Proportion of the images to be determined as representative. Smaller than closest group.
 
 # General params.
 processes: 6                # Number of parallel processes for downloading and extraction.

@@ -50,7 +50,7 @@ def process_combined_features(descriptors, descriptor_colors, random_colors, des
     return Y
 
 
-def process(data, representative_count=5):
+def process(data):
     """ Processes feature vectors according to feature mode specified in data set. Saves result to file.
 
     :param data: Data set with feature mode.
@@ -73,7 +73,8 @@ def process(data, representative_count=5):
 
     Y_truncated = Y[:, :data.config.pc_projection_count]
     closest_group = kclosest.k_closest(int(data.config.closest_group * images.shape[0]), Y_truncated)
-    representative = closest_group[kclosest.k_closest(representative_count, Y_truncated[closest_group, :])]
+    representative = closest_group[kclosest.k_closest(int(data.config.representative * images.shape[0]),
+                                                      Y_truncated[closest_group, :])]
 
     save_result(data.result_path, images, Y, closest_group, representative)
 

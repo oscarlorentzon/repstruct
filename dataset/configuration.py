@@ -10,7 +10,6 @@ class Configuration:
 
         :param path: Path to config file.
         :param name: Name of the config file.
-        :return:
         """
 
         if path is None:
@@ -41,6 +40,7 @@ class Configuration:
         # Properties for feature vector distance measuring.
         self.__pc_projection_count = self.__config['pc_projection_count']
         self.__closest_group = self.__config['closest_group']
+        self.__representative = self.__config['representative']
 
         # General properties.
         self.__processes = self.__config['processes']
@@ -116,3 +116,12 @@ class Configuration:
     @closest_group.setter
     def closest_group(self, closest_group):
         self.__closest_group = closest_group
+
+    @property
+    def representative(self):
+        """ Proportion of the images to be determined as representative. """
+        return self.__representative
+
+    @representative.setter
+    def representative(self, representative):
+        self.__representative = representative
