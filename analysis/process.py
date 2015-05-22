@@ -53,10 +53,7 @@ def process_combined_features(descriptors, descriptor_colors, random_colors, des
 def process(data):
     """ Processes feature vectors according to feature mode specified in data set. Saves result to file.
 
-    :param data: Data set with feature mode.
-    :param principal_component_count: Number of principal component projections to use in closest group estimation.
-    :param closest_group_count: Number of images to use for closest group calculation.
-    :param representative_count: Number images to use for representative group.
+    :param data: Data set with feature mode, principal component count, closest group and representative.
     """
 
     images = data.images()
