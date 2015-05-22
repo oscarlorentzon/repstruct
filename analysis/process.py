@@ -13,14 +13,15 @@ def process_features(features, neutral_factor):
     :param features: The feature vectors.
     :param neutral_factor: The factor of the neutral vector to subtract.
     :return: Principal component projections of feature vectors.
+    :return: Principal components.
     """
 
     N = extract.create_neutral_vector(np.array([[features.shape[1], 1]]), features.shape[0])
     F = features
 
-    Y, V = pca.neutral_sub_pca_vector(F, neutral_factor*N)
+    pc_projections, pcs = pca.neutral_sub_pca_vector(F, neutral_factor*N)
 
-    return Y, V
+    return pc_projections, pcs
 
 
 def process_combined_features(descriptors, descriptor_colors, random_colors, descriptor_weight, neutral_factor):
@@ -33,6 +34,7 @@ def process_combined_features(descriptors, descriptor_colors, random_colors, des
     :param descriptor_weight: The weight of the descriptors as part of the norm.
     :param neutral_factor: The factor of the neutral vector to subtract.
     :return: Principal component projections of feature vectors.
+    :return: Principal components.
     """
 
     color_weight = (1-descriptor_weight)/2
@@ -45,9 +47,9 @@ def process_combined_features(descriptors, descriptor_colors, random_colors, des
     F = np.hstack((np.sqrt(descriptor_weight)*descriptors,
                    np.hstack((np.sqrt(color_weight)*descriptor_colors, np.sqrt(color_weight)*random_colors))))
 
-    Y, V = pca.neutral_sub_pca_vector(F, neutral_factor*N)
+    pc_projections, pcs = pca.neutral_sub_pca_vector(F, neutral_factor*N)
 
-    return Y, V
+    return pc_projections, pcs
 
 
 def process(data):
@@ -60,14 +62,14 @@ def process(data):
     descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor_path, images)
 
     if data.config.feature_mode == FeatureMode.Colors:
-        Y, V = process_features(random_colors, data.config.neutral_factor)
+        pc_projections, pcs = process_features(random_colors, data.config.neutral_factor)
     elif data.config.feature_mode == FeatureMode.Descriptors:
-        Y, V = process_features(descriptors, data.config.neutral_factor)
+        pc_projections, pcs = process_features(descriptors, data.config.neutral_factor)
     else:
-        Y, V = process_combined_features(descriptors, descriptor_colors, random_colors,
+        pc_projections, pcs = process_combined_features(descriptors, descriptor_colors, random_colors,
                                          data.config.descriptor_weight, data.config.neutral_factor)
 
-    save_principal_components(data.result_path, images, Y, V)
+    save_principal_components(data.result_path, images, pc_projections, pcs)
 
 
 def closest(data):
@@ -77,9 +79,9 @@ def closest(data):
     :param data: Data set.
     """
 
-    images, Y, V = load_principal_components(data.result_path)
+    images, pc_projections, pcs = load_principal_components(data.result_path)
 
-    Y_truncated = Y[:, :data.config.pc_projection_count]
+    Y_truncated = pc_projections[:, :data.config.pc_projection_count]
 
     closest_group_count = int(round(data.config.closest_group * images.shape[0], 0))
     representative_count = int(round(data.config.representative * images.shape[0], 0))

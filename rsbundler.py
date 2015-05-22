@@ -35,21 +35,21 @@ class FlickrRsBundler:
         process.closest(self.__data)
         
     def plot(self):
-        images, Y, V = process.load_principal_components(self.__data.result_path)
+        images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
         closest_group, representative = process.load_closest(self.__data.result_path)
 
-        plothelper.plot_pca_projections(Y, 1, 2)
-        plothelper.plot_pca_projections(Y, 3, 4)
+        plothelper.plot_pca_projections(pc_projections, 1, 2)
+        plothelper.plot_pca_projections(pc_projections, 3, 4)
         plothelper.plot_images(self.__data.image_path, images[closest_group], 3, 10)
         plothelper.plot_images(self.__data.image_path, images[representative], 1, 5)
 
     def plot_result(self):
-        images, Y, V = process.load_principal_components(self.__data.result_path)
+        images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
         closest_group, representative = process.load_closest(self.__data.result_path)
 
         save_path = self.__data.result_path if self.__data.config.save_plot else None
-        plothelper.plot_pca_images(self.__data.image_path, images, Y, 1, 2, save_path=save_path)
-        plothelper.plot_pca_images(self.__data.image_path, images, Y, 3, 4, save_path=save_path)
+        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 1, 2, save_path=save_path)
+        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 3, 4, save_path=save_path)
         plothelper.plot_result(self.__data.image_path, images, closest_group, representative, save_path=save_path)
  
              
