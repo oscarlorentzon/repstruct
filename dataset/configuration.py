@@ -40,6 +40,7 @@ class Configuration:
 
         # Properties for feature vector distance measuring.
         self.__pc_projection_count = self.__config['pc_projection_count']
+        self.__closest_group = self.__config['closest_group']
 
         # General properties.
         self.__processes = self.__config['processes']
@@ -106,3 +107,12 @@ class Configuration:
     @pc_projection_count.setter
     def pc_projection_count(self, pc_projection_count):
         self.__pc_projection_count = pc_projection_count
+
+    @property
+    def closest_group(self):
+        """ Proportion of the images to be included in the closest group. """
+        return self.__closest_group
+
+    @closest_group.setter
+    def closest_group(self, closest_group):
+        self.__closest_group = closest_group
