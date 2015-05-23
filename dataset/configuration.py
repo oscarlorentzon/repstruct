@@ -3,6 +3,7 @@ import os.path as op
 
 from features.featuremode import FeatureMode
 
+
 class Configuration:
 
     def __init__(self, path=None, name='config.yaml'):
@@ -44,7 +45,10 @@ class Configuration:
 
         # General properties.
         self.__processes = self.__config['processes']
+
+        # Plot properties
         self.__save_plot = self.__config['save_plot']
+        self.__ticks = self.__config['ticks']
 
     @property
     def descriptor_weight(self):
@@ -135,3 +139,12 @@ class Configuration:
     @save_plot.setter
     def save_plot(self, save_plot):
         self.__save_plot = save_plot
+
+    @property
+    def ticks(self):
+        """ Boolean specifying if the principal component projection plots should have ticks. """
+        return self.__ticks
+
+    @ticks.setter
+    def ticks(self, ticks):
+        self.__ticks = ticks

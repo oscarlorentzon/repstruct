@@ -20,7 +20,6 @@ class FlickrRsBundler:
         self.download()
         self.extract()
         self.process()
-        self.plot_image_pca()
         self.plot_result()
         
     def download(self):
@@ -48,8 +47,12 @@ class FlickrRsBundler:
         closest_group, representative = process.load_closest(self.__data.result_path)
 
         save_path = self.__data.result_path if self.__data.config.save_plot else None
-        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 1, 2, save_path=save_path)
-        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 3, 4, save_path=save_path)
+
+        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 1, 2,
+                                   save_path=save_path, ticks=self.__data.config.ticks)
+        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 3, 4,
+                                   save_path=save_path, ticks=self.__data.config.ticks)
+
         plothelper.plot_result(self.__data.image_path, images, closest_group, representative, save_path=save_path)
  
              
@@ -77,7 +80,7 @@ def main(argv):
                """
     
     try:
-        opts, args = getopt.getopt(argv,'ha:t:f:r:', ['apikey=', 'tag=', 'featuremode=', 'runmode='])
+        opts, args = getopt.getopt(argv, 'ha:t:f:r:', ['apikey=', 'tag=', 'featuremode=', 'runmode='])
     except getopt.GetoptError:
         print help_text
         sys.exit(2)
