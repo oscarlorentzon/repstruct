@@ -46,7 +46,7 @@ class FlickrRsBundler:
         images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
         closest_group, representative = process.load_closest(self.__data.result_path)
 
-        save_path = self.__data.result_path if self.__data.config.save_plot else None
+        save_path = self.__data.plot_path if self.__data.config.save_plot else None
 
         plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 1, 2,
                                    save_path=save_path, ticks=self.__data.config.ticks)

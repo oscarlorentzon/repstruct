@@ -26,9 +26,10 @@ class DataSet:
         self.__feature_path = self.__data_path + 'features/'
         self.__descriptor_path = self.__data_path + 'descriptors/'
         self.__result_path = self.__data_path + 'results/'
+        self.__plot_path = self.__data_path + 'plots/'
 
         # Create tag directories if not existing..
-        for p in [self.__image_path, self.__feature_path, self.__descriptor_path, self.__result_path]:
+        for p in [self.__image_path, self.__feature_path, self.__descriptor_path, self.__result_path, self.__plot_path]:
             if not op.exists(p):
                 makedirs(p)
 
@@ -75,6 +76,15 @@ class DataSet:
     @result_path.setter
     def result_path(self, result_path):
         self.__result_path = result_path
+
+    @property
+    def plot_path(self):
+        """ The path to the plot directory. """
+        return self.__plot_path
+
+    @plot_path.setter
+    def plot_path(self, plot_path):
+        self.__plot_path = plot_path
 
     @property
     def config(self):
