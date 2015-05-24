@@ -51,7 +51,7 @@ class Configuration:
         # Plot properties
         self.__save_plot = self.__config.get('save_plot', False)
         self.__ticks = self.__config.get('ticks', False)
-        self.__columns = self.__config.get('columns', False)
+        self.__columns = self.__config.get('columns', 10)
         self.__pc_plots = np.array(self.__config.get('pc_plots', [[2, 3], [4, 5]])) - 1
 
     @property
