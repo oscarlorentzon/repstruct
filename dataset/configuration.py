@@ -50,6 +50,7 @@ class Configuration:
         # Plot properties
         self.__save_plot = self.__config.get('save_plot', False)
         self.__ticks = self.__config.get('ticks', False)
+        self.__columns = self.__config.get('columns', False)
 
     @property
     def descriptor_weight(self):
@@ -158,3 +159,12 @@ class Configuration:
     @ticks.setter
     def ticks(self, ticks):
         self.__ticks = ticks
+
+    @property
+    def columns(self):
+        """ Number of columns in result plot. """
+        return self.__columns
+
+    @columns.setter
+    def columns(self, columns):
+        self.__columns = columns

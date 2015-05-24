@@ -19,3 +19,4 @@ collection_count: 100       # Size of collection. Number of images to be downloa
 # Plot params.
 save_plot: false            # Boolean specifying if plots should be saved to file.
 ticks: false                # Boolean specifying if the principal component projection plots should have ticks.
+columns: 10                 # Number of columns in result plot.

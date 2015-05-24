@@ -53,7 +53,8 @@ class RsBundler:
         plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 3, 4,
                                    save_path=save_path, ticks=self.__data.config.ticks)
 
-        plothelper.plot_result(self.__data.image_path, images, closest_group, representative, save_path=save_path)
+        plothelper.plot_result(self.__data.image_path, images, closest_group, representative,
+                               save_path=save_path, cols=self.__data.config.columns)
  
              
 def main(argv):
