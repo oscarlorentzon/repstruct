@@ -1,5 +1,6 @@
 import yaml
 import os.path as op
+import numpy as np
 
 from features.featuremode import FeatureMode
 
@@ -51,6 +52,7 @@ class Configuration:
         self.__save_plot = self.__config.get('save_plot', False)
         self.__ticks = self.__config.get('ticks', False)
         self.__columns = self.__config.get('columns', False)
+        self.__pc_plots = np.array(self.__config.get('pc_plots', [[2, 3], [4, 5]])) - 1
 
     @property
     def descriptor_weight(self):
@@ -168,3 +170,12 @@ class Configuration:
     @columns.setter
     def columns(self, columns):
         self.__columns = columns
+
+    @property
+    def pc_plots(self):
+        """ Principal components for which to plot the projections against. """
+        return self.__pc_plots
+
+    @pc_plots.setter
+    def pc_plots(self, pc_plots):
+        self.__pc_plots = pc_plots

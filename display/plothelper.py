@@ -51,8 +51,8 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=120, dim
     :param image_dir: The image directory.
     :param images: The image names.
     :param pc_projections: The principal component projections in rows.
-    :param pc1: The first principal component to plot against.
-    :param pc2: The second principal component to plot against.
+    :param pc1: The index of the first principal component to plot against.
+    :param pc2: The index of the second principal component to plot against.
     :param im_dim: Dimension of longest side of collection images.
     :param dim: Dimension of projection background.
     :param min_axis: Minimum axis span in interval [0, 1].
@@ -88,12 +88,12 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=120, dim
         pl.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off',
                        labelbottom='off', labelleft='off')
 
-    pl.xlabel('Principal component {0}'.format(pc1), fontsize=12)
-    pl.ylabel('Principal component {0}'.format(pc2), fontsize=12)
+    pl.xlabel('Principal component {0}'.format(pc1 + 1), fontsize=12)
+    pl.ylabel('Principal component {0}'.format(pc2 + 1), fontsize=12)
     pl.imshow(background)
 
     if save_path is not None:
-        fig.savefig(save_path + 'pcs_{0}_{1}.jpg'.format(pc1, pc2), dpi=100)
+        fig.savefig(save_path + 'pcs_{0}_{1}.jpg'.format(pc1 + 1, pc2 + 1), dpi=100)
         pl.close()
     else:
         pl.show()

@@ -37,8 +37,9 @@ class RsBundler:
         images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
         closest_group, representative = process.load_closest(self.__data.result_path)
 
-        plothelper.plot_pca_projections(pc_projections, 1, 2)
-        plothelper.plot_pca_projections(pc_projections, 3, 4)
+        for pc_plot in self.__data.config.pc_plots:
+            plothelper.plot_pca_projections(pc_projections, pc_plot[0], pc_plot[1])
+
         plothelper.plot_images(self.__data.image_path, images[closest_group], 3, 10)
         plothelper.plot_images(self.__data.image_path, images[representative], 1, 5)
 
@@ -48,10 +49,9 @@ class RsBundler:
 
         save_path = self.__data.plot_path if self.__data.config.save_plot else None
 
-        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 1, 2,
-                                   save_path=save_path, ticks=self.__data.config.ticks)
-        plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, 3, 4,
-                                   save_path=save_path, ticks=self.__data.config.ticks)
+        for pc_plot in self.__data.config.pc_plots:
+            plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, pc_plot[0], pc_plot[1],
+                                       save_path=save_path, ticks=self.__data.config.ticks)
 
         plothelper.plot_result(self.__data.image_path, images, closest_group, representative,
                                save_path=save_path, cols=self.__data.config.columns)
