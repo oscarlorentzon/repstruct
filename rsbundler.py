@@ -10,11 +10,11 @@ from runmode import RunMode
 from dataset.dataset import DataSet
 
 
-class FlickrRsBundler:
+class RsBundler:
 
     def __init__(self, api_key, tag):
         self.__data = DataSet(tag, op.dirname(op.abspath(__file__)))
-        self.__flickr_wrapper = FlickrWrapper(api_key)
+        self.__flickr = FlickrWrapper(api_key)
 
     def run(self):
         self.download()
@@ -23,7 +23,7 @@ class FlickrRsBundler:
         self.plot_result()
         
     def download(self):
-        self.__flickr_wrapper.download(self.__data)
+        self.__flickr.download(self.__data)
 
     def extract(self):
         sift.extract(self.__data)
@@ -105,7 +105,7 @@ def main(argv):
         with open('flickr_key.txt', 'r') as f_out:
             api_key = f_out.readline().rstrip()
 
-    bundler = FlickrRsBundler(api_key, tag)
+    bundler = RsBundler(api_key, tag)
     
     if run_mode == RunMode.Download:
         bundler.download()
