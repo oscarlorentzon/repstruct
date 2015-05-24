@@ -44,7 +44,8 @@ class Configuration:
         self.__representative = self.__config.get('representative', 0.05)
 
         # General properties.
-        self.__processes = self.__config.get('processes', 6)
+        self.__processes = self.__config.get('processes', 8)
+        self.__collection_count = self.__config.get('collection_count', 100)
 
         # Plot properties
         self.__save_plot = self.__config.get('save_plot', False)
@@ -76,15 +77,6 @@ class Configuration:
     @feature_mode.setter
     def feature_mode(self, feature_mode):
         self.__feature_mode = feature_mode
-
-    @property
-    def processes(self):
-        """ Number of parallel processes for downloading and extraction. """
-        return self.__processes
-
-    @processes.setter
-    def processes(self, processes):
-        self.__processes = processes
 
     @property
     def edge_threshold(self):
@@ -130,6 +122,24 @@ class Configuration:
     @representative.setter
     def representative(self, representative):
         self.__representative = representative
+
+    @property
+    def processes(self):
+        """ Number of parallel processes for downloading and extraction. """
+        return self.__processes
+
+    @processes.setter
+    def processes(self, processes):
+        self.__processes = processes
+
+    @property
+    def collection_count(self):
+        """ Size of collection. Number of images to be downloaded. """
+        return self.__collection_count
+
+    @collection_count.setter
+    def collection_count(self, collection_count):
+        self.__collection_count = collection_count
 
     @property
     def save_plot(self):

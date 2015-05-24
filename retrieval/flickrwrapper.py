@@ -15,18 +15,19 @@ class FlickrWrapper:
 
         self.__api_key = api_key
 
-    def get_urls(self, tag, sort_mode='relevance'):
+    def get_urls(self, tag, count=100, sort_mode='relevance'):
         """Gets image URLs from Flickr.
 
         :param tag: The tag for the search.
+        :param count: The number of images to download. Maximum is 500.
         :param sort_mode: One of the values in the Flickr sort mode enumeration.
                           E.g. date-posted-desc, interestingness-desc and relevance.
         """
 
         request = 'https://api.flickr.com/services/rest/?method=flickr.photos.search' +\
-                  '&api_key={0}&tags={1}&sort={2}&format=json&nojsoncallback=1'
+                  '&api_key={0}&tags={1}&sort={2}&per_page={3}&format=json&nojsoncallback=1'
 
-        response = urllib.urlopen(request.format(self.__api_key, tag, sort_mode))
+        response = urllib.urlopen(request.format(self.__api_key, tag, sort_mode, count))
         data = json.loads(response.read())
 
         url = 'https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg'
@@ -41,7 +42,7 @@ class FlickrWrapper:
                           E.g. date-posted-desc, interestingness-desc and relevance.
         """
 
-        image_urls = self.get_urls(data.tag, sort_mode)
+        image_urls = self.get_urls(data.tag, data.config.collection_count, sort_mode)
 
         url_paths = []
         for index, image_url in enumerate(image_urls):
