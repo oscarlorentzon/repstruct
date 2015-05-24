@@ -5,7 +5,7 @@ Repstruct is a python library for finding representative structures in large ima
 The results are obtained by an approach using bags of visual words and colors. The implementation extracts SIFT descriptors as well as colors from the images in the collection and creates feature vectors from histograms created by classifying the features against training data. A collection of images (default are 100) are downloaded from Flickr for a specified tag and the results for the most representative images according to the algorithm are presented by plotting the group of closest images and then the most representative.
 
 ## Running
-To be able to download images from flickr.com an API key is required. An API key can be obtained from flickr.com.
+To be able to download images from [Flickr](https://www.flickr.com/) an API key is required. An API key can be requested from [Flickr's App Garden](https://www.flickr.com/services/apps/create/).
 
 The rsbundler file can be run from the command line in the following way:
 
