@@ -32,16 +32,6 @@ class RsBundler:
     def process(self):
         process.process(self.__data)
         process.closest(self.__data)
-        
-    def plot(self):
-        images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
-        closest_group, representative = process.load_closest(self.__data.result_path)
-
-        for pc_plot in self.__data.config.pc_plots:
-            plothelper.plot_pca_projections(pc_projections, pc_plot[0], pc_plot[1])
-
-        plothelper.plot_images(self.__data.image_path, images[closest_group], 3, 10)
-        plothelper.plot_images(self.__data.image_path, images[representative], 1, 5)
 
     def plot_result(self):
         images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
