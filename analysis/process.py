@@ -112,9 +112,9 @@ def load_principal_components(file_path):
 
     :param file_path: The results folder.
 
-    :return  images: The image names.
+    :return images: The image names.
     :return pc_projections: The principal component projection arrays.
-    :param principal_components: The principal components.
+    :return principal_components: The principal components.
     """
 
     p = np.load(os.path.join(file_path, 'principal_components.npz'))

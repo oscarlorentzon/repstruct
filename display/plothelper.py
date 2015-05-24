@@ -26,22 +26,23 @@ def plot_images(image_dir, image_files, rows, columns):
     pl.show()
 
 
-def plot_pca_projections(V, pc1, pc2):
+def plot_pca_projections(pc_projections, pc1, pc2):
     """ Plots the projections for the specified principal components.
 
-    :param V: The principal component projections in rows.
+    :param pc_projections: The principal component projections in rows.
     :param pc1: The first principal component to plot against.
     :param pc2: The second principal component to plot against.
     """
     
     pl.figure()
-    pl.plot(V[:, pc1], V[:, pc2], '*')
+    pl.plot(pc_projections[:, pc1], pc_projections[:, pc2], '*')
     pl.axhline(0)
     pl.axvline(0)
     pl.show()
 
 
-def plot_pca_images(image_dir, images, Y, pc1, pc2, im_dim=100, dim=4000, min_axis=0., ticks=False, save_path=None):
+def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=120, dim=4000, min_axis=0.,
+                    ticks=False, save_path=None):
     """ Plots the images onto the projections for the specified
         principal components. Crops the projection image to the
         outermost images automatically. This can be overridden by
@@ -49,7 +50,7 @@ def plot_pca_images(image_dir, images, Y, pc1, pc2, im_dim=100, dim=4000, min_ax
 
     :param image_dir: The image directory.
     :param images: The image names.
-    :param Y: The principal component projections in rows.
+    :param pc_projections: The principal component projections in rows.
     :param pc1: The first principal component to plot against.
     :param pc2: The second principal component to plot against.
     :param im_dim: Dimension of longest side of collection images.
@@ -61,7 +62,7 @@ def plot_pca_images(image_dir, images, Y, pc1, pc2, im_dim=100, dim=4000, min_ax
 
     unit = dim / 2
 
-    center = int(np.round(unit * np.max([np.max(np.abs(Y[:, [pc1, pc2]])), min_axis]))) + im_dim
+    center = int(np.round(unit * np.max([np.max(np.abs(pc_projections[:, [pc1, pc2]])), min_axis]))) + im_dim
     background_dim = 2 * center
     background = 255 * np.ones((background_dim, background_dim, 3), np.uint8)
     background[center-2:center+3, :, :] = np.zeros((5, background_dim, 3))
@@ -69,12 +70,12 @@ def plot_pca_images(image_dir, images, Y, pc1, pc2, im_dim=100, dim=4000, min_ax
 
     for index, image in enumerate(images):
         im = load_image(image, image_dir, im_dim)
-        row = center - np.round(unit * Y[index, pc1])
-        col = center + np.round(unit * Y[index, pc2])
+        row = center - np.round(unit * pc_projections[index, pc1])
+        col = center + np.round(unit * pc_projections[index, pc2])
         insert_image(background, im, col, row)
 
     fig = pl.figure(figsize=(12, 12))
-    fig.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95, wspace=0, hspace=0)
+    fig.subplots_adjust(left=0.08, bottom=0.05, right=0.92, top=0.95, wspace=0, hspace=0)
 
     if ticks:
         neg_positions = np.arange(im_dim, center, (center - im_dim) / 2)[:2]
@@ -148,7 +149,7 @@ def plot_result(image_dir, images, index_closest_group, index_representative, im
         insert_image(background, im, col, row)
 
     if save_path is not None:
-        cv2.imwrite(save_path + 'result.jpg', background[:, :, ::-1])
+        cv2.imwrite(save_path + 'representative.jpg', background[:, :, ::-1])
     else:
         fig = pl.figure()
         fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
