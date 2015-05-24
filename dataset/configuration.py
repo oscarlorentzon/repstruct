@@ -13,22 +13,22 @@ class Configuration:
         :param name: Name of the config file.
         """
 
-        if path is None:
-            return
-
-        # Load the configuration file and stores values in properties.
-        with open(op.join(path, name)) as fin:
-            self.__config = yaml.load(fin)
+        if path is not None:
+            # Load the configuration file and stores values in properties.
+            with open(op.join(path, name)) as fin:
+                self.__config = yaml.load(fin)
+        else:
+            self.__config = {}
 
         # Properties for SIFT extraction.
-        self.__edge_threshold = self.__config['edge_threshold']
-        self.__peak_threshold = self.__config['peak_threshold']
+        self.__edge_threshold = self.__config.get('edge_threshold', 10)
+        self.__peak_threshold = self.__config.get('peak_threshold', 0.01)
 
         # Properties for principal component analysis.
-        self.__descriptor_weight = self.__config['descriptor_weight']
-        self.__neutral_factor = self.__config['neutral_factor']
+        self.__descriptor_weight = self.__config.get('descriptor_weight', 0.725)
+        self.__neutral_factor = self.__config.get('neutral_factor', 0.8)
 
-        feature_mode = self.__config['feature_mode'].upper()
+        feature_mode = self.__config.get('feature_mode', 'ALL').upper()
         if feature_mode == 'ALL':
             self.__feature_mode = FeatureMode.All
         elif feature_mode == 'DESCRIPTORS':
@@ -39,16 +39,16 @@ class Configuration:
             raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
 
         # Properties for feature vector distance measuring.
-        self.__pc_projection_count = self.__config['pc_projection_count']
-        self.__closest_group = self.__config['closest_group']
-        self.__representative = self.__config['representative']
+        self.__pc_projection_count = self.__config.get('pc_projection_count', 30)
+        self.__closest_group = self.__config.get('closest_group', 0.3)
+        self.__representative = self.__config.get('representative', 0.05)
 
         # General properties.
-        self.__processes = self.__config['processes']
+        self.__processes = self.__config.get('processes', 6)
 
         # Plot properties
-        self.__save_plot = self.__config['save_plot']
-        self.__ticks = self.__config['ticks']
+        self.__save_plot = self.__config.get('save_plot', False)
+        self.__ticks = self.__config.get('ticks', False)
 
     @property
     def descriptor_weight(self):
