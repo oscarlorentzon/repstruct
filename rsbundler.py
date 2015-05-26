@@ -4,6 +4,7 @@ import getopt
 
 from retrieval.flickrwrapper import FlickrWrapper
 from analysis import process
+from analysis import kmeans
 from display import plothelper
 from features import sift, extract
 from runmode import RunMode
@@ -32,10 +33,12 @@ class RsBundler:
     def process(self):
         process.process(self.__data)
         process.closest(self.__data)
+        kmeans.structures(self.__data)
 
     def plot_result(self):
         images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
         closest_group, representative = process.load_closest(self.__data.result_path)
+        centroids, structures = kmeans.load_structures(self.__data.result_path)
 
         save_path = self.__data.plot_path if self.__data.config.save_plot else None
 
@@ -45,6 +48,8 @@ class RsBundler:
 
         plothelper.plot_result(self.__data.image_path, images, closest_group, representative,
                                save_path=save_path, cols=self.__data.config.columns)
+
+        plothelper.plot_structures(self.__data.image_path, images, structures)
  
              
 def main(argv):
