@@ -81,13 +81,13 @@ def closest(data):
 
     images, pc_projections, pcs = load_principal_components(data.result_path)
 
-    Y_truncated = pc_projections[:, :data.config.pc_projection_count]
+    pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
 
     closest_group_count = int(round(data.config.closest_group * images.shape[0], 0))
     representative_count = int(round(data.config.representative * images.shape[0], 0))
 
-    closest_group = kclosest.k_closest(closest_group_count, Y_truncated)
-    representative = closest_group[kclosest.k_closest(representative_count, Y_truncated[closest_group, :])]
+    closest_group = kclosest.k_closest(closest_group_count, pc_projections_truncated)
+    representative = closest_group[kclosest.k_closest(representative_count, pc_projections_truncated[closest_group, :])]
 
     save_closest(data.result_path, closest_group, representative)
 
