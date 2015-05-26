@@ -99,6 +99,43 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=120, dim
         pl.show()
 
 
+def plot_structures(image_dir, images, structures, im_dim=200, cols=10):
+    space = im_dim / 10
+    border = 2 * space
+
+    h_s = 0
+    for structure in structures:
+        r_a = math.ceil(len(structure) / float(cols))
+        h_a = r_a * im_dim + (r_a - 1) * space + 2 * border
+        h_s += h_a
+
+    w = cols * im_dim + (cols - 1) * space + 2 * border
+    h = h_s + (structures.shape[0] - 1) * space
+
+    background = 255 * np.ones((h, w, 3), np.uint8)
+
+    translation = 0
+    for i, structure in enumerate(structures):
+
+        if i > 0:
+            background[translation-space+1:translation+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
+
+        for index, image in enumerate(images[structure]):
+            im = load_image(image, image_dir, im_dim)
+            row, col = get_row_col(index, translation, im_dim, space, border, cols)
+            insert_image(background, im, col, row)
+
+        translation = row + im_dim / 2 + border + space
+
+
+    fig = pl.figure()
+    fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
+    pl.axis('off')
+    pl.imshow(background)
+    pl.show()
+
+
+
 def plot_result(image_dir, images, index_closest_group, index_representative, im_dim=200, cols=10, save_path=None):
     """ Shows the result by plotting all images on top, then the thirty
         closest images and at last the five closest in double size.
