@@ -33,12 +33,13 @@ class RsBundler:
     def process(self):
         process.process(self.__data)
         process.closest(self.__data)
-        kmeans.structures(self.__data)
+        kmeans.all_structures(self.__data)
+        kmeans.score_structures(self.__data)
 
     def plot_result(self):
         images, pc_projections, pcs = process.load_principal_components(self.__data.result_path)
         closest_group, representative = process.load_closest(self.__data.result_path)
-        centroids, structures = kmeans.load_structures(self.__data.result_path)
+        structures = kmeans.load_scored_structures(self.__data.result_path)
 
         save_path = self.__data.plot_path if self.__data.config.save_plot else None
 
