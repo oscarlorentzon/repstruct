@@ -41,7 +41,7 @@ def plot_pca_projections(pc_projections, pc1, pc2):
     pl.show()
 
 
-def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=120, dim=4000, min_axis=0.,
+def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=100, dim=3300, min_axis=0.,
                     ticks=False, save_path=None):
     """ Plots the images onto the projections for the specified
         principal components. Crops the projection image to the

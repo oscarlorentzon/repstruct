@@ -45,13 +45,14 @@ class RsBundler:
 
         for pc_plot in self.__data.config.pc_plots:
             plothelper.plot_pca_images(self.__data.image_path, images, pc_projections, pc_plot[0], pc_plot[1],
-                                       save_path=save_path, ticks=self.__data.config.ticks)
+                                       save_path=save_path, ticks=self.__data.config.ticks,
+                                       im_dim=self.__data.config.image_dimension)
 
-        plothelper.plot_result(self.__data.image_path, images, closest_group, representative,
-                               save_path=save_path, cols=self.__data.config.columns)
+        plothelper.plot_result(self.__data.image_path, images, closest_group, representative, save_path=save_path,
+                               cols=self.__data.config.columns, im_dim=self.__data.config.image_dimension)
 
-        plothelper.plot_structures(self.__data.image_path, images, structures,
-                                   save_path=save_path, cols=self.__data.config.columns)
+        plothelper.plot_structures(self.__data.image_path, images, structures, save_path=save_path,
+                                   cols=self.__data.config.columns, im_dim=self.__data.config.image_dimension)
  
              
 def main(argv):

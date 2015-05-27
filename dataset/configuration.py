@@ -55,8 +55,9 @@ class Configuration:
 
         # Plot properties
         self.__save_plot = self.__config.get('save_plot', False)
-        self.__ticks = self.__config.get('ticks', False)
+        self.__image_dimension = self.__config.get('image_dimension', 100)
         self.__columns = self.__config.get('columns', 10)
+        self.__ticks = self.__config.get('ticks', False)
         self.__pc_plots = np.array(self.__config.get('pc_plots', [[2, 3], [4, 5]])) - 1
 
     @property
@@ -186,13 +187,13 @@ class Configuration:
         self.__save_plot = save_plot
 
     @property
-    def ticks(self):
-        """ Boolean specifying if the principal component projection plots should have ticks. """
-        return self.__ticks
+    def image_dimension(self):
+        """ Dimension of the longest side of images in plots. """
+        return self.__image_dimension
 
-    @ticks.setter
-    def ticks(self, ticks):
-        self.__ticks = ticks
+    @image_dimension.setter
+    def image_dimension(self, image_dimension):
+        self.__image_dimension = image_dimension
 
     @property
     def columns(self):
@@ -202,6 +203,15 @@ class Configuration:
     @columns.setter
     def columns(self, columns):
         self.__columns = columns
+
+    @property
+    def ticks(self):
+        """ Boolean specifying if the principal component projection plots should have ticks. """
+        return self.__ticks
+
+    @ticks.setter
+    def ticks(self, ticks):
+        self.__ticks = ticks
 
     @property
     def pc_plots(self):
