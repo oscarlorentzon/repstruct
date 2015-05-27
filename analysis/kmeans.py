@@ -6,7 +6,7 @@ import warnings
 import process
 
 
-def all_structures(data, clusters=8, iterations=200, runs=200):
+def all_structures(data, clusters=8, iterations=100, runs=200):
 
     images, pc_projections, pcs = process.load_principal_components(data.result_path)
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
@@ -52,6 +52,27 @@ def k_means_distortion(observations, labels, centroids):
     return distortion, non_empty_clusters
 
 
+def score_structures(data):
+    closest_group, representative = process.load_closest(data.result_path)
+    centroids, structures = load_structures(data.result_path)
+
+    scores = []
+    for structure in structures:
+        score = 0
+        for index in structure:
+            if index in representative:
+                score += 3
+            elif index in closest_group:
+                score += 1
+
+        scores.append(score)
+
+    ordered = np.argsort(scores)[::-1]  # Sort and reverse to get descending
+    scored_structures = structures[ordered]
+
+    save_scored_structures(data.result_path, scored_structures)
+
+
 def save_structures(file_path, centroids, structures):
     """ Saves result to .npz.
 
@@ -77,3 +98,26 @@ def load_structures(file_path):
     s = np.load(os.path.join(file_path, 'structures.npz'))
 
     return s['centroids'], s['structures']
+
+
+def save_scored_structures(file_path, scored_structures):
+    """ Saves result to .npz.
+
+    :param file_path: The results folder.
+    :param scored_structures:
+    """
+
+    np.savez(os.path.join(file_path, 'scored_structures.npz'), scored_structures=scored_structures)
+
+
+def load_scored_structures(file_path):
+    """ Loads result from .npz.
+
+    :param file_path: The result folder.
+
+    :return scored_structures:
+    """
+
+    s = np.load(os.path.join(file_path, 'scored_structures.npz'))
+
+    return s['scored_structures']
