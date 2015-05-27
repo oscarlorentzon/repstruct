@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.cluster.vq import kmeans2
 import os.path
+import warnings
 
 import process
 
@@ -13,14 +14,18 @@ def all_structures(data, clusters=8, iterations=200, runs=200):
     centroids = None
     labels = None
     distortion = float('inf')
-    for run in range(0, runs):
-        cs, ls = kmeans2(pc_projections_truncated, k=clusters, iter=iterations, minit='random')
-        d, non_empty_clusters = k_means_distortion(pc_projections_truncated, ls, cs)
 
-        if d < distortion:
-            centroids = cs[non_empty_clusters]
-            labels = ls
-            distortion = d
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")  # Ignore warning from kmeans2 about empty clusters.
+
+        for run in range(0, runs):
+            cs, ls = kmeans2(pc_projections_truncated, k=clusters, iter=iterations, minit='random')
+            d, non_empty_clusters = k_means_distortion(pc_projections_truncated, ls, cs)
+
+            if d < distortion:
+                centroids = cs[non_empty_clusters]
+                labels = ls
+                distortion = d
 
     structure_indices = []
     for label in range(0, clusters):
