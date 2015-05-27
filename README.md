@@ -2,7 +2,7 @@
 
 Repstruct is a python library for finding representative structures in large image collections. It is implemented according to the theory of the Master's thesis [Finding reprensentative structures in large image collections](http://www2.maths.lth.se/vision/education/pages/OscarNils09/) by Oscar Lorentzon and Nils Lundahl.
 
-The results are obtained by an approach using bags of visual words and colors. The implementation extracts SIFT descriptors as well as colors from the images in the collection and creates feature vectors from histograms created by classifying the features against training data. A collection of images (default are 100) are downloaded from Flickr for a specified tag and the results for the most representative images according to the algorithm are presented by plotting the group of closest images and then the most representative.
+The results are obtained by an approach using bags of visual words and colors. The implementation extracts SIFT descriptors as well as colors from the images in the collection and creates feature vectors from histograms created by classifying the features against training data. A collection of images is downloaded from Flickr for a specified tag and the results of the algorithm are presented by plotting the group of closest images and then the most representative.
 
 ## Running
 To be able to download images from [Flickr](https://www.flickr.com/) an API key is required. An API key can be requested from [Flickr's App Garden](https://www.flickr.com/services/apps/create/).
@@ -50,8 +50,11 @@ The images below show the result from a run using the tag **steppyramid.** The f
 
 The second output image shows the result after running the algorithm. On top all collection images are shown, in the middle the thirty closest images are shown and at the bottom the five most representative images are shown.
 
-![Result](example/result.jpg)
+![Result](example/representative.jpg)
 
+The third output image shows the result for finding all structures ordered according to a score based on the representative result.
+
+![Result](example/structures.jpg)
 
 [OpenCV]: http://opencv.org/ (Computer vision and machine learning software library)
 [NumPy]: http://www.numpy.org/ (Scientific computing with Python)
