@@ -6,7 +6,15 @@ import warnings
 import process
 
 
-def all_structures(data, clusters=8, iterations=100, runs=200):
+def all_structures(data, k=8, iterations=100, runs=200):
+    """ Calculates all structures for the principal component projections. Runs k-means a number of times and
+        saves the result with lowest distortion.
+
+    :param data: Data set.
+    :param k: Number of clusters.
+    :param iterations: Number of iterations for each run of k-means.
+    :param runs: Number of times to run k-means.
+    """
 
     images, pc_projections, pcs = process.load_principal_components(data.result_path)
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
@@ -16,10 +24,10 @@ def all_structures(data, clusters=8, iterations=100, runs=200):
     distortion = float('inf')
 
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")  # Ignore warning from kmeans2 about empty clusters.
+        warnings.simplefilter("ignore")  # Ignore warning from k-means about empty clusters.
 
         for run in range(0, runs):
-            cs, ls = kmeans2(pc_projections_truncated, k=clusters, iter=iterations, minit='random')
+            cs, ls = kmeans2(pc_projections_truncated, k=k, iter=iterations, minit='random')
             d, non_empty_clusters = k_means_distortion(pc_projections_truncated, ls, cs)
 
             if d < distortion:
@@ -28,7 +36,7 @@ def all_structures(data, clusters=8, iterations=100, runs=200):
                 distortion = d
 
     structure_indices = []
-    for label in range(0, clusters):
+    for label in range(0, k):
         structure_indices.append(np.where(labels == label)[0])
 
     structure_indices = np.array(structure_indices)
@@ -37,6 +45,17 @@ def all_structures(data, clusters=8, iterations=100, runs=200):
 
 
 def k_means_distortion(observations, labels, centroids):
+    """ Determines the distortion for a k-means run by calculating the total norm of all observations to their cluster
+        centroids.
+
+    :param observations: The observations.
+    :param labels: The cluster label for each observation.
+    :param centroids: The cluster centroids.
+
+    :return distortion: The distortion of the k-means result.
+    :return non_empty_clusters: The indices of the non empty clusters.
+    """
+
     non_empty_clusters = []
     for label in range(0, centroids.shape[0]):
         if np.sum(labels == label) > 0:
@@ -53,6 +72,11 @@ def k_means_distortion(observations, labels, centroids):
 
 
 def score_structures(data):
+    """ Scores structures based on the representative result.
+
+    :param data: Data set.
+    """
+
     closest_group, representative = process.load_closest(data.result_path)
     centroids, structures = load_structures(data.result_path)
 
@@ -86,8 +110,8 @@ def save_structures(file_path, centroids, structures):
     """ Saves result to .npz.
 
     :param file_path: The results folder.
-    :param centroids:
-    :param structures:
+    :param centroids: The cluster centroids.
+    :param structures: Array of structures containing indices for images connected to each cluster centroid.
     """
 
     np.savez(os.path.join(file_path, 'structures.npz'),
@@ -100,8 +124,8 @@ def load_structures(file_path):
 
     :param file_path: The result folder.
 
-    :return centroids:
-    :return structures:
+    :param centroids: The cluster centroids.
+    :param structures: Array of structures containing indices for images connected to each cluster centroid.
     """
 
     s = np.load(os.path.join(file_path, 'structures.npz'))
@@ -113,7 +137,7 @@ def save_scored_structures(file_path, scored_structures):
     """ Saves result to .npz.
 
     :param file_path: The results folder.
-    :param scored_structures:
+    :param scored_structures: Arrays of structures ordered base on score.
     """
 
     np.savez(os.path.join(file_path, 'scored_structures.npz'), scored_structures=scored_structures)
@@ -124,7 +148,7 @@ def load_scored_structures(file_path):
 
     :param file_path: The result folder.
 
-    :return scored_structures:
+    :return scored_structures: Array of structures ordered base on score.
     """
 
     s = np.load(os.path.join(file_path, 'scored_structures.npz'))
