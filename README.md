@@ -50,11 +50,11 @@ The images below show the result from a run using the tag **steppyramid.** The f
 
 The second output image shows the result after running the algorithm. On top all collection images are shown, in the middle the thirty closest images are shown and at the bottom the five most representative images are shown.
 
-![Result](example/representative.jpg)
+![Representative](example/representative.jpg)
 
 The third output image shows the result for finding all structures ordered according to a score based on the representative result.
 
-![Result](example/structures.jpg)
+![Structures](example/structures.jpg)
 
 [OpenCV]: http://opencv.org/ (Computer vision and machine learning software library)
 [NumPy]: http://www.numpy.org/ (Scientific computing with Python)
