@@ -57,7 +57,10 @@ def score_structures(data):
     centroids, structures = load_structures(data.result_path)
 
     scores = []
+    lengths = []
     for structure in structures:
+        lengths.append(len(structure))
+
         score = 0
         for index in structure:
             if index in representative:
@@ -67,7 +70,13 @@ def score_structures(data):
 
         scores.append(score)
 
-    ordered = np.argsort(scores)[::-1]  # Sort and reverse to get descending
+    scores = np.array(scores)
+    lengths = np.array(lengths)
+
+    # When multiple clusters have the same score the one with most images is ranked higher.
+    length_scores = np.max(lengths) * scores + lengths
+
+    ordered = np.argsort(length_scores)[::-1]  # Sort and reverse to get descending
     scored_structures = structures[ordered]
 
     save_scored_structures(data.result_path, scored_structures)
