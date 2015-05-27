@@ -16,15 +16,20 @@ def all_structures(data, clusters=8, iterations=100, runs=200):
     for run in range(0, runs):
         cs, ls = kmeans2(pc_projections_truncated, k=clusters, iter=iterations, minit='random')
 
+        non_empty_clusters = []
+        for i in range(0, clusters):
+            if np.sum(ls == i) > 0:
+                non_empty_clusters.append(i)
+
         d = 0
-        for label in range(0, clusters):
+        for label in non_empty_clusters:
             observations = pc_projections_truncated[np.where(ls == label)[0]]
 
             n = np.linalg.norm(observations - cs[label], axis=1)
             d += np.sum(n)
 
         if d < distortion:
-            centroids = cs
+            centroids = cs[non_empty_clusters]
             labels = ls
             distortion = d
 
