@@ -99,7 +99,7 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=120, dim
         pl.show()
 
 
-def plot_structures(image_dir, images, structures, im_dim=200, cols=10):
+def plot_structures(image_dir, images, structures, im_dim=200, cols=10, save_path=None):
     space = im_dim / 10
     border = 2 * space
 
@@ -116,7 +116,6 @@ def plot_structures(image_dir, images, structures, im_dim=200, cols=10):
 
     translation = 0
     for i, structure in enumerate(structures):
-
         if i > 0:
             background[translation-space+1:translation+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
 
@@ -127,13 +126,14 @@ def plot_structures(image_dir, images, structures, im_dim=200, cols=10):
 
         translation = row + im_dim / 2 + border + space
 
-
-    fig = pl.figure()
-    fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
-    pl.axis('off')
-    pl.imshow(background)
-    pl.show()
-
+    if save_path is not None:
+        cv2.imwrite(save_path + 'all_structures.jpg', background[:, :, ::-1])
+    else:
+        fig = pl.figure()
+        fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
+        pl.axis('off')
+        pl.imshow(background)
+        pl.show()
 
 
 def plot_result(image_dir, images, index_closest_group, index_representative, im_dim=200, cols=10, save_path=None):

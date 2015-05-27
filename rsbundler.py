@@ -50,7 +50,8 @@ class RsBundler:
         plothelper.plot_result(self.__data.image_path, images, closest_group, representative,
                                save_path=save_path, cols=self.__data.config.columns)
 
-        plothelper.plot_structures(self.__data.image_path, images, structures)
+        plothelper.plot_structures(self.__data.image_path, images, structures,
+                                   save_path=save_path, cols=self.__data.config.columns)
  
              
 def main(argv):
