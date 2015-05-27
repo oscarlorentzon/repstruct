@@ -44,6 +44,11 @@ class Configuration:
         self.__closest_group = self.__config.get('closest_group', 0.3)
         self.__representative = self.__config.get('representative', 0.05)
 
+        # Properties for determining all structures using k-means.
+        self.__clusters = self.__config.get('clusters', 8)
+        self.__runs = self.__config.get('runs', 200)
+        self.__iterations = self.__config.get('iterations', 100)
+
         # General properties.
         self.__processes = self.__config.get('processes', 8)
         self.__collection_count = self.__config.get('collection_count', 100)
@@ -125,6 +130,33 @@ class Configuration:
     @representative.setter
     def representative(self, representative):
         self.__representative = representative
+
+    @property
+    def clusters(self):
+        """ Number of cluster centroids. """
+        return self.__clusters
+
+    @clusters.setter
+    def clusters(self, clusters):
+        self.__clusters = clusters
+
+    @property
+    def runs(self):
+        """ Number of times to run the k-means algorithm. The run with lowest distortion is chosen. """
+        return self.__runs
+
+    @runs.setter
+    def runs(self, runs):
+        self.__runs = runs
+
+    @property
+    def iterations(self):
+        """ Number of iterations for each run of k-means. """
+        return self.__iterations
+
+    @iterations.setter
+    def iterations(self, iterations):
+        self.__iterations = iterations
 
     @property
     def processes(self):

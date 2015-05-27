@@ -12,6 +12,11 @@ pc_projection_count: 30     # Number of principal component projections used.
 closest_group: 0.3          # Proportion of the images to be included in the closest group. In interval [0, 1].
 representative: 0.05        # Proportion of the images to be determined as representative. Smaller than closest group.
 
+# Params for determining all structures using k-means.
+clusters: 8                 # Number of cluster centroids.
+runs: 200                   # Number of times to run the k-means algorithm. The run with lowest distortion is chosen.
+iterations: 100             # Number of iterations for each run of k-means.
+
 # General params.
 processes: 8                # Number of parallel processes for downloading and extraction.
 collection_count: 100       # Size of collection. Number of images to be downloaded. Maximum is 500.

@@ -6,14 +6,11 @@ import warnings
 import process
 
 
-def all_structures(data, k=8, iterations=100, runs=200):
+def all_structures(data):
     """ Calculates all structures for the principal component projections. Runs k-means a number of times and
         saves the result with lowest distortion.
 
     :param data: Data set.
-    :param k: Number of clusters.
-    :param iterations: Number of iterations for each run of k-means.
-    :param runs: Number of times to run k-means.
     """
 
     images, pc_projections, pcs = process.load_principal_components(data.result_path)
@@ -26,8 +23,10 @@ def all_structures(data, k=8, iterations=100, runs=200):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")  # Ignore warning from k-means about empty clusters.
 
-        for run in range(0, runs):
-            cs, ls = kmeans2(pc_projections_truncated, k=k, iter=iterations, minit='random')
+        for run in range(0, data.config.runs):
+            cs, ls = kmeans2(pc_projections_truncated,
+                             k=data.config.clusters, iter=data.config.iterations, minit='random')
+
             d, non_empty_clusters = k_means_distortion(pc_projections_truncated, ls, cs)
 
             if d < distortion:
@@ -36,7 +35,7 @@ def all_structures(data, k=8, iterations=100, runs=200):
                 distortion = d
 
     structure_indices = []
-    for label in range(0, k):
+    for label in range(0, centroids.shape[0]):
         structure_indices.append(np.where(labels == label)[0])
 
     structure_indices = np.array(structure_indices)
