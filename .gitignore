@@ -1,8 +1,6 @@
-*.pyc
-
 flickr_key.txt
-deschists_*.txt
-neut_*.txt
 
-*.*~
 tags/*
+
+*.pyc
+*.*~
