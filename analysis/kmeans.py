@@ -5,12 +5,28 @@ import os.path
 import process
 
 
-def structures(data, clusters=8):
+def all_structures(data, clusters=8, iterations=100, runs=200):
 
     images, pc_projections, pcs = process.load_principal_components(data.result_path)
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
 
-    centroids, labels = kmeans2(pc_projections_truncated, k=clusters, iter=1000, minit='random')
+    centroids = None
+    labels = None
+    distortion = float('inf')
+    for run in range(0, runs):
+        cs, ls = kmeans2(pc_projections_truncated, k=clusters, iter=iterations, minit='random')
+
+        d = 0
+        for label in range(0, clusters):
+            observations = pc_projections_truncated[np.where(ls == label)[0]]
+
+            n = np.linalg.norm(observations - cs[label], axis=1)
+            d += np.sum(n)
+
+        if d < distortion:
+            centroids = cs
+            labels = ls
+            distortion = d
 
     structure_indices = []
     for label in range(0, clusters):
