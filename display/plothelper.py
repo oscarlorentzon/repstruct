@@ -99,7 +99,18 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=100, dim
         pl.show()
 
 
-def plot_structures(image_dir, images, structures, im_dim=200, cols=10, save_path=None):
+def plot_structures(image_dir, images, structures, im_dim=100, cols=10, save_path=None):
+    """ Shows all structures by plotting each set of structure images with a line between them.
+
+    :param image_dir: Image directory.
+    :param images: Image names.
+    :param structures: Array of structure indices in rows.
+    :param im_dim: Dimension of the longest side of the image.
+    :param cols: Number of image columns. Must be greater than one. The five
+                 closest images will have half the columns.
+    :param save_path: Path for saving as an image. If none the plot is shown in a figure.
+    """
+
     space = im_dim / 10
     border = 2 * space
 
@@ -127,7 +138,7 @@ def plot_structures(image_dir, images, structures, im_dim=200, cols=10, save_pat
         translation = row + im_dim / 2 + border + space
 
     if save_path is not None:
-        cv2.imwrite(save_path + 'all_structures.jpg', background[:, :, ::-1])
+        cv2.imwrite(save_path + 'structures.jpg', background[:, :, ::-1])
     else:
         fig = pl.figure()
         fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
@@ -136,7 +147,7 @@ def plot_structures(image_dir, images, structures, im_dim=200, cols=10, save_pat
         pl.show()
 
 
-def plot_result(image_dir, images, index_closest_group, index_representative, im_dim=200, cols=10, save_path=None):
+def plot_result(image_dir, images, index_closest_group, index_representative, im_dim=100, cols=10, save_path=None):
     """ Shows the result by plotting all images on top, then the thirty
         closest images and at last the five closest in double size.
 
