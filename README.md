@@ -9,15 +9,15 @@ To be able to download images from [Flickr](https://www.flickr.com/) an API key 
 
 The rsbundler file can be run from the command line in the following way:
 
-	bin/rsbundler.py -t <tag> -a <flickrapikey>
+	bin/rsbundler -t <tag> -a <flickrapikey>
 
 The API key can also be provided by adding a text file called flickr_key.txt with the API key in the root of the project. Then the bundler can be run as follows:
 
-	bin/rsbundler.py -t <tag>
+	bin/rsbundler -t <tag>
 
 To view additional bundler options run the bundler with the -h flag:
 	
-	bin/rsbundler.py -h
+	bin/rsbundler -h
 
 ## Dependencies
 You need to have Python 2.7+ and the following libraries:
