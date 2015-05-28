@@ -8,7 +8,7 @@ packages = ['analysis',
             'retrieval']
 
 package_data = {
-    'data': ['*.mat']
+    'features': ['data/*.mat']
 }
 
 setup(

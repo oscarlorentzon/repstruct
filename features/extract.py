@@ -1,6 +1,7 @@
 import scipy.io
 import numpy as np
 import matplotlib.colors as mc
+import os.path as op
 import cv2
 import os
 from multiprocessing import Pool
@@ -87,9 +88,11 @@ def extract(data):
     :return C_rand : A 2-D array with histograms for colors for Gaussian
                      distributed random points for each image in rows.
     """
-    
-    descriptor_data = scipy.io.loadmat('data/kmeans_descriptor_results.mat')
-    color_data = scipy.io.loadmat('data/kmeans_color_results.mat')
+
+    data_folder = op.abspath(op.join(op.dirname(__file__), 'data'))
+
+    descriptor_data = scipy.io.loadmat(op.join(data_folder, 'kmeans_descriptor_results.mat'))
+    color_data = scipy.io.loadmat(op.join(data_folder, 'kmeans_color_results.mat'))
     
     # Get descriptor training data cluster centers and descriptor training data 
     # cluster center indexes and create histogram.
@@ -100,7 +103,7 @@ def extract(data):
     color_cc_norm = np.histogram(color_data.get('idxcbest'), range(1, color_cc.shape[0] + 2))[0]
     
     # Retrieve Gaussian distributed random points for color retrieval.
-    gaussians = scipy.io.loadmat('data/gaussians.mat').get('rands')
+    gaussians = scipy.io.loadmat(op.join(data_folder, 'gaussians.mat')).get('rands')
     x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
 
