@@ -1,5 +1,8 @@
 flickr_key.txt
 
+build/*
+*.egg-info/*
+
 tags/*
 
 *.pyc
