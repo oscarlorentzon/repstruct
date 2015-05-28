@@ -1,7 +1,8 @@
 from setuptools import setup
 
 
-packages = ['repstruct.analysis',
+packages = ['repstruct',
+            'repstruct.analysis',
             'repstruct.dataset',
             'repstruct.display',
             'repstruct.features',

@@ -2,7 +2,7 @@ import yaml
 import os.path as op
 import numpy as np
 
-from repstruct.features.featuremode import FeatureMode
+from repstruct.featuremode import FeatureMode
 
 
 class Configuration:
