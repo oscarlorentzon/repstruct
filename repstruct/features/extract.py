@@ -6,18 +6,17 @@ import cv2
 import os
 from multiprocessing import Pool
 
-import sift as sift
 import descriptor as desc
 
 
 class DescriptorExtractor:
 
-    def __init__(self, image_path, descriptor_path, feature_path, desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
+    def __init__(self, feature_data, image_path, descriptor_path, desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
         """ Creates a descriptor extractor.
 
+        :param feature_data: Feature data set.
         :param image_path: Path to image files.
         :param descriptor_path: Path to descriptor files.
-        :param feature_path: Path to feature files.
         :param desc_cc: Descriptor cluster centers.
         :param desc_cc_norm: Descriptor cluster center normalization histogram..
         :param color_cc: Color cluster centers.
@@ -26,9 +25,10 @@ class DescriptorExtractor:
         :param y: Gaussian randomly distributed y values.
         """
 
+        self.__feature_data = feature_data
+
         self.__image_path = image_path
         self.__descriptor_path = descriptor_path
-        self.__feature_path = feature_path
 
         self.__desc_cc = desc_cc
         self.__desc_cc_norm = desc_cc_norm
@@ -53,7 +53,7 @@ class DescriptorExtractor:
         im = np.array(image) / 255.0
         shape = im.shape
 
-        locs, descs = sift.load_features(self.__feature_path, image_file)
+        locs, descs = self.__feature_data.load(image_file)
 
         descs = desc.normalize(descs)
         desc_cc = desc.normalize(self.__desc_cc)
@@ -107,7 +107,7 @@ def extract(data):
     x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
 
-    descriptor_extractor = DescriptorExtractor(data.image_path, data.descriptor_path, data.feature_path,
+    descriptor_extractor = DescriptorExtractor(data.feature, data.image_path, data.descriptor_path,
                                                desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y)
 
     if data.config.processes == 1:

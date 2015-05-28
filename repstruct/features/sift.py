@@ -7,19 +7,15 @@ from multiprocessing import Pool
 
 class SiftExtractor:
 
-    def __init__(self, image_path, feature_path, edge_threshold, peak_threshold):
+    def __init__(self, feature_data, image_path):
         """ Creates a SiftExtractor.
 
+        :param feature_data: Feature data set.
         :param image_path: Path to image files.
-        :param feature_path: Path to feature files.
-        :param edge_threshold: SIFT edge threshold.
-        :param peak_threshold: SIFT peak threshold.
         """
 
+        self.__feature_data = feature_data
         self.__image_path = image_path
-        self.__feature_path = feature_path
-        self.__edge_threshold = edge_threshold
-        self.__peak_threshold = peak_threshold
 
     def __call__(self, image):
         """ Extracts SIFT features for an image and saves the descriptors
@@ -29,9 +25,10 @@ class SiftExtractor:
         """
 
         im = cv2.imread(os.path.join(self.__image_path, image), cv2.IMREAD_GRAYSCALE)
-        locations, descriptors = extract_feature_vectors(im, self.__edge_threshold, self.__peak_threshold)
+        locations, descriptors = extract_feature_vectors(im, self.__feature_data.config.edge_threshold,
+                                                         self.__feature_data.config.peak_threshold)
 
-        save_features(self.__feature_path, image, locations, descriptors)
+        self.__feature_data.save(image, locations, descriptors)
 
         print 'Extracted {0} features for {1}'.format(descriptors.shape[0], image)
 
@@ -43,8 +40,7 @@ def extract(data):
     :param data: Data set.
     """
 
-    sift_extractor = SiftExtractor(data.image_path, data.feature_path,
-                                   data.config.edge_threshold, data.config.peak_threshold)
+    sift_extractor = SiftExtractor(data.feature, data.image_path)
     if data.config.processes == 1:
         for image in data.images():
             sift_extractor(image)
@@ -78,29 +74,3 @@ def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.01):
     locs = np.array([(i.pt[0], i.pt[1], i.size, i.angle) for i in locs])
 
     return locs, desc
-
-
-def save_features(file_path, image, locations, descriptors):
-    """ Saves features to .npz.
-
-    :param file_path: The folder.
-    :param image: The image name.
-    :param locations: Descriptor locations.
-    :param descriptors: Descriptor vectors.
-    """
-
-    np.savez(os.path.join(file_path, image + '.sift.npz'), locations=locations, descriptors=descriptors)
-
-
-def load_features(file_path, image):
-    """ Loads features from .npz.
-
-    :param file_path: The folder.
-    :param image: The image name.
-
-    :return Feature locations and feature descriptors.
-    """
-
-    f = np.load(os.path.join(file_path, image + '.sift.npz'))
-
-    return f['locations'], f['descriptors']

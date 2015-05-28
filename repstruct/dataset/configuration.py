@@ -21,10 +21,6 @@ class Configuration:
         else:
             self.__config = {}
 
-        # Properties for SIFT extraction.
-        self.__edge_threshold = self.__config.get('edge_threshold', 10)
-        self.__peak_threshold = self.__config.get('peak_threshold', 0.01)
-
         # Properties for principal component analysis.
         self.__descriptor_weight = self.__config.get('descriptor_weight', 0.725)
         self.__neutral_factor = self.__config.get('neutral_factor', 0.8)
@@ -86,24 +82,6 @@ class Configuration:
     @feature_mode.setter
     def feature_mode(self, feature_mode):
         self.__feature_mode = feature_mode
-
-    @property
-    def edge_threshold(self):
-        """ SIFT edge threshold. """
-        return self.__edge_threshold
-
-    @edge_threshold.setter
-    def edge_threshold(self, edge_threshold):
-        self.__edge_threshold = edge_threshold
-
-    @property
-    def peak_threshold(self):
-        """ SIFT peak threshold. """
-        return self.__peak_threshold
-
-    @peak_threshold.setter
-    def peak_threshold(self, peak_threshold):
-        self.__peak_threshold = peak_threshold
 
     @property
     def pc_projection_count(self):
@@ -221,3 +199,47 @@ class Configuration:
     @pc_plots.setter
     def pc_plots(self, pc_plots):
         self.__pc_plots = pc_plots
+
+
+class ConfigurationBase(object):
+
+    def __init__(self, path, name):
+
+        if path is not None:
+            with open(op.join(path, name)) as fin:
+                self._config = yaml.load(fin)
+        else:
+            self._config = {}
+
+
+class FeatureConfiguration(ConfigurationBase):
+
+    def __init__(self, path=None, name='config.yaml'):
+        """ Creates a feature configuration class by loading a configuration file.
+
+        :param path: Path to config file.
+        :param name: Name of the config file.
+        """
+
+        super(FeatureConfiguration, self).__init__(path, name)
+
+        self.__edge_threshold = self._config.get('edge_threshold', 10)
+        self.__peak_threshold = self._config.get('peak_threshold', 0.01)
+
+    @property
+    def edge_threshold(self):
+        """ SIFT edge threshold. """
+        return self.__edge_threshold
+
+    @edge_threshold.setter
+    def edge_threshold(self, edge_threshold):
+        self.__edge_threshold = edge_threshold
+
+    @property
+    def peak_threshold(self):
+        """ SIFT peak threshold. """
+        return self.__peak_threshold
+
+    @peak_threshold.setter
+    def peak_threshold(self, peak_threshold):
+        self.__peak_threshold = peak_threshold
