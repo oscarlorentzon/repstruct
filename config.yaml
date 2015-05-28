@@ -14,7 +14,7 @@ representative: 0.05        # Proportion of the images to be determined as repre
 
 # Params for determining all structures using k-means.
 clusters: 8                 # Number of cluster centroids.
-runs: 200                   # Number of times to run the k-means algorithm. The run with lowest distortion is chosen.
+runs: 500                   # Number of times to run the k-means algorithm. The run with lowest distortion is chosen.
 iterations: 100             # Number of iterations for each run of k-means.
 
 # General params.

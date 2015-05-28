@@ -1,7 +1,6 @@
 import numpy as np
-from scipy.cluster.vq import kmeans2
 import os.path
-import warnings
+import cv2
 
 import process
 
@@ -16,23 +15,9 @@ def all_structures(data):
     images, pc_projections, pcs = process.load_principal_components(data.result_path)
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
 
-    centroids = None
-    labels = None
-    distortion = float('inf')
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")  # Ignore warning from k-means about empty clusters.
-
-        for run in range(0, data.config.runs):
-            cs, ls = kmeans2(pc_projections_truncated,
-                             k=data.config.clusters, iter=data.config.iterations, minit='random')
-
-            d, non_empty_clusters = k_means_distortion(pc_projections_truncated, ls, cs)
-
-            if d < distortion:
-                centroids = cs[non_empty_clusters]
-                labels = ls
-                distortion = d
+    termination_criteria = (cv2.TERM_CRITERIA_EPS, 100, 0.0001)
+    ret, labels, centroids = cv2.kmeans(pc_projections_truncated.astype(np.float32), data.config.clusters,
+                                        termination_criteria, data.config.runs, cv2.KMEANS_RANDOM_CENTERS)
 
     structure_indices = []
     for label in range(0, centroids.shape[0]):
@@ -41,33 +26,6 @@ def all_structures(data):
     structure_indices = np.array(structure_indices)
 
     save_structures(data.result_path, centroids, structure_indices)
-
-
-def k_means_distortion(observations, labels, centroids):
-    """ Determines the distortion for a k-means run by calculating the total norm of all observations to their cluster
-        centroids.
-
-    :param observations: The observations.
-    :param labels: The cluster label for each observation.
-    :param centroids: The cluster centroids.
-
-    :return distortion: The distortion of the k-means result.
-    :return non_empty_clusters: The indices of the non empty clusters.
-    """
-
-    non_empty_clusters = []
-    for label in range(0, centroids.shape[0]):
-        if np.sum(labels == label) > 0:
-            non_empty_clusters.append(label)
-
-    distortion = 0
-    for label in non_empty_clusters:
-        cluster_observations = observations[np.where(labels == label)[0]]
-
-        n = np.linalg.norm(cluster_observations - centroids[label], axis=1)
-        distortion += np.sum(n)
-
-    return distortion, non_empty_clusters
 
 
 def score_structures(data):
