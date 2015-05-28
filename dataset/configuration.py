@@ -46,7 +46,7 @@ class Configuration:
 
         # Properties for determining all structures using k-means.
         self.__clusters = self.__config.get('clusters', 8)
-        self.__runs = self.__config.get('runs', 200)
+        self.__runs = self.__config.get('runs', 500)
         self.__iterations = self.__config.get('iterations', 100)
 
         # General properties.

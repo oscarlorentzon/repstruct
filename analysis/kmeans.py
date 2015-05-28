@@ -15,7 +15,7 @@ def all_structures(data):
     images, pc_projections, pcs = process.load_principal_components(data.result_path)
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
 
-    termination_criteria = (cv2.TERM_CRITERIA_EPS, 100, 0.0001)
+    termination_criteria = (cv2.TERM_CRITERIA_EPS, data.config.iterations, 0.0001)
     ret, labels, centroids = cv2.kmeans(pc_projections_truncated.astype(np.float32), data.config.clusters,
                                         termination_criteria, data.config.runs, cv2.KMEANS_RANDOM_CENTERS)
 
