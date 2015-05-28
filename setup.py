@@ -1,14 +1,14 @@
 from setuptools import setup
 
 
-packages = ['analysis',
-            'dataset',
-            'display',
-            'features',
-            'retrieval']
+packages = ['repstruct.analysis',
+            'repstruct.dataset',
+            'repstruct.display',
+            'repstruct.features',
+            'repstruct.retrieval']
 
 package_data = {
-    'features': ['data/*.mat']
+    'repstruct.features': ['data/*.mat']
 }
 
 setup(

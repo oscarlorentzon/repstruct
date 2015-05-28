@@ -7,7 +7,7 @@ import os
 from multiprocessing import Pool
 
 import sift as sift
-import features.descriptor as desc
+import descriptor as desc
 
 
 class DescriptorExtractor:
