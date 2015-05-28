@@ -165,30 +165,6 @@ def set_nan_rows_to_mean(X):
     return X
 
 
-def create_neutral_vector(D, rows):
-    """ Creates a 2-D array with neutral vectors according to the
-        size and weights specified in a 2-D array.
-
-    The neutral vector rows is only normalized if the input
-    parameters are weighted correctly.
-
-    :param D: 2-D array with rows specifying the length and weight
-              for each section of the neutral vector.
-    :param rows: An integer specifying the number of rows in the
-                 neutral 2-D array.
-
-    :return A 2-D array with rows with values according to the length
-            and weight requirements in the input.
-    """
-    
-    N = np.array([]).reshape(rows, 0)
-    
-    for d in D:
-        N = np.concatenate((N, d[1]*np.sqrt(1.0/d[0])*np.array([np.ones(d[0]),]*rows)), axis=1)
-    
-    return N
-
-
 def create_NaN_array(cols):
     """ Creates a 2-D array with NaN values.
 
