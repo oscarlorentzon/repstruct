@@ -3,6 +3,9 @@ language: python
 python:
   - "2.7"
 
+before_install:
+  - sudo apt-get update
+
 install:
   - sudo apt-get install python-opencv libopencv-dev gfortran python-matplotlib
   - pip install -r requirements.txt
