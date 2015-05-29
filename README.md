@@ -33,14 +33,11 @@ You need to have Python 2.7+ and the following libraries:
 
 1. [OpenCV][] - Install by following the steps in the Ubuntu OpenCV [installation guide](https://help.ubuntu.com/community/OpenCV).
 
-2. [SciPy][], [NumPy][], [Matplotlib][], [Enum34][] and [PyYAML][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
+2. [Matplotlib][], [SciPy][], [NumPy][], [Enum34][] and [PyYAML][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
 
-        sudo apt-get install gfortran
-        sudo pip install scipy
-        sudo pip install numpy
         sudo apt-get install python-matplotlib
-        sudo apt-get install python-enum34
-        sudo pip install pyyaml
+        sudo apt-get install gfortran
+        sudo pip install -r requirements.txt
 
 ## Example output
 
