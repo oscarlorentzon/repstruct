@@ -26,12 +26,12 @@ class DataSet:
         self.__feature = FeatureDataSet(self.__data_path, root_path)
         self.__descriptor = DescriptorDataSet(self.__data_path)
         self.__pca = PcaDataSet(self.__data_path, root_path)
+        self.__plot = PlotDataSet(self.__data_path, root_path)
 
         self.__result_path = self.__data_path + 'results/'
-        self.__plot_path = self.__data_path + 'plots/'
 
         # Create tag directories if not existing..
-        for p in [self.__result_path, self.__plot_path]:
+        for p in [self.__result_path]:
             if not op.exists(p):
                 makedirs(p)
 
@@ -90,13 +90,13 @@ class DataSet:
         self.__result_path = result_path
 
     @property
-    def plot_path(self):
-        """ The path to the plot directory. """
-        return self.__plot_path
+    def plot(self):
+        """ Plot data set. """
+        return self.__plot
 
-    @plot_path.setter
-    def plot_path(self, plot_path):
-        self.__plot_path = plot_path
+    @plot.setter
+    def plot(self, plot):
+        self.__plot = plot
 
     @property
     def config(self):
@@ -257,3 +257,15 @@ class PcaDataSet(DataSetBase):
         p = np.load(op.join(self._path, 'principal_components.npz'))
 
         return p['images'], p['pc_projections'], p['principal_components']
+
+
+class PlotDataSet(DataSetBase):
+
+    def __init__(self, data_path, config_path):
+        """ Initializes a plot data set.
+
+        :param data_path: Path to data folder.
+        :param config_path: Path to configuration file.
+        """
+
+        super(PlotDataSet, self).__init__(op.join(data_path, 'plots'), PlotConfiguration(config_path))

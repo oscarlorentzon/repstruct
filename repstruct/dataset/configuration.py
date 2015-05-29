@@ -31,13 +31,6 @@ class Configuration:
         self.__runs = self.__config.get('runs', 500)
         self.__iterations = self.__config.get('iterations', 100)
 
-        # Plot properties
-        self.__save_plot = self.__config.get('save_plot', False)
-        self.__image_dimension = self.__config.get('image_dimension', 100)
-        self.__columns = self.__config.get('columns', 10)
-        self.__ticks = self.__config.get('ticks', False)
-        self.__pc_plots = np.array(self.__config.get('pc_plots', [[2, 3], [4, 5]])) - 1
-
     @property
     def pc_projection_count(self):
         """ Number of principal component projections used for distance measuring. """
@@ -91,51 +84,6 @@ class Configuration:
     @iterations.setter
     def iterations(self, iterations):
         self.__iterations = iterations
-
-    @property
-    def save_plot(self):
-        """ Boolean specifying if plots should be saved to file. """
-        return self.__save_plot
-
-    @save_plot.setter
-    def save_plot(self, save_plot):
-        self.__save_plot = save_plot
-
-    @property
-    def image_dimension(self):
-        """ Dimension of the longest side of images in plots. """
-        return self.__image_dimension
-
-    @image_dimension.setter
-    def image_dimension(self, image_dimension):
-        self.__image_dimension = image_dimension
-
-    @property
-    def columns(self):
-        """ Number of columns in result plot. """
-        return self.__columns
-
-    @columns.setter
-    def columns(self, columns):
-        self.__columns = columns
-
-    @property
-    def ticks(self):
-        """ Boolean specifying if the principal component projection plots should have ticks. """
-        return self.__ticks
-
-    @ticks.setter
-    def ticks(self, ticks):
-        self.__ticks = ticks
-
-    @property
-    def pc_plots(self):
-        """ Principal components for which to plot the projections against. """
-        return self.__pc_plots
-
-    @pc_plots.setter
-    def pc_plots(self, pc_plots):
-        self.__pc_plots = pc_plots
 
 
 class ConfigurationBase(object):
@@ -265,3 +213,66 @@ class PcaConfiguration(ConfigurationBase):
     @feature_mode.setter
     def feature_mode(self, feature_mode):
         self.__feature_mode = feature_mode
+
+
+class PlotConfiguration(ConfigurationBase):
+
+    def __init__(self, path=None, name='config.yaml'):
+        """ Creates a plot configuration class by loading a configuration file.
+
+        :param path: Path to config file.
+        :param name: Name of the config file.
+        """
+
+        super(PlotConfiguration, self).__init__(path, name)
+
+        self.__save_plot = self._config.get('save_plot', False)
+        self.__image_dimension = self._config.get('image_dimension', 100)
+        self.__columns = self._config.get('columns', 10)
+        self.__ticks = self._config.get('ticks', False)
+        self.__pc_plots = np.array(self._config.get('pc_plots', [[2, 3], [4, 5]])) - 1
+
+    @property
+    def save_plot(self):
+        """ Boolean specifying if plots should be saved to file. """
+        return self.__save_plot
+
+    @save_plot.setter
+    def save_plot(self, save_plot):
+        self.__save_plot = save_plot
+
+    @property
+    def image_dimension(self):
+        """ Dimension of the longest side of images in plots. """
+        return self.__image_dimension
+
+    @image_dimension.setter
+    def image_dimension(self, image_dimension):
+        self.__image_dimension = image_dimension
+
+    @property
+    def columns(self):
+        """ Number of columns in result plot. """
+        return self.__columns
+
+    @columns.setter
+    def columns(self, columns):
+        self.__columns = columns
+
+    @property
+    def ticks(self):
+        """ Boolean specifying if the principal component projection plots should have ticks. """
+        return self.__ticks
+
+    @ticks.setter
+    def ticks(self, ticks):
+        self.__ticks = ticks
+
+    @property
+    def pc_plots(self):
+        """ Principal components for which to plot the projections against. """
+        return self.__pc_plots
+
+    @pc_plots.setter
+    def pc_plots(self, pc_plots):
+        self.__pc_plots = pc_plots
