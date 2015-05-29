@@ -3,7 +3,6 @@ from setuptools import setup
 
 packages = ['repstruct',
             'repstruct.analysis',
-            'repstruct.dataset',
             'repstruct.display',
             'repstruct.features',
             'repstruct.retrieval']
