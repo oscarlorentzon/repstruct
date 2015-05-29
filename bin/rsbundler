@@ -12,7 +12,7 @@ from repstruct.analysis import kmeans
 from repstruct.display import plothelper
 from repstruct.features import sift, extract
 from repstruct.retrieval.flickrwrapper import FlickrWrapper
-from repstruct.dataset.dataset import DataSet
+from repstruct.dataset import DataSet
 
 
 class RunMode(Enum):
@@ -52,17 +52,20 @@ class RsBundler:
         structures = self.__data.analysis.load_scored_structures()
 
         save_path = self.__data.plot.path if self.__data.plot.config.save_plot else None
+        image_path = self.__data.collection.path
+        columns = self.__data.plot.config.columns
+        im_dim = self.__data.plot.config.image_dimension
+        ticks = self.__data.plot.config.ticks
 
         for pc_plot in self.__data.plot.config.pc_plots:
-            plothelper.plot_pca_images(self.__data.collection.path, images, pc_projections, pc_plot[0], pc_plot[1],
-                                       save_path=save_path, ticks=self.__data.plot.config.ticks,
-                                       im_dim=self.__data.plot.config.image_dimension)
+            plothelper.plot_pca_images(image_path, images, pc_projections, pc_plot[0], pc_plot[1],
+                                       save_path=save_path, ticks=ticks, im_dim=im_dim)
 
-        plothelper.plot_result(self.__data.collection.path, images, closest_group, representative, save_path=save_path,
-                               cols=self.__data.plot.config.columns, im_dim=self.__data.plot.config.image_dimension)
+        plothelper.plot_result(image_path, images, closest_group, representative,
+                               save_path=save_path, cols=columns, im_dim=im_dim)
 
-        plothelper.plot_structures(self.__data.collection.path, images, structures, save_path=save_path,
-                                   cols=self.__data.plot.config.columns, im_dim=self.__data.plot.config.image_dimension)
+        plothelper.plot_structures(image_path, images, structures,
+                                   save_path=save_path, cols=columns, im_dim=im_dim)
  
 
 if __name__ == '__main__':

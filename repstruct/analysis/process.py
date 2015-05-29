@@ -1,6 +1,6 @@
 import numpy as np
 
-from repstruct.featuremode import FeatureMode
+from repstruct.configuration import FeatureMode
 import repstruct.features.extract as extract
 import pca
 import kclosest

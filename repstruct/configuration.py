@@ -1,8 +1,13 @@
 import yaml
 import os.path as op
 import numpy as np
+from enum import Enum
 
-from repstruct.featuremode import FeatureMode
+
+class FeatureMode(Enum):
+    All = 0
+    Descriptors = 1
+    Colors = 2
 
 
 class ConfigurationBase(object):
