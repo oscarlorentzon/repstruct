@@ -2,7 +2,7 @@ import os.path as op
 import numpy as np
 from os import makedirs, listdir
 
-from configuration import Configuration, FeatureConfiguration
+from configuration import *
 
 
 class DataSet:
@@ -24,6 +24,7 @@ class DataSet:
 
         self.__feature = FeatureDataSet(self.__data_path, root_path)
         self.__descriptor = DescriptorDataSet(self.__data_path)
+        self.__pca = PcaDataSet(self.__data_path, root_path)
 
         self.__image_path = self.__data_path + 'images/'
         self.__result_path = self.__data_path + 'results/'
@@ -69,6 +70,15 @@ class DataSet:
     @descriptor.setter
     def descriptor(self, descriptor):
         self.__descriptor = descriptor
+
+    @property
+    def pca(self):
+        """ PCA data set. """
+        return self.__pca
+
+    @pca.setter
+    def pca(self, pca):
+        self.__pca = pca
 
     @property
     def result_path(self):
@@ -198,3 +208,40 @@ class DescriptorDataSet(DataSetBase):
         d = np.load(op.join(self._path, image + '.descriptors.npz'))
 
         return d['descriptors'], d['descriptor_colors'], d['random_colors']
+
+
+class PcaDataSet(DataSetBase):
+
+    def __init__(self, data_path, config_path):
+        """ Initializes a pca data set.
+
+        :param data_path: Path to data folder.
+        :param config_path: Path to configuration file.
+        """
+
+        super(PcaDataSet, self).__init__(op.join(data_path, 'results'), PcaConfiguration(config_path))
+
+    def save(self, images, pc_projections, principal_components):
+        """ Saves result to .npz.
+
+        :param images: Image names.
+        :param pc_projections: The principal component projection arrays.
+        :param principal_components: The principal components.
+        """
+
+        np.savez(op.join(self._path, 'principal_components.npz'),
+                 images=images,
+                 pc_projections=pc_projections,
+                 principal_components=principal_components)
+
+    def load(self):
+        """ Loads principal components from .npz.
+
+        :return images: Image names.
+        :return pc_projections: The principal component projection arrays.
+        :return principal_components: The principal components.
+        """
+
+        p = np.load(op.join(self._path, 'principal_components.npz'))
+
+        return p['images'], p['pc_projections'], p['principal_components']

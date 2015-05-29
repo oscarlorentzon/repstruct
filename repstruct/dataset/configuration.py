@@ -21,20 +21,6 @@ class Configuration:
         else:
             self.__config = {}
 
-        # Properties for principal component analysis.
-        self.__descriptor_weight = self.__config.get('descriptor_weight', 0.725)
-        self.__neutral_factor = self.__config.get('neutral_factor', 0.8)
-
-        feature_mode = self.__config.get('feature_mode', 'ALL').upper()
-        if feature_mode == 'ALL':
-            self.__feature_mode = FeatureMode.All
-        elif feature_mode == 'DESCRIPTORS':
-            self.__feature_mode = FeatureMode.Descriptors
-        elif feature_mode == 'COLORS':
-            self.__feature_mode = FeatureMode.Colors
-        else:
-            raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
-
         # Properties for feature vector distance measuring.
         self.__pc_projection_count = self.__config.get('pc_projection_count', 30)
         self.__closest_group = self.__config.get('closest_group', 0.3)
@@ -55,33 +41,6 @@ class Configuration:
         self.__columns = self.__config.get('columns', 10)
         self.__ticks = self.__config.get('ticks', False)
         self.__pc_plots = np.array(self.__config.get('pc_plots', [[2, 3], [4, 5]])) - 1
-
-    @property
-    def descriptor_weight(self):
-        """ The weight of the descriptors with respect to the L2 norm of the combined feature vector. """
-        return self.__descriptor_weight
-
-    @descriptor_weight.setter
-    def descriptor_weight(self, descriptor_weight):
-        self.__descriptor_weight = descriptor_weight
-
-    @property
-    def neutral_factor(self):
-        """ The factor of the neutral vector to be subtracted in the neutral vector subtraction PCA. """
-        return self.__neutral_factor
-
-    @neutral_factor.setter
-    def neutral_factor(self, neutral_factor):
-        self.__neutral_factor = neutral_factor
-
-    @property
-    def feature_mode(self):
-        """ Feature mode to be used when processing feature vectors. """
-        return self.__feature_mode
-
-    @feature_mode.setter
-    def feature_mode(self, feature_mode):
-        self.__feature_mode = feature_mode
 
     @property
     def pc_projection_count(self):
@@ -243,3 +202,55 @@ class FeatureConfiguration(ConfigurationBase):
     @peak_threshold.setter
     def peak_threshold(self, peak_threshold):
         self.__peak_threshold = peak_threshold
+
+
+class PcaConfiguration(ConfigurationBase):
+
+    def __init__(self, path=None, name='config.yaml'):
+        """ Creates a principal component analysis configuration class by loading a configuration file.
+
+        :param path: Path to config file.
+        :param name: Name of the config file.
+        """
+
+        super(PcaConfiguration, self).__init__(path, name)
+
+        self.__descriptor_weight = self._config.get('descriptor_weight', 0.725)
+        self.__neutral_factor = self._config.get('neutral_factor', 0.8)
+
+        feature_mode = self._config.get('feature_mode', 'ALL').upper()
+        if feature_mode == 'ALL':
+            self.__feature_mode = FeatureMode.All
+        elif feature_mode == 'DESCRIPTORS':
+            self.__feature_mode = FeatureMode.Descriptors
+        elif feature_mode == 'COLORS':
+            self.__feature_mode = FeatureMode.Colors
+        else:
+            raise ValueError('Unknown feature mode (must be ALL, DESCRIPTORS or COLORS)')
+
+    @property
+    def descriptor_weight(self):
+        """ The weight of the descriptors with respect to the L2 norm of the combined feature vector. """
+        return self.__descriptor_weight
+
+    @descriptor_weight.setter
+    def descriptor_weight(self, descriptor_weight):
+        self.__descriptor_weight = descriptor_weight
+
+    @property
+    def neutral_factor(self):
+        """ The factor of the neutral vector to be subtracted in the neutral vector subtraction PCA. """
+        return self.__neutral_factor
+
+    @neutral_factor.setter
+    def neutral_factor(self, neutral_factor):
+        self.__neutral_factor = neutral_factor
+
+    @property
+    def feature_mode(self):
+        """ Feature mode to be used when processing feature vectors. """
+        return self.__feature_mode
+
+    @feature_mode.setter
+    def feature_mode(self, feature_mode):
+        self.__feature_mode = feature_mode

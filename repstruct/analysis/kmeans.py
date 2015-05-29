@@ -12,7 +12,7 @@ def all_structures(data):
     :param data: Data set.
     """
 
-    images, pc_projections, pcs = process.load_principal_components(data.result_path)
+    images, pc_projections, pcs = data.pca.load()
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
 
     termination_criteria = (cv2.TERM_CRITERIA_EPS, data.config.iterations, 0.0001)

@@ -61,15 +61,16 @@ def process(data):
     images = data.images()
     descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor, images)
 
-    if data.config.feature_mode == FeatureMode.Colors:
-        pc_projections, pcs = process_features(random_colors, data.config.neutral_factor)
-    elif data.config.feature_mode == FeatureMode.Descriptors:
-        pc_projections, pcs = process_features(descriptors, data.config.neutral_factor)
+    if data.pca.config.feature_mode == FeatureMode.Colors:
+        pc_projections, pcs = process_features(random_colors, data.pca.config.neutral_factor)
+    elif data.pca.config.feature_mode == FeatureMode.Descriptors:
+        pc_projections, pcs = process_features(descriptors, data.pca.config.neutral_factor)
     else:
         pc_projections, pcs = process_combined_features(descriptors, descriptor_colors, random_colors,
-                                         data.config.descriptor_weight, data.config.neutral_factor)
+                                                        data.pca.config.descriptor_weight,
+                                                        data.pca.config.neutral_factor)
 
-    save_principal_components(data.result_path, images, pc_projections, pcs)
+    data.pca.save(images, pc_projections, pcs)
 
 
 def closest(data):
@@ -79,7 +80,7 @@ def closest(data):
     :param data: Data set.
     """
 
-    images, pc_projections, pcs = load_principal_components(data.result_path)
+    images, pc_projections, pcs = data.pca.load()
 
     pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
 
@@ -114,36 +115,6 @@ def create_neutral_vector(D, rows):
         N = np.concatenate((N, d[1]*np.sqrt(1.0/d[0])*np.array([np.ones(d[0]),]*rows)), axis=1)
 
     return N
-
-
-def save_principal_components(file_path, images, pc_projections, principal_components):
-    """ Saves result to .npz.
-
-    :param file_path: The results folder.
-    :param images: The image names.
-    :param pc_projections: The principal component projection arrays.
-    :param principal_components: The principal components.
-    """
-
-    np.savez(os.path.join(file_path, 'principal_components.npz'),
-             images=images,
-             pc_projections=pc_projections,
-             principal_components=principal_components)
-
-
-def load_principal_components(file_path):
-    """ Loads principal components from .npz.
-
-    :param file_path: The results folder.
-
-    :return images: The image names.
-    :return pc_projections: The principal component projection arrays.
-    :return principal_components: The principal components.
-    """
-
-    p = np.load(os.path.join(file_path, 'principal_components.npz'))
-
-    return p['images'], p['pc_projections'], p['principal_components']
 
 
 def save_closest(file_path, closest_group, representative):
