@@ -1,0 +1,11 @@
+language: python
+
+python:
+  - "2.7"
+
+install:
+  - sudo apt-get install python-opencv libopencv-dev python-matplotlib python-enum34 gfortran
+  - pip install scipy numpy pyyaml
+
+script:
+  - python setup.py test
