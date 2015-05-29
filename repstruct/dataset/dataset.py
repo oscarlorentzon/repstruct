@@ -23,14 +23,14 @@ class DataSet:
         self.__data_path = root_path + '/tags/' + self.__tag + '/'
 
         self.__feature = FeatureDataSet(self.__data_path, root_path)
+        self.__descriptor = DescriptorDataSet(self.__data_path)
 
         self.__image_path = self.__data_path + 'images/'
-        self.__descriptor_path = self.__data_path + 'descriptors/'
         self.__result_path = self.__data_path + 'results/'
         self.__plot_path = self.__data_path + 'plots/'
 
         # Create tag directories if not existing..
-        for p in [self.__image_path, self.__descriptor_path, self.__result_path, self.__plot_path]:
+        for p in [self.__image_path, self.__result_path, self.__plot_path]:
             if not op.exists(p):
                 makedirs(p)
 
@@ -62,13 +62,13 @@ class DataSet:
         self.__feature = feature
 
     @property
-    def descriptor_path(self):
-        """ The path to the descriptor directory. """
-        return self.__descriptor_path
+    def descriptor(self):
+        """ Descriptor data set. """
+        return self.__descriptor
 
-    @descriptor_path.setter
-    def descriptor_path(self, descriptor_path):
-        self.__descriptor_path = descriptor_path
+    @descriptor.setter
+    def descriptor(self, descriptor):
+        self.__descriptor = descriptor
 
     @property
     def result_path(self):
@@ -159,3 +159,42 @@ class FeatureDataSet(DataSetBase):
         f = np.load(op.join(self._path, image + '.sift.npz'))
 
         return f['locations'], f['descriptors']
+
+
+class DescriptorDataSet(DataSetBase):
+
+    def __init__(self, data_path):
+        """ Initializes a descriptor data set.
+
+        :param data_path: Path to data folder.
+        """
+
+        super(DescriptorDataSet, self).__init__(op.join(data_path, 'descriptors'), {})
+
+    def save(self, image, descriptors, descriptor_colors, random_colors):
+        """ Saves bag of visual word descriptors to .npz.
+
+        :param image: Image name.
+        :param descriptors: Descriptor histogram.
+        :param descriptor_colors: Histogram for colors in descriptor locations.
+        :param random_colors: Histogram for colors in random locations.
+        """
+
+        np.savez(op.join(self._path, image + '.descriptors.npz'),
+                 descriptors=descriptors,
+                 descriptor_colors=descriptor_colors,
+                 random_colors=random_colors)
+
+    def load(self, image):
+        """ Loads bag of visual word descriptors from .npz.
+
+        :param image: Image name.
+
+        :return descriptors: Descriptor histogram.
+        :return descriptor_colors: Histogram for colors in descriptor locations.
+        :return random_colors: Histogram for colors in random locations.
+        """
+
+        d = np.load(op.join(self._path, image + '.descriptors.npz'))
+
+        return d['descriptors'], d['descriptor_colors'], d['random_colors']

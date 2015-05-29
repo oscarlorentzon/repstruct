@@ -11,12 +11,12 @@ import descriptor as desc
 
 class DescriptorExtractor:
 
-    def __init__(self, feature_data, image_path, descriptor_path, desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
+    def __init__(self, feature_data, descriptor_data, image_path, desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
         """ Creates a descriptor extractor.
 
         :param feature_data: Feature data set.
+        :param descriptor_data: Descriptor data set.
         :param image_path: Path to image files.
-        :param descriptor_path: Path to descriptor files.
         :param desc_cc: Descriptor cluster centers.
         :param desc_cc_norm: Descriptor cluster center normalization histogram..
         :param color_cc: Color cluster centers.
@@ -26,9 +26,9 @@ class DescriptorExtractor:
         """
 
         self.__feature_data = feature_data
+        self.__descriptor_data = descriptor_data
 
         self.__image_path = image_path
-        self.__descriptor_path = descriptor_path
 
         self.__desc_cc = desc_cc
         self.__desc_cc_norm = desc_cc_norm
@@ -69,7 +69,7 @@ class DescriptorExtractor:
         colors_rand_hist = get_color_hist(im, shape[0]*np.array(self.__y), shape[1]*np.array(self.__x),
                                           self.__color_cc, self.__color_cc_norm)
 
-        save_descriptor(self.__descriptor_path, image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
+        self.__descriptor_data.save(image_file, norm_desc_hist, colors_desc_hist, colors_rand_hist)
 
         print 'Processed {0}'.format(image_file)
 
@@ -91,23 +91,23 @@ def extract(data):
 
     data_folder = op.abspath(op.join(op.dirname(__file__), 'data'))
 
-    descriptor_data = scipy.io.loadmat(op.join(data_folder, 'kmeans_descriptor_results.mat'))
-    color_data = scipy.io.loadmat(op.join(data_folder, 'kmeans_color_results.mat'))
+    descriptor_mat = scipy.io.loadmat(op.join(data_folder, 'kmeans_descriptor_results.mat'))
+    color_mat = scipy.io.loadmat(op.join(data_folder, 'kmeans_color_results.mat'))
     
     # Get descriptor training data cluster centers and descriptor training data 
     # cluster center indexes and create histogram.
-    desc_cc = descriptor_data.get('cbest')
-    desc_cc_norm = np.histogram(descriptor_data.get('idxbest'), range(1, desc_cc.shape[0] + 2))[0]
+    desc_cc = descriptor_mat.get('cbest')
+    desc_cc_norm = np.histogram(descriptor_mat.get('idxbest'), range(1, desc_cc.shape[0] + 2))[0]
 
-    color_cc = color_data.get('ccbest')
-    color_cc_norm = np.histogram(color_data.get('idxcbest'), range(1, color_cc.shape[0] + 2))[0]
+    color_cc = color_mat.get('ccbest')
+    color_cc_norm = np.histogram(color_mat.get('idxcbest'), range(1, color_cc.shape[0] + 2))[0]
     
     # Retrieve Gaussian distributed random points for color retrieval.
     gaussians = scipy.io.loadmat(op.join(data_folder, 'gaussians.mat')).get('rands')
-    x = np.mod((1+gaussians['x'][0,0]/2.3263)/2, 1)[:, 0]
-    y = np.mod((1+gaussians['y'][0,0]/2.3263)/2, 1)[:, 0]
+    x = np.mod((1+gaussians['x'][0, 0]/2.3263)/2, 1)[:, 0]
+    y = np.mod((1+gaussians['y'][0, 0]/2.3263)/2, 1)[:, 0]
 
-    descriptor_extractor = DescriptorExtractor(data.feature, data.image_path, data.descriptor_path,
+    descriptor_extractor = DescriptorExtractor(data.feature, data.descriptor, data.image_path,
                                                desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y)
 
     if data.config.processes == 1:
@@ -217,23 +217,7 @@ def get_rgb_from_locs(locs_r, locs_c, im):
     return np.resize(rgb, (rgb.shape[0], 1, rgb.shape[1]))
 
 
-def save_descriptor(file_path, image, descriptors, descriptor_colors, random_colors):
-    """ Saves descriptors to .npz.
-
-    :param file_path: The folder.
-    :param image: The image name.
-    :param descriptors: Descriptor histogram.
-    :param descriptor_colors: Histogram for colors in descriptor locations.
-    :param random_colors: Histogram for colors in random locations.
-    """
-
-    np.savez(os.path.join(file_path, image + '.descriptors.npz'),
-             descriptors=descriptors,
-             descriptor_colors=descriptor_colors,
-             random_colors=random_colors)
-
-
-def load_descriptors(file_path, images):
+def load_descriptors(descriptor_data, images):
     """ Loads descriptors from .npz. Descriptor color values for grayscale images are set to
         mean of values for RGB images.
 
@@ -250,7 +234,7 @@ def load_descriptors(file_path, images):
     random_colors = []
 
     for image in images:
-        d, dc, rc = load_descriptor(file_path, image)
+        d, dc, rc = descriptor_data.load(image)
 
         descriptors.append(d)
         descriptor_colors.append(dc)
@@ -265,19 +249,3 @@ def load_descriptors(file_path, images):
     random_colors = set_nan_rows_to_mean(random_colors)
 
     return descriptors, descriptor_colors, random_colors
-
-
-def load_descriptor(file_path, image):
-    """ Loads descriptors from .npz.
-
-    :param file_path: The folder.
-    :param image: The image name.
-
-    :return descriptors: Descriptor histogram.
-    :return descriptor_colors: Histogram for colors in descriptor locations.
-    :return random_colors: Histogram for colors in random locations.
-    """
-
-    d = np.load(os.path.join(file_path, image + '.descriptors.npz'))
-
-    return d['descriptors'], d['descriptor_colors'], d['random_colors']

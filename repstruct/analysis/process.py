@@ -59,7 +59,7 @@ def process(data):
     """
 
     images = data.images()
-    descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor_path, images)
+    descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor, images)
 
     if data.config.feature_mode == FeatureMode.Colors:
         pc_projections, pcs = process_features(random_colors, data.config.neutral_factor)
