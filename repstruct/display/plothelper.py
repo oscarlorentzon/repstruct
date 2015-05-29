@@ -93,7 +93,7 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=100, dim
     pl.imshow(background)
 
     if save_path is not None:
-        fig.savefig(save_path + 'pcs_{0}_{1}.jpg'.format(pc1 + 1, pc2 + 1), dpi=100)
+        fig.savefig(os.path.join(save_path, 'pcs_{0}_{1}.jpg'.format(pc1 + 1, pc2 + 1)), dpi=100)
         pl.close()
     else:
         pl.show()
@@ -138,7 +138,7 @@ def plot_structures(image_dir, images, structures, im_dim=100, cols=10, save_pat
         translation = row + im_dim / 2 + border + space
 
     if save_path is not None:
-        cv2.imwrite(save_path + 'structures.jpg', background[:, :, ::-1])
+        cv2.imwrite(os.path.join(save_path, 'structures.jpg'), background[:, :, ::-1])
     else:
         fig = pl.figure()
         fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)
@@ -197,7 +197,7 @@ def plot_result(image_dir, images, index_closest_group, index_representative, im
         insert_image(background, im, col, row)
 
     if save_path is not None:
-        cv2.imwrite(save_path + 'representative.jpg', background[:, :, ::-1])
+        cv2.imwrite(os.path.join(save_path, 'representative.jpg'), background[:, :, ::-1])
     else:
         fig = pl.figure()
         fig.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.99, wspace=0, hspace=0)

@@ -1,5 +1,3 @@
-import os.path as op
-import numpy as np
 from os import makedirs, listdir
 
 from configuration import *
@@ -15,7 +13,6 @@ class DataSet:
         """
 
         self.__tag = tag
-        self.__config = Configuration(root_path)
 
         if root_path is None:
             return
@@ -26,14 +23,8 @@ class DataSet:
         self.__feature = FeatureDataSet(self.__data_path, root_path)
         self.__descriptor = DescriptorDataSet(self.__data_path)
         self.__pca = PcaDataSet(self.__data_path, root_path)
+        self.__analysis = AnalysisDataSet(self.__data_path, root_path)
         self.__plot = PlotDataSet(self.__data_path, root_path)
-
-        self.__result_path = self.__data_path + 'results/'
-
-        # Create tag directories if not existing..
-        for p in [self.__result_path]:
-            if not op.exists(p):
-                makedirs(p)
 
     @property
     def tag(self):
@@ -81,13 +72,13 @@ class DataSet:
         self.__pca = pca
 
     @property
-    def result_path(self):
-        """ The path to the result directory. """
-        return self.__result_path
+    def analysis(self):
+        """ Analysis data set. """
+        return self.__analysis
 
-    @result_path.setter
-    def result_path(self, result_path):
-        self.__result_path = result_path
+    @analysis.setter
+    def analysis(self, analysis):
+        self.__analysis = analysis
 
     @property
     def plot(self):
@@ -97,11 +88,6 @@ class DataSet:
     @plot.setter
     def plot(self, plot):
         self.__plot = plot
-
-    @property
-    def config(self):
-        """ Configuration. """
-        return self.__config
 
 
 class DataSetBase(object):
@@ -257,6 +243,18 @@ class PcaDataSet(DataSetBase):
         p = np.load(op.join(self._path, 'principal_components.npz'))
 
         return p['images'], p['pc_projections'], p['principal_components']
+
+
+class AnalysisDataSet(DataSetBase):
+
+    def __init__(self, data_path, config_path):
+        """ Initializes an analysis data set.
+
+        :param data_path: Path to data folder.
+        :param config_path: Path to configuration file.
+        """
+
+        super(AnalysisDataSet, self).__init__(op.join(data_path, 'results'), AnalysisConfiguration(config_path))
 
 
 class PlotDataSet(DataSetBase):

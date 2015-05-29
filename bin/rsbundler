@@ -48,8 +48,8 @@ class RsBundler:
 
     def plot_result(self):
         images, pc_projections, pcs = self.__data.pca.load()
-        closest_group, representative = process.load_closest(self.__data.result_path)
-        structures = kmeans.load_scored_structures(self.__data.result_path)
+        closest_group, representative = process.load_closest(self.__data.analysis.path)
+        structures = kmeans.load_scored_structures(self.__data.analysis.path)
 
         save_path = self.__data.plot.path if self.__data.plot.config.save_plot else None
 

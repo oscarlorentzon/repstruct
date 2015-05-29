@@ -5,87 +5,6 @@ import numpy as np
 from repstruct.featuremode import FeatureMode
 
 
-class Configuration:
-
-    def __init__(self, path=None, name='config.yaml'):
-        """ Creates a configuration class by loading a configuration file.
-
-        :param path: Path to config file.
-        :param name: Name of the config file.
-        """
-
-        if path is not None:
-            # Load the configuration file and stores values in properties.
-            with open(op.join(path, name)) as fin:
-                self.__config = yaml.load(fin)
-        else:
-            self.__config = {}
-
-        # Properties for feature vector distance measuring.
-        self.__pc_projection_count = self.__config.get('pc_projection_count', 30)
-        self.__closest_group = self.__config.get('closest_group', 0.3)
-        self.__representative = self.__config.get('representative', 0.05)
-
-        # Properties for determining all structures using k-means.
-        self.__clusters = self.__config.get('clusters', 8)
-        self.__runs = self.__config.get('runs', 500)
-        self.__iterations = self.__config.get('iterations', 100)
-
-    @property
-    def pc_projection_count(self):
-        """ Number of principal component projections used for distance measuring. """
-        return self.__pc_projection_count
-
-    @pc_projection_count.setter
-    def pc_projection_count(self, pc_projection_count):
-        self.__pc_projection_count = pc_projection_count
-
-    @property
-    def closest_group(self):
-        """ Proportion of the images to be included in the closest group. """
-        return self.__closest_group
-
-    @closest_group.setter
-    def closest_group(self, closest_group):
-        self.__closest_group = closest_group
-
-    @property
-    def representative(self):
-        """ Proportion of the images to be determined as representative. """
-        return self.__representative
-
-    @representative.setter
-    def representative(self, representative):
-        self.__representative = representative
-
-    @property
-    def clusters(self):
-        """ Number of cluster centroids. """
-        return self.__clusters
-
-    @clusters.setter
-    def clusters(self, clusters):
-        self.__clusters = clusters
-
-    @property
-    def runs(self):
-        """ Number of times to run the k-means algorithm. The run with lowest distortion is chosen. """
-        return self.__runs
-
-    @runs.setter
-    def runs(self, runs):
-        self.__runs = runs
-
-    @property
-    def iterations(self):
-        """ Number of iterations for each run of k-means. """
-        return self.__iterations
-
-    @iterations.setter
-    def iterations(self, iterations):
-        self.__iterations = iterations
-
-
 class ConfigurationBase(object):
 
     def __init__(self, path, name):
@@ -213,6 +132,83 @@ class PcaConfiguration(ConfigurationBase):
     @feature_mode.setter
     def feature_mode(self, feature_mode):
         self.__feature_mode = feature_mode
+
+
+class AnalysisConfiguration(ConfigurationBase):
+
+    def __init__(self, path=None, name='config.yaml'):
+        """ Creates a plot configuration class by loading a configuration file.
+
+        :param path: Path to config file.
+        :param name: Name of the config file.
+        """
+
+        super(AnalysisConfiguration, self).__init__(path, name)
+
+        # Properties for feature vector distance measuring.
+        self.__pc_projection_count = self._config.get('pc_projection_count', 30)
+        self.__closest_group = self._config.get('closest_group', 0.3)
+        self.__representative = self._config.get('representative', 0.05)
+
+        # Properties for determining all structures using k-means.
+        self.__clusters = self._config.get('clusters', 8)
+        self.__runs = self._config.get('runs', 500)
+        self.__iterations = self._config.get('iterations', 100)
+
+    @property
+    def pc_projection_count(self):
+        """ Number of principal component projections used for distance measuring. """
+        return self.__pc_projection_count
+
+    @pc_projection_count.setter
+    def pc_projection_count(self, pc_projection_count):
+        self.__pc_projection_count = pc_projection_count
+
+    @property
+    def closest_group(self):
+        """ Proportion of the images to be included in the closest group. """
+        return self.__closest_group
+
+    @closest_group.setter
+    def closest_group(self, closest_group):
+        self.__closest_group = closest_group
+
+    @property
+    def representative(self):
+        """ Proportion of the images to be determined as representative. """
+        return self.__representative
+
+    @representative.setter
+    def representative(self, representative):
+        self.__representative = representative
+
+    @property
+    def clusters(self):
+        """ Number of cluster centroids. """
+        return self.__clusters
+
+    @clusters.setter
+    def clusters(self, clusters):
+        self.__clusters = clusters
+
+    @property
+    def runs(self):
+        """ Number of times to run the k-means algorithm. The run with lowest distortion is chosen. """
+        return self.__runs
+
+    @runs.setter
+    def runs(self, runs):
+        self.__runs = runs
+
+    @property
+    def iterations(self):
+        """ Number of iterations for each run of k-means. """
+        return self.__iterations
+
+    @iterations.setter
+    def iterations(self, iterations):
+        self.__iterations = iterations
+
 
 
 class PlotConfiguration(ConfigurationBase):

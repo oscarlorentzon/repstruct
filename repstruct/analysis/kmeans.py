@@ -13,11 +13,11 @@ def all_structures(data):
     """
 
     images, pc_projections, pcs = data.pca.load()
-    pc_projections_truncated = pc_projections[:, :data.config.pc_projection_count]
+    pc_projections_truncated = pc_projections[:, :data.analysis.config.pc_projection_count]
 
-    termination_criteria = (cv2.TERM_CRITERIA_EPS, data.config.iterations, 0.0001)
-    ret, labels, centroids = cv2.kmeans(pc_projections_truncated.astype(np.float32), data.config.clusters,
-                                        termination_criteria, data.config.runs, cv2.KMEANS_RANDOM_CENTERS)
+    termination_criteria = (cv2.TERM_CRITERIA_EPS, data.analysis.config.iterations, 0.0001)
+    ret, labels, centroids = cv2.kmeans(pc_projections_truncated.astype(np.float32), data.analysis.config.clusters,
+                                        termination_criteria, data.analysis.config.runs, cv2.KMEANS_RANDOM_CENTERS)
 
     structure_indices = []
     for label in range(0, centroids.shape[0]):
@@ -25,7 +25,7 @@ def all_structures(data):
 
     structure_indices = np.array(structure_indices)
 
-    save_structures(data.result_path, centroids, structure_indices)
+    save_structures(data.analysis.path, centroids, structure_indices)
 
 
 def score_structures(data):
@@ -34,8 +34,8 @@ def score_structures(data):
     :param data: Data set.
     """
 
-    closest_group, representative = process.load_closest(data.result_path)
-    centroids, structures = load_structures(data.result_path)
+    closest_group, representative = process.load_closest(data.analysis.path)
+    centroids, structures = load_structures(data.analysis.path)
 
     scores = []
     lengths = []
@@ -60,7 +60,7 @@ def score_structures(data):
     ordered = np.argsort(length_scores)[::-1]  # Sort and reverse to get descending
     scored_structures = structures[ordered]
 
-    save_scored_structures(data.result_path, scored_structures)
+    save_scored_structures(data.analysis.path, scored_structures)
 
 
 def save_structures(file_path, centroids, structures):
