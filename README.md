@@ -18,7 +18,7 @@ The API key can also be provided by adding a text file called flickr_key.txt wit
 To view additional bundler options run the bundler with the -h flag:
 	
 	bin/rsbundler -h
-
+	
 ## Dependencies
 You need to have Python 2.7+ and the following libraries:
 
@@ -36,7 +36,9 @@ You need to have Python 2.7+ and the following libraries:
 2. [SciPy][], [NumPy][], [Enum34][], [PyYAML][] and [Matplotlib][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
 
         sudo apt-get install gfortran
-        sudo pip install -r requirements.txt
+        sudo pip install scipy
+        sudo pip install numpy
+        sudo pip install pyyaml enum34
         sudo apt-get install python-matplotlib
 
 ## Example output
