@@ -150,8 +150,8 @@ class FeatureDataSet(DataSetBase):
         """ Saves features for an image to .npz.
 
         :param image: Image name.
-        :param locations: Descriptor locations.
-        :param descriptors: Descriptor vectors.
+        :param locations: Feature locations.
+        :param descriptors: Feature descriptor vectors.
         """
 
         np.savez(op.join(self._path, image + '.sift.npz'), locations=locations, descriptors=descriptors)

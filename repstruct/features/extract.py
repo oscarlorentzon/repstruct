@@ -141,31 +141,10 @@ def get_color_hist(image, rows, columns, cluster_centers, cluster_center_norm):
         hist = desc.classify_euclidean(hs_coords, cluster_centers)
         return desc.normalize_by_division(hist, cluster_center_norm)
     else:
-        return create_NaN_array(cluster_centers.shape[0])
+        return create_nan_array(cluster_centers.shape[0])
 
 
-def set_nan_rows_to_mean(X):
-    """ Sets rows of a 2-D array with NaN values to 
-        the mean of the non NaN values for each column.
-
-    :param X: A 2-D array of row vectors.
-
-    :return A 2-D array where the row vectors with NaN values have been
-            changed to the mean of the rest of the row vectors for each column.
-    """
-    
-    C_norm = np.linalg.norm(X, axis=1)
-        
-    C_real = np.mean(X[~np.isnan(C_norm), :], axis=0)
-    C_real = C_real / np.linalg.norm(C_real)
-    
-    # Set the NaN rows to the mean.    
-    X[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
-    
-    return X
-
-
-def create_NaN_array(cols):
+def create_nan_array(cols):
     """ Creates a 2-D array with NaN values.
 
      :param rows: The number of rows.
@@ -215,37 +194,3 @@ def get_rgb_from_locs(locs_r, locs_c, im):
     rgb = im[locs_row, locs_col]
 
     return np.resize(rgb, (rgb.shape[0], 1, rgb.shape[1]))
-
-
-def load_descriptors(descriptor_data, images):
-    """ Loads descriptors from .npz. Descriptor color values for grayscale images are set to
-        mean of values for RGB images.
-
-    :param file_path: The folder.
-    :param images: The image names.
-
-    :return descriptors: Descriptor histograms for all images in rows.
-    :return descriptor_colors: Histogram for colors in descriptor locations for all images in rows.
-    :return random_colors: Histogram for colors in random locations for all images in rows.
-    """
-
-    descriptors = []
-    descriptor_colors = []
-    random_colors = []
-
-    for image in images:
-        d, dc, rc = descriptor_data.load(image)
-
-        descriptors.append(d)
-        descriptor_colors.append(dc)
-        random_colors.append(rc)
-
-    descriptors = np.array(descriptors)
-    descriptor_colors = np.array(descriptor_colors)
-    random_colors = np.array(random_colors)
-
-    # Set colors for grayscale images to mean of other feature vectors.
-    descriptor_colors = set_nan_rows_to_mean(descriptor_colors)
-    random_colors = set_nan_rows_to_mean(random_colors)
-
-    return descriptors, descriptor_colors, random_colors

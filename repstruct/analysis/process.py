@@ -1,7 +1,6 @@
 import numpy as np
 
 from repstruct.configuration import FeatureMode
-import repstruct.features.extract as extract
 import pca
 import kclosest
 
@@ -58,7 +57,7 @@ def process(data):
     """
 
     images = data.collection.images()
-    descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor, images)
+    descriptors, descriptor_colors, random_colors = load_descriptors(data.descriptor, images)
 
     if data.pca.config.feature_mode == FeatureMode.Colors:
         pc_projections, pcs = process_features(random_colors, data.pca.config.neutral_factor)
@@ -116,3 +115,56 @@ def create_neutral_vector(D, rows):
     return N
 
 
+def load_descriptors(descriptor_data, images):
+    """ Loads descriptors from .npz. Descriptor color values for grayscale images are set to
+        mean of values for RGB images.
+
+    :param descriptor_data: Descriptor data set.
+    :param images: The image names.
+
+    :return descriptors: Descriptor histograms for all images in rows.
+    :return descriptor_colors: Histogram for colors in descriptor locations for all images in rows.
+    :return random_colors: Histogram for colors in random locations for all images in rows.
+    """
+
+    descriptors = []
+    descriptor_colors = []
+    random_colors = []
+
+    for image in images:
+        d, dc, rc = descriptor_data.load(image)
+
+        descriptors.append(d)
+        descriptor_colors.append(dc)
+        random_colors.append(rc)
+
+    descriptors = np.array(descriptors)
+    descriptor_colors = np.array(descriptor_colors)
+    random_colors = np.array(random_colors)
+
+    # Set colors for grayscale images to mean of other feature vectors.
+    descriptor_colors = set_nan_rows_to_mean(descriptor_colors)
+    random_colors = set_nan_rows_to_mean(random_colors)
+
+    return descriptors, descriptor_colors, random_colors
+
+
+def set_nan_rows_to_mean(X):
+    """ Sets rows of a 2-D array with NaN values to
+        the mean of the non NaN values for each column.
+
+    :param X: A 2-D array of row vectors.
+
+    :return A 2-D array where the row vectors with NaN values have been
+            changed to the mean of the rest of the row vectors for each column.
+    """
+
+    C_norm = np.linalg.norm(X, axis=1)
+
+    C_real = np.mean(X[~np.isnan(C_norm), :], axis=0)
+    C_real = C_real / np.linalg.norm(C_real)
+
+    # Set the NaN rows to the mean.
+    X[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
+
+    return X

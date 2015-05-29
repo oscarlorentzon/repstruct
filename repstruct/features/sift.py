@@ -25,8 +25,8 @@ class SiftExtractor:
         """
 
         im = cv2.imread(os.path.join(self.__collection_data.path, image), cv2.IMREAD_GRAYSCALE)
-        locations, descriptors = extract_feature_vectors(im, self.__feature_data.config.edge_threshold,
-                                                         self.__feature_data.config.peak_threshold)
+        locations, descriptors = extract_sift_features(im, self.__feature_data.config.edge_threshold,
+                                                       self.__feature_data.config.peak_threshold)
 
         self.__feature_data.save(image, locations, descriptors)
 
@@ -51,7 +51,7 @@ def extract(data):
     print 'Features extracted'
 
 
-def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.01):
+def extract_sift_features(image, edge_threshold=10, peak_threshold=0.01):
     """ Process a grayscale image and return the found SIFT feature points
         and descriptors.
 
@@ -59,8 +59,8 @@ def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.01):
     :param edge_threshold: The edge threshold.
     :param peak_threshold: The peak threshold.
 
-    :return locs : An array with the row, column, scale and orientation of each feature.
-    :return descs : The descriptors.
+    :return locations : An array with the row, column, scale and orientation of each feature.
+    :return descriptors : The descriptors.
     """
 
     detector = cv2.FeatureDetector_create('SIFT')
@@ -68,9 +68,9 @@ def extract_feature_vectors(image, edge_threshold=10, peak_threshold=0.01):
     detector.setDouble('edgeThreshold', edge_threshold)
     detector.setDouble("contrastThreshold", peak_threshold)
 
-    locs = detector.detect(image)
-    locs, desc = descriptor.compute(image, locs)
+    locations = detector.detect(image)
+    locations, descriptors = descriptor.compute(image, locations)
 
-    locs = np.array([(i.pt[0], i.pt[1], i.size, i.angle) for i in locs])
+    locations = np.array([(loc.pt[0], loc.pt[1], loc.size, loc.angle) for loc in locations])
 
-    return locs, desc
+    return locations, descriptors

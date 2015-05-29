@@ -147,7 +147,7 @@ def plot_structures(image_dir, images, structures, im_dim=100, cols=10, save_pat
         pl.show()
 
 
-def plot_result(image_dir, images, index_closest_group, index_representative, im_dim=100, cols=10, save_path=None):
+def plot_representative(image_dir, images, index_closest_group, index_representative, im_dim=100, cols=10, save_path=None):
     """ Shows the result by plotting all images on top, then the thirty
         closest images and at last the five closest in double size.
 

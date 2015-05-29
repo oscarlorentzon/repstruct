@@ -1,8 +1,5 @@
 import numpy as np
-import os.path
 import cv2
-
-import process
 
 
 def all_structures(data):

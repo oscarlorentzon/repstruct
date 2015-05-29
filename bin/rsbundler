@@ -9,7 +9,7 @@ from enum import Enum
 
 from repstruct.analysis import process
 from repstruct.analysis import kmeans
-from repstruct.display import plothelper
+from repstruct.display import plot
 from repstruct.features import sift, extract
 from repstruct.retrieval.flickrwrapper import FlickrWrapper
 from repstruct.dataset import DataSet
@@ -58,14 +58,14 @@ class RsBundler:
         ticks = self.__data.plot.config.ticks
 
         for pc_plot in self.__data.plot.config.pc_plots:
-            plothelper.plot_pca_images(image_path, images, pc_projections, pc_plot[0], pc_plot[1],
-                                       save_path=save_path, ticks=ticks, im_dim=im_dim)
+            plot.plot_pca_images(image_path, images, pc_projections, pc_plot[0], pc_plot[1],
+                                 save_path=save_path, ticks=ticks, im_dim=im_dim)
 
-        plothelper.plot_result(image_path, images, closest_group, representative,
-                               save_path=save_path, cols=columns, im_dim=im_dim)
+        plot.plot_representative(image_path, images, closest_group, representative,
+                                 save_path=save_path, cols=columns, im_dim=im_dim)
 
-        plothelper.plot_structures(image_path, images, structures,
-                                   save_path=save_path, cols=columns, im_dim=im_dim)
+        plot.plot_structures(image_path, images, structures,
+                             save_path=save_path, cols=columns, im_dim=im_dim)
  
 
 if __name__ == '__main__':
