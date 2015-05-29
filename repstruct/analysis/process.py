@@ -1,5 +1,4 @@
 import numpy as np
-import os
 
 from repstruct.featuremode import FeatureMode
 import repstruct.features.extract as extract
@@ -90,7 +89,7 @@ def closest(data):
     closest_group = kclosest.k_closest(closest_group_count, pc_projections_truncated)
     representative = closest_group[kclosest.k_closest(representative_count, pc_projections_truncated[closest_group, :])]
 
-    save_closest(data.analysis.path, closest_group, representative)
+    data.analysis.save_closest(closest_group, representative)
 
 
 def create_neutral_vector(D, rows):
@@ -115,32 +114,5 @@ def create_neutral_vector(D, rows):
         N = np.concatenate((N, d[1]*np.sqrt(1.0/d[0])*np.array([np.ones(d[0]),]*rows)), axis=1)
 
     return N
-
-
-def save_closest(file_path, closest_group, representative):
-    """ Saves result to .npz.
-
-    :param file_path: The results folder.
-    :param closest_group: The image indices of the closest group.
-    :param representative: The image indices of the representative group.
-    """
-
-    np.savez(os.path.join(file_path, 'closest.npz'),
-             closest_group=closest_group,
-             representative=representative)
-
-
-def load_closest(file_path):
-    """ Loads result from .npz.
-
-    :param file_path: The result folder.
-
-    :return closest_group: The image indices of the closest group.
-    :return representative: The image indices of the representative group.
-    """
-
-    c = np.load(os.path.join(file_path, 'closest.npz'))
-
-    return c['closest_group'], c['representative']
 
 

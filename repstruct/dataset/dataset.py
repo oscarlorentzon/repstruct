@@ -256,6 +256,70 @@ class AnalysisDataSet(DataSetBase):
 
         super(AnalysisDataSet, self).__init__(op.join(data_path, 'results'), AnalysisConfiguration(config_path))
 
+    def save_closest(self, closest_group, representative):
+        """ Saves closest group and representative indices result to .npz.
+
+        :param closest_group: The image indices of the closest group.
+        :param representative: The image indices of the representative group.
+        """
+
+        np.savez(op.join(self._path, 'closest.npz'),
+                 closest_group=closest_group,
+                 representative=representative)
+
+    def load_closest(self):
+        """ Loads result from .npz.
+
+        :param file_path: The result folder.
+
+        :return closest_group: The image indices of the closest group.
+        :return representative: The image indices of the representative group.
+        """
+
+        c = np.load(op.join(self._path, 'closest.npz'))
+
+        return c['closest_group'], c['representative']
+
+    def save_structures(self, centroids, structures):
+        """ Saves k-means structure results to .npz.
+
+        :param centroids: The cluster centroids.
+        :param structures: Array of structures containing indices for images connected to each cluster centroid.
+        """
+
+        np.savez(op.join(self._path, 'structures.npz'),
+                 centroids=centroids,
+                 structures=structures)
+
+    def load_structures(self):
+        """ Loads result from .npz.
+
+        :return centroids: The cluster centroids.
+        :return structures: Array of structures containing indices for images connected to each cluster centroid.
+        """
+
+        s = np.load(op.join(self._path, 'structures.npz'))
+
+        return s['centroids'], s['structures']
+
+    def save_scored_structures(self, scored_structures):
+        """ Saves scored structures to .npz.
+
+        :param scored_structures: Arrays of structures ordered base on score.
+        """
+
+        np.savez(op.join(self._path, 'scored_structures.npz'), scored_structures=scored_structures)
+
+    def load_scored_structures(self):
+        """ Loads scored structures from .npz.
+
+        :return scored_structures: Array of structures ordered base on score.
+        """
+
+        s = np.load(op.join(self._path, 'scored_structures.npz'))
+
+        return s['scored_structures']
+
 
 class PlotDataSet(DataSetBase):
 
