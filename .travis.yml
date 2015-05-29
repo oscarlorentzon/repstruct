@@ -4,10 +4,12 @@ python:
   - "2.7"
 
 before_install:
-  - sudo apt-get update
+  - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install python-opencv libopencv-dev gfortran python-matplotlib
+  - sudo apt-get install -qq python-opencv libopencv-dev
+  - sudo apt-get install -qq libatlas-dev libatlas-base-dev liblapack-dev gfortran
+  - sudo apt-get install -qq python-matplotlib
   - pip install -r requirements.txt
 
 script:
