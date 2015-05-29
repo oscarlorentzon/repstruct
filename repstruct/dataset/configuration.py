@@ -31,10 +31,6 @@ class Configuration:
         self.__runs = self.__config.get('runs', 500)
         self.__iterations = self.__config.get('iterations', 100)
 
-        # General properties.
-        self.__processes = self.__config.get('processes', 8)
-        self.__collection_count = self.__config.get('collection_count', 100)
-
         # Plot properties
         self.__save_plot = self.__config.get('save_plot', False)
         self.__image_dimension = self.__config.get('image_dimension', 100)
@@ -97,24 +93,6 @@ class Configuration:
         self.__iterations = iterations
 
     @property
-    def processes(self):
-        """ Number of parallel processes for downloading and extraction. """
-        return self.__processes
-
-    @processes.setter
-    def processes(self, processes):
-        self.__processes = processes
-
-    @property
-    def collection_count(self):
-        """ Size of collection. Number of images to be downloaded. """
-        return self.__collection_count
-
-    @collection_count.setter
-    def collection_count(self, collection_count):
-        self.__collection_count = collection_count
-
-    @property
     def save_plot(self):
         """ Boolean specifying if plots should be saved to file. """
         return self.__save_plot
@@ -169,6 +147,39 @@ class ConfigurationBase(object):
                 self._config = yaml.load(fin)
         else:
             self._config = {}
+
+
+class CollectionConfiguration(ConfigurationBase):
+
+    def __init__(self, path=None, name='config.yaml'):
+        """ Creates a collection configuration class by loading a configuration file.
+
+        :param path: Path to config file.
+        :param name: Name of the config file.
+        """
+
+        super(CollectionConfiguration, self).__init__(path, name)
+
+        self.__processes = self._config.get('processes', 8)
+        self.__count = self._config.get('collection_count', 100)
+
+    @property
+    def processes(self):
+        """ Number of parallel processes for downloading and extraction. """
+        return self.__processes
+
+    @processes.setter
+    def processes(self, processes):
+        self.__processes = processes
+
+    @property
+    def count(self):
+        """ Size of collection. Number of images to be downloaded. """
+        return self.__count
+
+    @count.setter
+    def count(self, count):
+        self.__count = count
 
 
 class FeatureConfiguration(ConfigurationBase):

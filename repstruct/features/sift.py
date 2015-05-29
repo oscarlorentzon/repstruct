@@ -7,15 +7,15 @@ from multiprocessing import Pool
 
 class SiftExtractor:
 
-    def __init__(self, feature_data, image_path):
+    def __init__(self, feature_data, collection_data):
         """ Creates a SiftExtractor.
 
         :param feature_data: Feature data set.
-        :param image_path: Path to image files.
+        :param collection_data: Collection data set.
         """
 
         self.__feature_data = feature_data
-        self.__image_path = image_path
+        self.__collection_data = collection_data
 
     def __call__(self, image):
         """ Extracts SIFT features for an image and saves the descriptors
@@ -24,7 +24,7 @@ class SiftExtractor:
         :param image: Image name.
         """
 
-        im = cv2.imread(os.path.join(self.__image_path, image), cv2.IMREAD_GRAYSCALE)
+        im = cv2.imread(os.path.join(self.__collection_data.path, image), cv2.IMREAD_GRAYSCALE)
         locations, descriptors = extract_feature_vectors(im, self.__feature_data.config.edge_threshold,
                                                          self.__feature_data.config.peak_threshold)
 
@@ -40,13 +40,13 @@ def extract(data):
     :param data: Data set.
     """
 
-    sift_extractor = SiftExtractor(data.feature, data.image_path)
-    if data.config.processes == 1:
-        for image in data.images():
+    sift_extractor = SiftExtractor(data.feature, data.collection)
+    if data.collection.config.processes == 1:
+        for image in data.collection.images():
             sift_extractor(image)
     else:
-        pool = Pool(data.config.processes)
-        pool.map(sift_extractor, data.images())
+        pool = Pool(data.collection.config.processes)
+        pool.map(sift_extractor, data.collection.images())
 
     print 'Features extracted'
 

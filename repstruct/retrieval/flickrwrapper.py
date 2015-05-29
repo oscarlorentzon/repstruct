@@ -1,4 +1,4 @@
-import os.path
+import os.path as op
 import urllib
 import json
 
@@ -42,18 +42,18 @@ class FlickrWrapper:
                           E.g. date-posted-desc, interestingness-desc and relevance.
         """
 
-        image_urls = self.get_urls(data.tag, data.config.collection_count, sort_mode)
+        image_urls = self.get_urls(data.tag, data.collection.config.count, sort_mode)
 
         url_paths = []
         for index, image_url in enumerate(image_urls):
-            url_paths.append((image_url, data.image_path + data.tag + str(index + 1) + '.jpg'))
+            url_paths.append((image_url, op.join(data.collection.path, data.tag + str(index + 1) + '.jpg')))
 
         downloader = Downloader()
-        if data.config.processes == 1:
+        if data.collection.config.processes == 1:
             for url_path in url_paths:
                 downloader(url_path)
         else:
-            pool = Pool(data.config.processes)
+            pool = Pool(data.collection.config.processes)
             pool.map(downloader, url_paths)
         
         print 'Images downloaded'

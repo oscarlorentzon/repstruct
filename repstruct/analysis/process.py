@@ -58,7 +58,7 @@ def process(data):
     :param data: Data set with feature mode, neutral factor and descriptor weight.
     """
 
-    images = data.images()
+    images = data.collection.images()
     descriptors, descriptor_colors, random_colors = extract.load_descriptors(data.descriptor, images)
 
     if data.pca.config.feature_mode == FeatureMode.Colors:

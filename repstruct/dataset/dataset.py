@@ -22,16 +22,16 @@ class DataSet:
 
         self.__data_path = root_path + '/tags/' + self.__tag + '/'
 
+        self.__collection = CollectionDataSet(self.__data_path, root_path)
         self.__feature = FeatureDataSet(self.__data_path, root_path)
         self.__descriptor = DescriptorDataSet(self.__data_path)
         self.__pca = PcaDataSet(self.__data_path, root_path)
 
-        self.__image_path = self.__data_path + 'images/'
         self.__result_path = self.__data_path + 'results/'
         self.__plot_path = self.__data_path + 'plots/'
 
         # Create tag directories if not existing..
-        for p in [self.__image_path, self.__result_path, self.__plot_path]:
+        for p in [self.__result_path, self.__plot_path]:
             if not op.exists(p):
                 makedirs(p)
 
@@ -45,13 +45,13 @@ class DataSet:
         self.__tag = tag
 
     @property
-    def image_path(self):
-        """ The path to the image directory. """
-        return self.__image_path
+    def collection(self):
+        """ Collection data set. """
+        return self.__collection
 
-    @image_path.setter
-    def image_path(self, image_path):
-        self.__image_path = image_path
+    @collection.setter
+    def collection(self, collection):
+        self.__collection = collection
 
     @property
     def feature(self):
@@ -103,15 +103,6 @@ class DataSet:
         """ Configuration. """
         return self.__config
 
-    def images(self):
-        """ Lists all images in the image directory.
-
-        :return: List of image names.
-        """
-
-        return np.array([im for im in listdir(self.image_path)
-                         if op.isfile(op.join(self.image_path, im)) and im.endswith(".jpg")])
-
 
 class DataSetBase(object):
 
@@ -135,6 +126,27 @@ class DataSetBase(object):
     def config(self):
         """ Configuration. """
         return self._config
+
+
+class CollectionDataSet(DataSetBase):
+
+    def __init__(self, data_path, config_path):
+        """ Initializes a feature data set.
+
+        :param data_path: Path to data folder.
+        :param config_path: Path to configuration file.
+        """
+
+        super(CollectionDataSet, self).__init__(op.join(data_path, 'images'), CollectionConfiguration(config_path))
+
+    def images(self):
+        """ Lists all images in the image directory.
+
+        :return: List of image names.
+        """
+
+        return np.array([im for im in listdir(self._path)
+                         if op.isfile(op.join(self._path, im)) and im.endswith(".jpg")])
 
 
 class FeatureDataSet(DataSetBase):

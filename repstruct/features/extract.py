@@ -11,12 +11,13 @@ import descriptor as desc
 
 class DescriptorExtractor:
 
-    def __init__(self, feature_data, descriptor_data, image_path, desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
+    def __init__(self, feature_data, descriptor_data, collection_data,
+                 desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y):
         """ Creates a descriptor extractor.
 
         :param feature_data: Feature data set.
         :param descriptor_data: Descriptor data set.
-        :param image_path: Path to image files.
+        :param collection_data: Collection data set.
         :param desc_cc: Descriptor cluster centers.
         :param desc_cc_norm: Descriptor cluster center normalization histogram..
         :param color_cc: Color cluster centers.
@@ -27,8 +28,7 @@ class DescriptorExtractor:
 
         self.__feature_data = feature_data
         self.__descriptor_data = descriptor_data
-
-        self.__image_path = image_path
+        self.__collection_data = collection_data
 
         self.__desc_cc = desc_cc
         self.__desc_cc_norm = desc_cc_norm
@@ -45,7 +45,7 @@ class DescriptorExtractor:
         :param image_file: Image name.
         """
 
-        image = cv2.imread(os.path.join(self.__image_path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
+        image = cv2.imread(os.path.join(self.__collection_data.path, image_file), cv2.CV_LOAD_IMAGE_UNCHANGED)
 
         if len(image.shape) == 3:
             image = image[:, :, ::-1]  # Reverse to RGB if color image
@@ -107,15 +107,15 @@ def extract(data):
     x = np.mod((1+gaussians['x'][0, 0]/2.3263)/2, 1)[:, 0]
     y = np.mod((1+gaussians['y'][0, 0]/2.3263)/2, 1)[:, 0]
 
-    descriptor_extractor = DescriptorExtractor(data.feature, data.descriptor, data.image_path,
+    descriptor_extractor = DescriptorExtractor(data.feature, data.descriptor, data.collection,
                                                desc_cc, desc_cc_norm, color_cc, color_cc_norm, x, y)
 
-    if data.config.processes == 1:
-        for image_file in data.images():
+    if data.collection.config.processes == 1:
+        for image_file in data.collection.images():
             descriptor_extractor(image_file)
     else:
-        pool = Pool(data.config.processes)
-        pool.map(descriptor_extractor, data.images())
+        pool = Pool(data.collection.config.processes)
+        pool.map(descriptor_extractor, data.collection.images())
 
     print 'Images processed'
 
