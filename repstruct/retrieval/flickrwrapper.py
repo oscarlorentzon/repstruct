@@ -61,6 +61,9 @@ class FlickrWrapper:
 
 class Downloader:
 
+    def __init__(self):
+        pass
+
     def __call__(self, url_path):
         """ Downloads data from a url and saves it in the path.
 
