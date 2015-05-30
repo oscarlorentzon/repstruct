@@ -21,6 +21,7 @@ install:
   - sudo apt-get install -qq python-opencv libopencv-dev
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib
   - pip install pyyaml enum34
+  - python setup.py install
 
 script:
   - python setup.py test
