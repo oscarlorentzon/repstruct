@@ -18,7 +18,8 @@ before_install:
   - sudo ln -s /run/shm /dev/shm
 
 install:
-  - sudo apt-get install -qq python-opencv libopencv-dev
+  - sudo apt-get install -qq python-opencv
+  - sudo dpkg -L python-opencv
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose
   - pip install pyyaml enum34
   - python setup.py install
