@@ -19,6 +19,10 @@ To view additional bundler options run the bundler with the -h flag:
 	
 	bin/rsbundler -h
 	
+## Continuous integration
+
+[![Build Status](https://travis-ci.org/oscarlorentzon/repstruct.svg?branch=master)](https://travis-ci.org/oscarlorentzon/repstruct)
+	
 ## Dependencies
 You need to have Python 2.7+ and the following libraries:
 
