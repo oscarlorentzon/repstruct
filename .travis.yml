@@ -18,12 +18,13 @@ before_install:
   - sudo ln -s /run/shm /dev/shm
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose mock opencv
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib mock opencv
   - pip install pyyaml enum34 coveralls
+  - pip install --upgrade nose coverage
   - python setup.py install
 
 script:
-  - nosetests --with-coverage --cover-package=repstruct --logging-level=INFO
+  - coverage run --source=repstruct setup.py test
 
 after_success:
   - coveralls
