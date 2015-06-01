@@ -23,7 +23,7 @@ install:
   - python setup.py install
 
 script:
-  - nosetests --with-coverage --cover-package=repstruct --cov-config .coveragerc --logging-level=INFO
+  - nosetests --with-coverage --cover-package=repstruct --logging-level=INFO
 
 after_success:
-  - coveralls --config_file .coveragerc
+  - coveralls
