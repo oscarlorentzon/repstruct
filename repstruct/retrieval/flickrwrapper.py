@@ -2,7 +2,7 @@ import os.path as op
 import urllib
 import json
 
-from multiprocessing import Pool
+import multiprocessing
 
 
 class FlickrWrapper:
@@ -28,7 +28,9 @@ class FlickrWrapper:
                   '&api_key={0}&tags={1}&sort={2}&per_page={3}&format=json&nojsoncallback=1'
 
         response = urllib.urlopen(request.format(self.__api_key, tag, sort_mode, count))
-        data = json.loads(response.read())
+
+        a = response.read()
+        data = json.loads(a)
 
         url = 'https://farm{0}.staticflickr.com/{1}/{2}_{3}.jpg'
         return [url.format(photo['farm'], photo['server'], photo['id'], photo['secret'])
@@ -53,7 +55,7 @@ class FlickrWrapper:
             for url_path in url_paths:
                 downloader(url_path)
         else:
-            pool = Pool(data.collection.config.processes)
+            pool = multiprocessing.Pool(data.collection.config.processes)
             pool.map(downloader, url_paths)
         
         print 'Images downloaded'
