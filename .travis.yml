@@ -19,8 +19,11 @@ before_install:
 
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION atlas numpy scipy matplotlib nose mock opencv
-  - pip install pyyaml enum34
+  - pip install pyyaml enum34 coveralls
   - python setup.py install
 
 script:
-  - python setup.py test
+  - coverage run --source=repstruct setup.py test
+
+after_success:
+  coveralls
