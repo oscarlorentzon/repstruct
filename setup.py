@@ -21,5 +21,5 @@ setup(
     license='BSD 3-Clause',
     keywords='image analysis pca bag of words represent',
     url='https://github.com/oscarlorentzon/repstruct',
-    test_suite='nose.collector'
+    test_suite='tests'
 )
