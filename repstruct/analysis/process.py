@@ -38,9 +38,9 @@ def process_combined_features(descriptors, descriptor_colors, random_colors, des
     color_weight = (1-descriptor_weight)/2
 
     N = create_neutral_vector(
-        np.array([[descriptors.shape[1], np.sqrt(descriptor_weight)],
-                  [descriptor_colors.shape[1], np.sqrt(color_weight)],
-                  [random_colors.shape[1], np.sqrt(color_weight)]]),
+        np.array([[descriptors.shape[1], descriptor_weight],
+                  [descriptor_colors.shape[1], color_weight],
+                  [random_colors.shape[1], color_weight]]),
         descriptors.shape[0])
     F = np.hstack((np.sqrt(descriptor_weight)*descriptors,
                    np.hstack((np.sqrt(color_weight)*descriptor_colors, np.sqrt(color_weight)*random_colors))))
@@ -107,12 +107,16 @@ def create_neutral_vector(D, rows):
             and weight requirements in the input.
     """
 
-    N = np.array([]).reshape(rows, 0)
+    if not np.abs(np.sum(D[:, 1]) - 1.) < 0.0000001:
+        raise AssertionError('Total weight must be 1.')
+
+    N = np.array([]).reshape(1, 0)
 
     for d in D:
-        N = np.concatenate((N, d[1]*np.sqrt(1.0/d[0])*np.array([np.ones(d[0]),]*rows)), axis=1)
+        k = np.sqrt(d[1]/d[0])
+        N = np.concatenate((N, k * np.ones((1, d[0]))), axis=1)
 
-    return N
+    return np.tile(N, (rows, 1))
 
 
 def load_descriptors(descriptor_data, images):
@@ -143,15 +147,16 @@ def load_descriptors(descriptor_data, images):
     random_colors = np.array(random_colors)
 
     # Set colors for grayscale images to mean of other feature vectors.
-    descriptor_colors = set_nan_rows_to_mean(descriptor_colors)
-    random_colors = set_nan_rows_to_mean(random_colors)
+    descriptor_colors = set_nan_rows_to_normalized_mean(descriptor_colors)
+    random_colors = set_nan_rows_to_normalized_mean(random_colors)
 
     return descriptors, descriptor_colors, random_colors
 
 
-def set_nan_rows_to_mean(X):
+def set_nan_rows_to_normalized_mean(X):
     """ Sets rows of a 2-D array with NaN values to
-        the mean of the non NaN values for each column.
+        the mean of the non NaN values for each column
+        and normalizes the former NaN rows.
 
     :param X: A 2-D array of row vectors.
 
@@ -162,7 +167,7 @@ def set_nan_rows_to_mean(X):
     C_norm = np.linalg.norm(X, axis=1)
 
     C_real = np.mean(X[~np.isnan(C_norm), :], axis=0)
-    C_real = C_real / np.linalg.norm(C_real)
+    C_real = C_real / np.linalg.norm(C_real, axis=0)
 
     # Set the NaN rows to the mean.
     X[np.isnan(C_norm), :] = np.tile(C_real, (sum(np.isnan(C_norm)), 1))
