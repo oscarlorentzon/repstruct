@@ -44,7 +44,7 @@ class RsBundler:
         process.process(self.__data)
         process.closest(self.__data)
         kmeans.all_structures(self.__data)
-        kmeans.score_structures(self.__data)
+        kmeans.score_structures(self.__data.analysis)
 
     def plot_result(self):
         images, pc_projections, pcs = self.__data.pca.load()

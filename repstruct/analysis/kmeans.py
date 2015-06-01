@@ -25,14 +25,14 @@ def all_structures(data):
     data.analysis.save_structures(centroids, structure_indices)
 
 
-def score_structures(data):
+def score_structures(analysis_data):
     """ Scores structures based on the representative result.
 
-    :param data: Data set.
+    :param analysis_data: Analysis data set.
     """
 
-    closest_group, representative = data.analysis.load_closest()
-    centroids, structures = data.analysis.load_structures()
+    closest_group, representative = analysis_data.load_closest()
+    centroids, structures = analysis_data.load_structures()
 
     scores = []
     lengths = []
@@ -57,4 +57,4 @@ def score_structures(data):
     ordered = np.argsort(length_scores)[::-1]  # Sort and reverse to get descending
     scored_structures = structures[ordered]
 
-    data.analysis.save_scored_structures(scored_structures)
+    analysis_data.save_scored_structures(scored_structures)
