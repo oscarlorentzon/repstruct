@@ -92,3 +92,7 @@ class TestKMeans(unittest.TestCase):
 
         for index, structure in enumerate(structures[1][np.array([1, 0, 2])]):
             self.assertSequenceEqual(list(structure), list(call_args[index]))
+
+
+if __name__ == '__main__':
+    unittest.main()
