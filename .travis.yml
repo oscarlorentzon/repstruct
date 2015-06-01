@@ -26,4 +26,4 @@ script:
   - coverage run --source=repstruct setup.py test
 
 after_success:
-  coveralls
+  - coveralls
