@@ -22,7 +22,8 @@ To view additional bundler options run the bundler with the -h flag:
 ## Continuous integration
 
 [![Build Status](https://travis-ci.org/oscarlorentzon/repstruct.svg?branch=master)](https://travis-ci.org/oscarlorentzon/repstruct)
-	
+[![Coverage Status](https://coveralls.io/repos/oscarlorentzon/repstruct/badge.svg?branch=master)](https://coveralls.io/r/oscarlorentzon/repstruct?branch=master)
+
 ## Dependencies
 You need to have Python 2.7+ and the following libraries:
 
@@ -37,11 +38,11 @@ You need to have Python 2.7+ and the following libraries:
 
 1. [OpenCV][] - Install by following the steps in the Ubuntu OpenCV [installation guide](https://help.ubuntu.com/community/OpenCV).
 
-2. [SciPy][], [NumPy][], [Enum34][], [PyYAML][] and [Matplotlib][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
+2. [NumPy][], [SciPy][], [PyYAML][], [Enum34][] and [Matplotlib][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
 
+        sudo pip install numpy
         sudo apt-get install gfortran
         sudo pip install scipy
-        sudo pip install numpy
         sudo pip install pyyaml enum34
         sudo apt-get install python-matplotlib
 
