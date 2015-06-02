@@ -1,5 +1,7 @@
 import numpy as np
 
+import process
+
 
 def neutral_sub_pca(X, neut_factor=0.8):
     """ Performs PCA by singular value decomposition after
@@ -18,15 +20,16 @@ def neutral_sub_pca(X, neut_factor=0.8):
     vector_length = X_shape[1]
     
     # Subtracting a neutral vector for each row in X before performing SVD.
-    N = np.sqrt(1.0/vector_length)*np.array([np.ones(vector_length),]*row_count)
+    N = process.create_neutral_vector(np.array([[vector_length, 1.]]), row_count)
     X_neut = X-neut_factor*N
     
     U, S, VT = np.linalg.svd(X_neut)
-    
+
     # Projecting feature vectors on principal components.
-    Y = np.dot(X_neut, VT.T)
+    V = VT.T
+    Y = np.dot(X_neut, V)
     
-    return Y, VT.T
+    return Y, V
 
 
 def neutral_sub_pca_vector(X, N):
@@ -45,8 +48,9 @@ def neutral_sub_pca_vector(X, N):
     X_neut = X-N
     
     U, S, VT = np.linalg.svd(X_neut)
-    
+
     # Projecting feature vectors on principal components.
-    Y = np.dot(X_neut, VT.T)
+    V = VT.T
+    Y = np.dot(X_neut, V)
     
-    return Y, VT.T
+    return Y, V
