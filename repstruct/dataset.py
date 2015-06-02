@@ -113,6 +113,10 @@ class DataSetBase(object):
         """ Configuration. """
         return self._config
 
+    @config.setter
+    def config(self, value):
+        self._config = value
+
 
 class CollectionDataSet(DataSetBase):
 
