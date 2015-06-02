@@ -92,12 +92,16 @@ class DataSet:
 
 class DataSetBase(object):
 
-    def __init__(self, path, config):
-        self._path = path
+    def __init__(self, path, folder, config):
         self._config = config
 
-        if not op.exists(self._path):
-            makedirs(self._path)
+        if path is not None:
+            self._path = op.join(path, folder)
+
+            if not op.exists(self._path):
+                makedirs(self._path)
+        else:
+            self._path = None
 
     @property
     def path(self):
@@ -123,7 +127,7 @@ class CollectionDataSet(DataSetBase):
         :param config_path: Path to configuration file.
         """
 
-        super(CollectionDataSet, self).__init__(op.join(data_path, 'images'), CollectionConfiguration(config_path))
+        super(CollectionDataSet, self).__init__(data_path, 'images', CollectionConfiguration(config_path))
 
     def images(self):
         """ Lists all images in the image directory.
@@ -144,7 +148,7 @@ class FeatureDataSet(DataSetBase):
         :param config_path: Path to configuration file.
         """
 
-        super(FeatureDataSet, self).__init__(op.join(data_path, 'features'), FeatureConfiguration(config_path))
+        super(FeatureDataSet, self).__init__(data_path, 'features', FeatureConfiguration(config_path))
 
     def save(self, image, locations, descriptors):
         """ Saves features for an image to .npz.
@@ -177,7 +181,7 @@ class DescriptorDataSet(DataSetBase):
         :param data_path: Path to data folder.
         """
 
-        super(DescriptorDataSet, self).__init__(op.join(data_path, 'descriptors'), {})
+        super(DescriptorDataSet, self).__init__(data_path, 'descriptors', {})
 
     def save(self, image, descriptors, descriptor_colors, random_colors):
         """ Saves bag of visual word descriptors to .npz.
@@ -217,7 +221,7 @@ class PcaDataSet(DataSetBase):
         :param config_path: Path to configuration file.
         """
 
-        super(PcaDataSet, self).__init__(op.join(data_path, 'results'), PcaConfiguration(config_path))
+        super(PcaDataSet, self).__init__(data_path, 'results', PcaConfiguration(config_path))
 
     def save(self, images, pc_projections, principal_components):
         """ Saves result to .npz.
@@ -254,7 +258,7 @@ class AnalysisDataSet(DataSetBase):
         :param config_path: Path to configuration file.
         """
 
-        super(AnalysisDataSet, self).__init__(op.join(data_path, 'results'), AnalysisConfiguration(config_path))
+        super(AnalysisDataSet, self).__init__(data_path, 'results', AnalysisConfiguration(config_path))
 
     def save_closest(self, closest_group, representative):
         """ Saves closest group and representative indices result to .npz.
@@ -330,4 +334,4 @@ class PlotDataSet(DataSetBase):
         :param config_path: Path to configuration file.
         """
 
-        super(PlotDataSet, self).__init__(op.join(data_path, 'plots'), PlotConfiguration(config_path))
+        super(PlotDataSet, self).__init__(data_path, 'plots', PlotConfiguration(config_path))

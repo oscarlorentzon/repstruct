@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 
-from multiprocessing import Pool
+import multiprocessing
 
 
 class SiftExtractor:
@@ -45,7 +45,7 @@ def extract(data):
         for image in data.collection.images():
             sift_extractor(image)
     else:
-        pool = Pool(data.collection.config.processes)
+        pool = multiprocessing.Pool(data.collection.config.processes)
         pool.map(sift_extractor, data.collection.images())
 
     print 'Features extracted'
