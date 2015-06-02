@@ -117,6 +117,24 @@ class DataSetBase(object):
     def config(self, value):
         self._config = value
 
+    def _save(self, file_name, **kwargs):
+        """ Saves the key word arguments to npz file.
+
+        :param file_name: File name without extension.
+        :param kwargs: Keyword arguments.
+        """
+
+        np.savez(op.join(self._path, file_name + '.npz'), **kwargs)
+
+    def _load(self, file_name):
+        """ Loads npz data from file.
+
+        :param file_name: File name without extension.
+        :return: Loaded data.
+        """
+
+        return np.load(op.join(self._path, file_name + '.npz'))
+
 
 class CollectionDataSet(DataSetBase):
 
@@ -151,24 +169,24 @@ class FeatureDataSet(DataSetBase):
         super(FeatureDataSet, self).__init__(data_path, 'features', FeatureConfiguration(config_path))
 
     def save(self, image, locations, descriptors):
-        """ Saves features for an image to .npz.
+        """ Saves features for an image to file.
 
         :param image: Image name.
         :param locations: Feature locations.
         :param descriptors: Feature descriptor vectors.
         """
 
-        np.savez(op.join(self._path, image + '.sift.npz'), locations=locations, descriptors=descriptors)
+        self._save(image + '.sift', locations=locations, descriptors=descriptors)
 
     def load(self, image):
-        """ Loads features for an image from .npz.
+        """ Loads features for an image from file.
 
         :param image: Image name.
 
         :return Feature locations and feature descriptors.
         """
 
-        f = np.load(op.join(self._path, image + '.sift.npz'))
+        f = self._load(image + '.sift')
 
         return f['locations'], f['descriptors']
 
@@ -184,7 +202,7 @@ class DescriptorDataSet(DataSetBase):
         super(DescriptorDataSet, self).__init__(data_path, 'descriptors', {})
 
     def save(self, image, descriptors, descriptor_colors, random_colors):
-        """ Saves bag of visual word descriptors to .npz.
+        """ Saves bag of visual word descriptors to file.
 
         :param image: Image name.
         :param descriptors: Descriptor histogram.
@@ -192,13 +210,13 @@ class DescriptorDataSet(DataSetBase):
         :param random_colors: Histogram for colors in random locations.
         """
 
-        np.savez(op.join(self._path, image + '.descriptors.npz'),
-                 descriptors=descriptors,
-                 descriptor_colors=descriptor_colors,
-                 random_colors=random_colors)
+        self._save(image + '.descriptors',
+                   descriptors=descriptors,
+                   descriptor_colors=descriptor_colors,
+                   random_colors=random_colors)
 
     def load(self, image):
-        """ Loads bag of visual word descriptors from .npz.
+        """ Loads bag of visual word descriptors from file.
 
         :param image: Image name.
 
@@ -207,7 +225,7 @@ class DescriptorDataSet(DataSetBase):
         :return random_colors: Histogram for colors in random locations.
         """
 
-        d = np.load(op.join(self._path, image + '.descriptors.npz'))
+        d = self._load(image + '.descriptors')
 
         return d['descriptors'], d['descriptor_colors'], d['random_colors']
 
@@ -224,27 +242,27 @@ class PcaDataSet(DataSetBase):
         super(PcaDataSet, self).__init__(data_path, 'results', PcaConfiguration(config_path))
 
     def save(self, images, pc_projections, principal_components):
-        """ Saves result to .npz.
+        """ Saves result to file.
 
         :param images: Image names.
         :param pc_projections: The principal component projection arrays.
         :param principal_components: The principal components.
         """
 
-        np.savez(op.join(self._path, 'principal_components.npz'),
-                 images=images,
-                 pc_projections=pc_projections,
-                 principal_components=principal_components)
+        self._save('principal_components',
+                   images=images,
+                   pc_projections=pc_projections,
+                   principal_components=principal_components)
 
     def load(self):
-        """ Loads principal components from .npz.
+        """ Loads principal components from file.
 
         :return images: Image names.
         :return pc_projections: The principal component projection arrays.
         :return principal_components: The principal components.
         """
 
-        p = np.load(op.join(self._path, 'principal_components.npz'))
+        p = self._load('principal_components')
 
         return p['images'], p['pc_projections'], p['principal_components']
 
@@ -261,18 +279,18 @@ class AnalysisDataSet(DataSetBase):
         super(AnalysisDataSet, self).__init__(data_path, 'results', AnalysisConfiguration(config_path))
 
     def save_closest(self, closest_group, representative):
-        """ Saves closest group and representative indices result to .npz.
+        """ Saves closest group and representative indices result to file.
 
         :param closest_group: The image indices of the closest group.
         :param representative: The image indices of the representative group.
         """
 
-        np.savez(op.join(self._path, 'closest.npz'),
-                 closest_group=closest_group,
-                 representative=representative)
+        self._save('closest',
+                   closest_group=closest_group,
+                   representative=representative)
 
     def load_closest(self):
-        """ Loads result from .npz.
+        """ Loads result from file.
 
         :param file_path: The result folder.
 
@@ -280,47 +298,47 @@ class AnalysisDataSet(DataSetBase):
         :return representative: The image indices of the representative group.
         """
 
-        c = np.load(op.join(self._path, 'closest.npz'))
+        c = self._load('closest')
 
         return c['closest_group'], c['representative']
 
     def save_structures(self, centroids, structures):
-        """ Saves k-means structure results to .npz.
+        """ Saves k-means structure results to file.
 
         :param centroids: The cluster centroids.
         :param structures: Array of structures containing indices for images connected to each cluster centroid.
         """
 
-        np.savez(op.join(self._path, 'structures.npz'),
-                 centroids=centroids,
-                 structures=structures)
+        self._save('structures',
+                   centroids=centroids,
+                   structures=structures)
 
     def load_structures(self):
-        """ Loads result from .npz.
+        """ Loads result from file.
 
         :return centroids: The cluster centroids.
         :return structures: Array of structures containing indices for images connected to each cluster centroid.
         """
 
-        s = np.load(op.join(self._path, 'structures.npz'))
+        s = self._load('structures')
 
         return s['centroids'], s['structures']
 
     def save_scored_structures(self, scored_structures):
-        """ Saves scored structures to .npz.
+        """ Saves scored structures to file.
 
         :param scored_structures: Arrays of structures ordered base on score.
         """
 
-        np.savez(op.join(self._path, 'scored_structures.npz'), scored_structures=scored_structures)
+        self._save('scored_structures', scored_structures=scored_structures)
 
     def load_scored_structures(self):
-        """ Loads scored structures from .npz.
+        """ Loads scored structures from file.
 
         :return scored_structures: Array of structures ordered base on score.
         """
 
-        s = np.load(op.join(self._path, 'scored_structures.npz'))
+        s = self._load('scored_structures')
 
         return s['scored_structures']
 
