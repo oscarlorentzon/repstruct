@@ -1,9 +1,9 @@
-from os import makedirs, listdir
+import os
 
 from configuration import *
 
 
-class DataSet:
+class DataSet(object):
 
     def __init__(self, tag, root_path=None):
         """ Creates a data set which holds paths, image list and config values.
@@ -13,11 +13,7 @@ class DataSet:
         """
 
         self.__tag = tag
-
-        if root_path is None:
-            return
-
-        self.__data_path = root_path + '/tags/' + self.__tag + '/'
+        self.__data_path = root_path + '/tags/' + self.__tag + '/' if root_path is not None else None
 
         self.__collection = CollectionDataSet(self.__data_path, root_path)
         self.__feature = FeatureDataSet(self.__data_path, root_path)
@@ -32,8 +28,8 @@ class DataSet:
         return self.__tag
 
     @tag.setter
-    def tag(self, tag):
-        self.__tag = tag
+    def tag(self, value):
+        self.__tag = value
 
     @property
     def collection(self):
@@ -41,8 +37,8 @@ class DataSet:
         return self.__collection
 
     @collection.setter
-    def collection(self, collection):
-        self.__collection = collection
+    def collection(self, value):
+        self.__collection = value
 
     @property
     def feature(self):
@@ -50,8 +46,8 @@ class DataSet:
         return self.__feature
 
     @feature.setter
-    def feature(self, feature):
-        self.__feature = feature
+    def feature(self, value):
+        self.__feature = value
 
     @property
     def descriptor(self):
@@ -59,8 +55,8 @@ class DataSet:
         return self.__descriptor
 
     @descriptor.setter
-    def descriptor(self, descriptor):
-        self.__descriptor = descriptor
+    def descriptor(self, value):
+        self.__descriptor = value
 
     @property
     def pca(self):
@@ -68,8 +64,8 @@ class DataSet:
         return self.__pca
 
     @pca.setter
-    def pca(self, pca):
-        self.__pca = pca
+    def pca(self, value):
+        self.__pca = value
 
     @property
     def analysis(self):
@@ -77,8 +73,8 @@ class DataSet:
         return self.__analysis
 
     @analysis.setter
-    def analysis(self, analysis):
-        self.__analysis = analysis
+    def analysis(self, value):
+        self.__analysis = value
 
     @property
     def plot(self):
@@ -99,7 +95,7 @@ class DataSetBase(object):
             self._path = op.join(path, folder)
 
             if not op.exists(self._path):
-                makedirs(self._path)
+                os.makedirs(self._path)
         else:
             self._path = None
 
@@ -109,8 +105,8 @@ class DataSetBase(object):
         return self._path
 
     @path.setter
-    def path(self, path):
-        self._path = path
+    def path(self, value):
+        self._path = value
 
     @property
     def config(self):
@@ -135,7 +131,7 @@ class CollectionDataSet(DataSetBase):
         :return: List of image names.
         """
 
-        return np.array([im for im in listdir(self._path)
+        return np.array([im for im in os.listdir(self._path)
                          if op.isfile(op.join(self._path, im)) and im.endswith(".jpg")])
 
 
