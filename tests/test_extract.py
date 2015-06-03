@@ -1,6 +1,9 @@
 import unittest
 import numpy as np
 import repstruct.features.extract as extract
+import repstruct.dataset as dataset
+
+from mock import Mock, patch
 
 
 class TestExtract(unittest.TestCase):
@@ -98,6 +101,50 @@ class TestExtract(unittest.TestCase):
         self.assertLess(np.abs(np.linalg.norm(result[0]) - 1.), 0.0000001)
         self.assertLess(np.abs(np.linalg.norm(result[1]) - 1.), 0.0000001)
         self.assertLess(np.abs(np.linalg.norm(result[2]) - 1.), 0.0000001)
+
+    @patch('repstruct.features.extract.get_color_hist')
+    @patch('repstruct.features.descriptor.normalize_by_division')
+    @patch('repstruct.features.descriptor.classify_cosine')
+    @patch('repstruct.features.descriptor.normalize')
+    @patch('cv2.imread')
+    def testDescriptorExtractor(self, imread_mock, norm_mock, classify_mock, div_mock, hist_mock):
+        imread_mock.return_value = np.array([[[0, 0, 0]]])
+
+        desc_res = 'desc'
+        color_res = ['color', 'random']
+        div_mock.return_value = desc_res
+        hist_mock.side_effect = color_res
+
+        zero = np.zeros((1, 2))
+        classify_mock.return_value = zero
+        norm_mock.return_value = zero
+
+        feature_data = dataset.FeatureDataSet(None, None)
+        feature_data.load = Mock(return_value=(zero, zero))
+
+        descriptor_data = dataset.DescriptorDataSet(None)
+        descriptor_data.save = Mock()
+
+        collection_data = dataset.CollectionDataSet(None, None)
+        collection_data.path = 'path'
+
+        desc_cc = np.array([0., 0.])
+        desc_cc_norm = np.array([1., 1.])
+
+        color_cc = np.array([0., 0.])
+        color_cc_norm = np.array([1., 1.])
+
+        x = np.array([0., 1.])
+        y = np.array([0., 1.])
+
+        extractor = extract.DescriptorExtractor(feature_data, descriptor_data, collection_data,
+                                                desc_cc, desc_cc_norm, color_cc, color_cc_norm,
+                                                x, y)
+
+        im = 'im'
+        extractor(im)
+
+        descriptor_data.save.assert_called_with(im, desc_res, color_res[0], color_res[1])
 
 
 if __name__ == '__main__':
