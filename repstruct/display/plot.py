@@ -128,7 +128,7 @@ def plot_structures(image_dir, images, structures, im_dim=100, cols=10, save_pat
     translation = 0
     for i, structure in enumerate(structures):
         if i > 0:
-            background[translation-space+1:translation+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
+            background[translation-space+.5:translation+.5, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
 
         for index, image in enumerate(images[structure]):
             im = load_image(image, image_dir, im_dim)
