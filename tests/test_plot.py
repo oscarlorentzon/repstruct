@@ -315,6 +315,45 @@ class TestPlot(unittest.TestCase):
         self.assertEqual(1, xticks_mock.call_count)
         self.assertEqual(1, yticks_mock.call_count)
 
+    @patch('matplotlib.pyplot.show')
+    @patch('matplotlib.pyplot.figure')
+    @patch('cv2.imread')
+    def testPlotImages(self, imread_mock, figure_mock, show_mock):
+        image_count = 5
+
+        images = np.array([str(i) for i in range(0, image_count)])
+
+        imread_mock.return_value = np.zeros((1, 1, 3), np.uint8)
+        figure_instance = figure_mock.return_value
+        figure_instance.add_subplot = Mock(return_value=Mock())
+        subplot_instance = figure_instance.add_subplot.return_value
+        subplot_instance.imshow = Mock()
+
+        plot.plot_images('dir', images, 1, image_count)
+
+        self.assertEqual(image_count, figure_instance.add_subplot.call_count)
+        self.assertEqual(image_count, subplot_instance.imshow.call_count)
+        self.assertEqual(image_count, imread_mock.call_count)
+        self.assertEqual(1, show_mock.call_count)
+
+    @patch('matplotlib.pyplot.show')
+    @patch('matplotlib.pyplot.axvline')
+    @patch('matplotlib.pyplot.axhline')
+    @patch('matplotlib.pyplot.plot')
+    @patch('matplotlib.pyplot.figure')
+    def testPlotPcProjections(self, figure_mock, plot_mock,
+                              hline_mock, vline_mock, show_mock):
+        pc_projections = np.ones((5, 2), np.float)
+
+        plot.plot_pca_projections(pc_projections, 0, 1)
+
+        self.assertEqual(1, figure_mock.call_count)
+        self.assertEqual(1, plot_mock.call_count)
+        self.assertEqual(1, hline_mock.call_count)
+        self.assertEqual(1, vline_mock.call_count)
+        self.assertEqual(1, show_mock.call_count)
+
+
 
 if __name__ == '__main__':
     unittest.main()
