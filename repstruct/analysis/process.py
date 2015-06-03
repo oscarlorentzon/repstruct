@@ -15,9 +15,8 @@ def process_features(features, neutral_factor):
     """
 
     N = create_neutral_vector(np.array([[features.shape[1], 1]]), features.shape[0])
-    F = features
 
-    pc_projections, pcs = pca.neutral_sub_pca_vector(F, neutral_factor*N)
+    pc_projections, pcs = pca.neutral_sub_pca_vector(features, neutral_factor*N)
 
     return pc_projections, pcs
 
