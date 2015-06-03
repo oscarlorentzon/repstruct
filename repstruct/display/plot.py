@@ -61,17 +61,18 @@ def plot_pca_images(image_dir, images, pc_projections, pc1, pc2, im_dim=100, dim
     """
 
     unit = dim / 2
+    line = im_dim / 10.
 
     center = int(np.round(unit * np.max([np.max(np.abs(pc_projections[:, [pc1, pc2]])), min_axis]))) + im_dim
     background_dim = 2 * center
     background = 255 * np.ones((background_dim, background_dim, 3), np.uint8)
-    background[center-2:center+3, :, :] = np.zeros((5, background_dim, 3))
-    background[:, center-2:center+3, :] = np.zeros((background_dim, 5, 3))
+    background[center-line/2:center+line/2, :, :] = np.zeros((line, background_dim, 3))
+    background[:, center-line/2:center+line/2, :] = np.zeros((background_dim, line, 3))
 
     for index, image in enumerate(images):
         im = load_image(image, image_dir, im_dim)
-        row = center - np.round(unit * pc_projections[index, pc1])
-        col = center + np.round(unit * pc_projections[index, pc2])
+        row = center - np.round(unit * pc_projections[index, pc2])
+        col = center + np.round(unit * pc_projections[index, pc1])
         insert_image(background, im, col, row)
 
     fig = pl.figure(figsize=(12, 12))
