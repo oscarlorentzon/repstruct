@@ -1,8 +1,7 @@
 import unittest
+import numpy as np
 
 from mock import Mock
-
-import numpy as np
 
 import repstruct.analysis.process as process
 import repstruct.dataset as dataset

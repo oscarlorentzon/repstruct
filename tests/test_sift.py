@@ -1,7 +1,6 @@
 import unittest
-from mock import Mock, patch, PropertyMock
 
-import cv2
+from mock import Mock, patch, PropertyMock
 
 import repstruct.features.sift as sift
 from repstruct.dataset import *

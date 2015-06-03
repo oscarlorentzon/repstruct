@@ -1,9 +1,10 @@
 import unittest
 import numpy as np
-import repstruct.features.extract as extract
-import repstruct.dataset as dataset
 
 from mock import Mock, patch, PropertyMock
+
+import repstruct.features.extract as extract
+import repstruct.dataset as dataset
 
 
 class TestExtract(unittest.TestCase):

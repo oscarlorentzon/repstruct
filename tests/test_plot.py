@@ -5,8 +5,6 @@ from mock import patch, Mock
 
 import repstruct.display.plot as plot
 
-import matplotlib.pyplot as pl
-
 
 class TestPlot(unittest.TestCase):
 
