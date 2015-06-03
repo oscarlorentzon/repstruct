@@ -146,6 +146,38 @@ class TestExtract(unittest.TestCase):
 
         descriptor_data.save.assert_called_with(im, desc_res, color_res[0], color_res[1])
 
+    def testGetColorHist(self):
+        im = np.array([[[0, 0, 0]], [[255, 0, 0]]], np.uint8)
+        rows = np.array([0, 1])
+        cols = np.array([0, 0])
+        cluster_centers = np.array([[0., 0.], [1., 0.]])
+        cluster_center_norm = np.ones(2, np.float)
+
+        result = extract.get_color_hist(im, rows, cols, cluster_centers, cluster_center_norm)
+
+        self.assertEqual(1, len(result.shape))
+        self.assertEqual(2, result.shape[0])
+        self.assertFalse(np.any(np.isnan(result)))
+
+        norm = np.linalg.norm(result)
+        self.assertLess(np.abs(norm - 1.), 0.0000001)
+
+        # Same number of items in the two clusters.
+        self.assertLess(np.abs(result[0] - result[1]), 0.0000001)
+
+    def testGetColorHistGrayscale(self):
+        im = np.array([[0], [255]], np.uint8)
+        rows = np.array([0, 1])
+        cols = np.array([0, 0])
+        cluster_centers = np.array([[0., 0.], [1., 0.]])
+        cluster_center_norm = np.ones(2, np.float)
+
+        result = extract.get_color_hist(im, rows, cols, cluster_centers, cluster_center_norm)
+
+        self.assertEqual(1, len(result.shape))
+        self.assertEqual(2, result.shape[0])
+        self.assertTrue(np.all(np.isnan(result)))
+
 
 if __name__ == '__main__':
     unittest.main()
