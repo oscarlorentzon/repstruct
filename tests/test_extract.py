@@ -3,7 +3,7 @@ import numpy as np
 import repstruct.features.extract as extract
 import repstruct.dataset as dataset
 
-from mock import Mock, patch
+from mock import Mock, patch, PropertyMock
 
 
 class TestExtract(unittest.TestCase):
@@ -177,6 +177,65 @@ class TestExtract(unittest.TestCase):
         self.assertEqual(1, len(result.shape))
         self.assertEqual(2, result.shape[0])
         self.assertTrue(np.all(np.isnan(result)))
+
+    @patch('numpy.mod')
+    @patch('numpy.histogram')
+    @patch('scipy.io.loadmat')
+    @patch('repstruct.features.extract.DescriptorExtractor')
+    @patch('multiprocessing.Pool')
+    def testExtract(self, pool_mock, extract_mock, loadmat_mock, hist_mock, mod_mock):
+        pool_instance = pool_mock.return_value
+        pool_instance.map = Mock(return_value=0)
+
+        extractor_instance = extract_mock.return_value
+
+        zero_array = np.zeros((2, 1))
+        loadmat_mock.return_value = {'cbest': zero_array, 'idxbest': zero_array,
+                                     'ccbest': zero_array, 'idxcbest': zero_array,
+                                     'rands': {'x': zero_array, 'y': zero_array}}
+
+        hist_mock.return_value = (0, 0)
+
+        data = dataset.DataSet('tag')
+        data.collection = PropertyMock()
+        data.collection.images = Mock(return_value=np.array(['im1', 'im2', 'im3']))
+        data.collection.config = PropertyMock()
+        data.collection.config.processes = 1
+
+        extract.extract(data)
+
+        self.assertEqual(3, extractor_instance.call_count)
+        self.assertEqual(0, pool_instance.map.call_count)
+
+    @patch('numpy.mod')
+    @patch('numpy.histogram')
+    @patch('scipy.io.loadmat')
+    @patch('repstruct.features.extract.DescriptorExtractor')
+    @patch('multiprocessing.Pool')
+    def testExtractMultiProcess(self, pool_mock, extract_mock, loadmat_mock, hist_mock, mod_mock):
+        pool_instance = pool_mock.return_value
+        pool_instance.map = Mock(return_value=0)
+
+        extractor_instance = extract_mock.return_value
+
+        zero_array = np.zeros((2, 1))
+        loadmat_mock.return_value = {'cbest': zero_array, 'idxbest': zero_array,
+                                     'ccbest': zero_array, 'idxcbest': zero_array,
+                                     'rands': {'x': zero_array, 'y': zero_array}}
+
+        hist_mock.return_value = (0, 0)
+
+        data = dataset.DataSet('tag')
+        data.collection = PropertyMock()
+        data.collection.images = Mock(return_value=np.array(['im1', 'im2', 'im3']))
+        data.collection.config = PropertyMock()
+        data.collection.config.processes = 2
+
+        extract.extract(data)
+
+        self.assertEqual(0, extractor_instance.call_count)
+        self.assertEqual(1, pool_instance.map.call_count)
+
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import matplotlib.colors as mc
 import os.path as op
 import cv2
 import os
-from multiprocessing import Pool
+import multiprocessing
 
 import descriptor as desc
 
@@ -114,7 +114,7 @@ def extract(data):
         for image_file in data.collection.images():
             descriptor_extractor(image_file)
     else:
-        pool = Pool(data.collection.config.processes)
+        pool = multiprocessing.Pool(data.collection.config.processes)
         pool.map(descriptor_extractor, data.collection.images())
 
     print 'Images processed'
