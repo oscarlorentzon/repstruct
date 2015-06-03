@@ -163,7 +163,10 @@ def plot_representative(image_dir, images, index_closest_group, index_representa
 
     space = im_dim / 10
     border = 2 * space
+
     k_space = (cols - 1) / (cols / 2. - 1) if cols > 2 else 1
+    k_cols = 1 if cols < 2 else cols / 2
+    k_dim = im_dim if cols < 2 else 2 * im_dim
 
     r_a = math.ceil(len(images) / float(cols))
     h_a = r_a * im_dim + (r_a - 1) * space + 2 * border
@@ -171,15 +174,15 @@ def plot_representative(image_dir, images, index_closest_group, index_representa
     r_t = math.ceil(len(index_closest_group) / float(cols))
     h_t = r_t * im_dim + (r_t - 1) * space + 2 * border
 
-    r_f = math.ceil(len(index_representative) / float(cols / 2))
-    h_f = r_f * 2 * im_dim + (r_f - 1) * k_space * space + 2 * border
+    r_f = math.ceil(len(index_representative) / float(k_cols))
+    h_f = r_f * k_dim + (r_f - 1) * k_space * space + 2 * border
 
     w = cols * im_dim + (cols - 1) * space + 2 * border
     h = h_a + space + h_t + space + h_f
 
     background = 255 * np.ones((h, w, 3), np.uint8)
-    background[h_a+1:h_a+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
-    background[h_a+space+h_t+1:h_a+space+h_t+space+1, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
+    background[h_a+.5:h_a+space+.5, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
+    background[h_a+space+h_t+.5:h_a+space+h_t+space+.5, border:w-border, :] = np.zeros((space, w-2*border, 3), np.uint8)
 
     for index, image in enumerate(images):
         im = load_image(image, image_dir, im_dim)
@@ -192,8 +195,8 @@ def plot_representative(image_dir, images, index_closest_group, index_representa
         insert_image(background, im, col, row)
 
     for index, image in enumerate(np.array(images)[index_representative]):
-        im = load_image(image, image_dir, 2 * im_dim)
-        row, col = get_row_col(index, h_a + space + h_t + space, 2 * im_dim, k_space * space, border, cols / 2)
+        im = load_image(image, image_dir, k_dim)
+        row, col = get_row_col(index, h_a + space + h_t + space, k_dim, k_space * space, border, k_cols)
         insert_image(background, im, col, row)
 
     if save_path is not None:
