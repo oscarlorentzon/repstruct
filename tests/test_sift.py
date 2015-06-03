@@ -77,7 +77,11 @@ class TestSift(unittest.TestCase):
         self.assertEqual(0, sift_instance.call_count)
         self.assertEqual(1, pool_instance.map.call_count)
 
-    def testSiftExtractor(self):
+    @patch('os.remove')
+    @patch('cv2.imread')
+    def testSiftExtractor(self, imread_mock, remove_mock):
+
+
         feature_data = FeatureDataSet(None, None)
         feature_data.save = Mock()
 
@@ -90,7 +94,7 @@ class TestSift(unittest.TestCase):
         box_high = im_size/2+box_size/2
         im = np.zeros((im_size, im_size), np.uint8)
         im[box_low:box_high, box_low:box_high] = 255 * np.ones((box_size, box_size), np.uint8)
-        cv2.imread = Mock(return_value=im)
+        imread_mock.return_value = im
 
         extractor = sift.SiftExtractor(feature_data, collection_data)
 
@@ -106,6 +110,22 @@ class TestSift(unittest.TestCase):
         self.assertEqual(im_name, call_args[0])
         self.assertSequenceEqual(locations, list(call_args[1][0]))
         self.assertSequenceEqual(list(descriptors), list(call_args[2][0]))
+
+        self.assertEqual(0, remove_mock.call_count)
+
+    @patch('os.remove')
+    @patch('cv2.imread')
+    def testSiftExtractorCorruptImage(self, imread_mock, remove_mock):
+        imread_mock.return_value = None
+
+        collection_data = CollectionDataSet(None, None)
+        collection_data._path = 'path'
+
+        extractor = sift.SiftExtractor(None, collection_data)
+        im_name = 'im_name'
+        extractor(im_name)
+
+        self.assertEqual(1, remove_mock.call_count)
 
 
 if __name__ == '__main__':

@@ -25,6 +25,13 @@ class SiftExtractor:
         """
 
         im = cv2.imread(os.path.join(self.__collection_data.path, image), cv2.IMREAD_GRAYSCALE)
+
+        if im is None:
+            # Image is corrupt. Delete the image file.
+            print 'Removing corrupt image {0}'.format(image)
+            os.remove(os.path.join(self.__collection_data.path, image))
+            return
+
         locations, descriptors = extract_sift_features(im, self.__feature_data.config.edge_threshold,
                                                        self.__feature_data.config.peak_threshold)
 
