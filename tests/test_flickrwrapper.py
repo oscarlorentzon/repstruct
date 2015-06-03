@@ -52,7 +52,8 @@ class TestFlickrWrapper(unittest.TestCase):
         self.assertTrue('secret2' in result[1])
         self.assertTrue('server2' in result[1])
 
-    def testFlickrWrapperDownload(self):
+    @patch('urllib.urlretrieve')
+    def testFlickrWrapperDownload(self, retrieve_mock):
 
         data = DataSet('tag')
         data.collection = PropertyMock()
@@ -67,7 +68,7 @@ class TestFlickrWrapper(unittest.TestCase):
         wrapper = FlickrWrapper(api_key)
         wrapper.get_urls = Mock(return_value=urls)
 
-        urllib.urlretrieve = Mock(return_value=0)
+        retrieve_mock.return_value = 0
 
         with patch('multiprocessing.Pool') as mock:
             instance = mock.return_value
@@ -80,7 +81,8 @@ class TestFlickrWrapper(unittest.TestCase):
 
         wrapper.get_urls.assert_called_with(data.tag, data.collection.config.count, sort_mode)
 
-    def testFlickrWrapperDownloadPool(self):
+    @patch('urllib.urlretrieve')
+    def testFlickrWrapperDownloadPool(self, retrieve_mock):
 
         data = DataSet('tag')
         data.collection = PropertyMock()
@@ -95,7 +97,7 @@ class TestFlickrWrapper(unittest.TestCase):
         wrapper = FlickrWrapper(api_key)
         wrapper.get_urls = Mock(return_value=urls)
 
-        urllib.urlretrieve = Mock(return_value=0)
+        retrieve_mock.return_value = 0
 
         with patch('multiprocessing.Pool') as mock:
             instance = mock.return_value

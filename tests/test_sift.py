@@ -79,8 +79,6 @@ class TestSift(unittest.TestCase):
     @patch('os.remove')
     @patch('cv2.imread')
     def testSiftExtractor(self, imread_mock, remove_mock):
-
-
         feature_data = FeatureDataSet(None, None)
         feature_data.save = Mock()
 
