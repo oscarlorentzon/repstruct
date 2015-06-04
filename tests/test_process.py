@@ -181,8 +181,31 @@ class TestProcess(unittest.TestCase):
                                           data.pca.config.neutral_factor)
         self.assertEqual(0, proc_feat_mock.call_count)
 
+    @patch('repstruct.analysis.pca.neutral_sub_pca_vector')
+    @patch('repstruct.analysis.process.create_neutral_vector')
+    def testProcessCombinedFeatures(self, neut_mock, pca_mock):
+        neut_mock.return_value = 1
+        pca_mock.return_value = ('proj', 'comp')
 
+        descriptors = np.ones((1, 5))
+        descriptors = descriptors / np.linalg.norm(descriptors)
+        descriptor_colors = np.ones((1, 6))
+        descriptor_colors = descriptor_colors / np.linalg.norm(descriptor_colors)
+        random_colors = np.ones((1, 7))
+        random_colors = random_colors / np.linalg.norm(random_colors)
+        descriptor_weight = 0.5
+        neutral_factor = 3
 
+        process.process_combined_features(descriptors, descriptor_colors, random_colors,
+                                          descriptor_weight, neutral_factor)
+
+        neut_call_args = neut_mock.call_args[0]
+        weight_sum = np.sum(neut_call_args[0][:, 1])
+        self.assertLess(np.abs(weight_sum - 1), 0.00000001)
+
+        pca_call_args = pca_mock.call_args[0]
+        features_norm = np.linalg.norm(pca_call_args[0])
+        self.assertLess(np.abs(features_norm - 1), 0.00000001)
 
 
 if __name__ == '__main__':
