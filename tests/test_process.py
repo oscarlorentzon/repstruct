@@ -207,6 +207,38 @@ class TestProcess(unittest.TestCase):
         features_norm = np.linalg.norm(pca_call_args[0])
         self.assertLess(np.abs(features_norm - 1), 0.00000001)
 
+    @patch('repstruct.analysis.kclosest.k_closest')
+    def testClosest(self, close_mock):
+        images = np.array([str(i) for i in range(0, 10)])
+        pc_projections = np.ones((10, 3))
+
+        data = dataset.DataSet('tag')
+        data.pca.load = Mock(return_value=(images, pc_projections, 'components'))
+        data.analysis = PropertyMock()
+        data.analysis.config = PropertyMock()
+        data.analysis.config.pc_projection_count = 2
+        data.analysis.config.closest_group = 0.4
+        data.analysis.config.representative = 0.1
+        data.analysis.save_closest = Mock()
+
+        closest_result = np.arange(0, int(data.analysis.config.closest_group * len(images)))
+        representative_result = np.arange(0, int(data.analysis.config.representative * len(images)))
+        close_mock.side_effect = [closest_result, representative_result]
+
+        process.closest(data)
+
+        call_args1 = close_mock.call_args_list[0][0]
+
+        self.assertEqual(len(closest_result), call_args1[0])
+        self.assertEqual(len(images), call_args1[1].shape[0])
+        self.assertEqual(data.analysis.config.pc_projection_count, call_args1[1].shape[1])
+
+        call_args2 = close_mock.call_args_list[1][0]
+
+        self.assertEqual(len(representative_result), call_args2[0])
+        self.assertEqual(len(closest_result), call_args2[1].shape[0])
+        self.assertEqual(data.analysis.config.pc_projection_count, call_args1[1].shape[1])
+
 
 if __name__ == '__main__':
     unittest.main()
