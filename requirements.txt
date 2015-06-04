@@ -1,0 +1,7 @@
+numpy
+scipy
+pyyaml
+enum34
+setuptools
+mock
+nose

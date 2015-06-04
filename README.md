@@ -25,7 +25,7 @@ To view additional bundler options run the bundler with the -h flag:
 [![Coverage Status](https://coveralls.io/repos/oscarlorentzon/repstruct/badge.svg?branch=master)](https://coveralls.io/r/oscarlorentzon/repstruct?branch=master)
 
 ## Dependencies
-You need to have Python 2.7+ and the following libraries:
+You need to have Python 2.7+ and the following libraries to run the algorithm:
 
 * [OpenCV][]
 * [SciPy][]
@@ -34,16 +34,20 @@ You need to have Python 2.7+ and the following libraries:
 * [Enum34][]
 * [PyYAML][]
 
+The following libraries are required to run the tests:
+
+* [Setuptools][]
+* [Mock][]
+* [Nose][]
+
 ### Installing dependencies on Ubuntu
 
 1. [OpenCV][] - Install by following the steps in the Ubuntu OpenCV [installation guide](https://help.ubuntu.com/community/OpenCV).
 
-2. [NumPy][], [SciPy][], [PyYAML][], [Enum34][] and [Matplotlib][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
+2. [NumPy][], [SciPy][], [PyYAML][], [Enum34][], [Setuptools][], [Mock][], [Nose][] and [Matplotlib][] - Install [pip](https://pypi.python.org/pypi/pip) and run:
 
-        sudo pip install numpy
         sudo apt-get install gfortran
-        sudo pip install scipy
-        sudo pip install pyyaml enum34
+        sudo pip install -r requirements.txt
         sudo apt-get install python-matplotlib
 
 ## Example output
@@ -66,3 +70,6 @@ The third output image shows the result for finding all structures ordered accor
 [Matplotlib]: http://matplotlib.sourceforge.net (Plotting in python)
 [Enum34]: https://pypi.python.org/pypi/enum34 (Enum support in python 2.*)
 [PyYAML]: http://pyyaml.org/ (YAML implementations for Python)
+[Setuptools]: http://pythonhosted.org/setuptools/ (Python project packaging)
+[Mock]: http://www.voidspace.org.uk/python/mock/ (Mocking and testing library)
+[Nose]: https://nose.readthedocs.org/en/latest/ (Unit test extensions)
