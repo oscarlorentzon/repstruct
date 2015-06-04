@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 trash=tags/trash/$1/`date -u +"%Y-%m-%dT%H:%M:%SZ"`
-mkdir -p $trash
+mkdir -vp $trash
 
 mv -vf tags/$1/images $trash
 mv -vf tags/$1/features $trash
@@ -9,4 +9,4 @@ mv -vf tags/$1/descriptors $trash
 mv -vf tags/$1/results $trash
 mv -vf tags/$1/plots $trash
 
-rm -rf tags/$1
+rm -rvf tags/$1
