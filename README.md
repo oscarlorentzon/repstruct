@@ -9,15 +9,15 @@ To be able to download images from [Flickr](https://www.flickr.com/) an API key 
 
 The rsbundler file can be run from the command line in the following way:
 
-	bin/rsbundler TAG -a FLICKR_API_KEY
+	bin/run TAG -a FLICKR_API_KEY
 
 The API key can also be provided by adding a text file called flickr_key.txt with the API key in the root of the project. Then the bundler can be run as follows:
 
-	bin/rsbundler TAG
+	bin/run TAG
 
 To view additional bundler options run the bundler with the -h flag:
 	
-	bin/rsbundler -h
+	bin/run -h
 	
 ## Continuous integration
 
